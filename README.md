@@ -1,9 +1,9 @@
 # Laravel 8 SNS Broadcaster
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/pod-point/laravel-sns-broadcast-driver.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-sns-broadcast-driver)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/pod-point/laravel-sns-broadcast-driver/run-tests?label=tests)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/pod-point/laravel-sns-broadcaster.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-sns-broadcaster)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/pod-point/laravel-sns-broadcaster/run-tests?label=tests)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Total Downloads](https://img.shields.io/packagist/dt/pod-point/laravel-sns-broadcast-driver.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-sns-broadcast-driver)
+[![Total Downloads](https://img.shields.io/packagist/dt/pod-point/laravel-sns-broadcaster.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-sns-broadcaster)
 
 This package adds support for broadcasting events via SNS (Simple Notification Service).
 
@@ -249,7 +249,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 - [laravel-sns-broadcaster](https://github.com/maxgaurav/laravel-sns-broadcaster) for some inspiration
 - [Laravel Package Development](https://laravelpackage.com) documentation by [John Braun](https://github.com/Jhnbrn90)
 - [Pod Point](https://github.com/pod-point)
-- [All Contributors](https://github.com/pod-point/laravel-sns-broadcast-driver/graphs/contributors)
+- [All Contributors](https://github.com/pod-point/laravel-sns-broadcaster/graphs/contributors)
 
 ## License
 
