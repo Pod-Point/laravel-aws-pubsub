@@ -12,12 +12,12 @@ class UserRetrievedWithCustomPayload implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public string $action = 'RETRIEVED';
+    public $action = 'RETRIEVED';
 
     /**
      * @var User
      */
-    public User $user;
+    public $user;
 
     /**
      * Create a new event instance.

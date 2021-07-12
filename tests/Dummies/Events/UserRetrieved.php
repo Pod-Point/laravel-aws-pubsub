@@ -19,7 +19,7 @@ class UserRetrieved implements ShouldBroadcast
     /**
      * @var User
      */
-    public User $user;
+    public $user;
 
     /**
      * Create a new event instance.
