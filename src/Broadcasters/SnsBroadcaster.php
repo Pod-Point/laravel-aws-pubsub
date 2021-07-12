@@ -11,12 +11,12 @@ class SnsBroadcaster extends Broadcaster
     /**
      * @var SnsClient
      */
-    protected SnsClient $snsClient;
+    protected $snsClient;
 
     /**
      * @var string
      */
-    protected string $arnPrefix;
+    protected $arnPrefix;
 
     /**
      * SnsBroadcaster constructor.
