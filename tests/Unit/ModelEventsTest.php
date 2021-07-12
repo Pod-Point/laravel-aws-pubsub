@@ -5,9 +5,9 @@ namespace PodPoint\SnsBroadcaster\Tests\Unit;
 use Aws\Sns\SnsClient;
 use Mockery;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEvents;
-use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEventsWithBroadcastEvents;
-use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEventsWithBroadcastWith;
-use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEventsWithBroadcastWithAndBroadcastEvents;
+use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEventsForSpecificEvents;
+use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEventsWithCustomPayload;
+use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEventsWithCustomPayloadForSpecificEvents;
 use PodPoint\SnsBroadcaster\Tests\TestCase;
 
 class ModelEventsTest extends TestCase
@@ -60,7 +60,7 @@ class ModelEventsTest extends TestCase
                 && $message['data']['foo'] == 'bar';
         }));
 
-        UserWithBroadcastingEventsWithBroadcastWith::create($userData);
+        UserWithBroadcastingEventsWithCustomPayload::create($userData);
     }
 
     /** @test */
@@ -70,7 +70,7 @@ class ModelEventsTest extends TestCase
 
         $this->app->instance(SnsClient::class, $mocked);
 
-        $user = UserWithBroadcastingEventsWithBroadcastEvents::create([
+        $user = UserWithBroadcastingEventsForSpecificEvents::create([
             'name' => 'Foo Bar',
             'email' => 'model-event-3@email.com',
             'password' => 'password',
@@ -96,7 +96,7 @@ class ModelEventsTest extends TestCase
 
         $mocked->shouldNotHaveReceived('publish');
 
-        $user = UserWithBroadcastingEventsWithBroadcastEvents::create([
+        $user = UserWithBroadcastingEventsForSpecificEvents::create([
             'name' => 'Foo Bar',
             'email' => 'model-event-4@email.com',
             'password' => 'password',
@@ -112,7 +112,7 @@ class ModelEventsTest extends TestCase
 
         $this->app->instance(SnsClient::class, $mocked);
 
-        $user = UserWithBroadcastingEventsWithBroadcastWithAndBroadcastEvents::create([
+        $user = UserWithBroadcastingEventsWithCustomPayloadForSpecificEvents::create([
             'name' => 'Foo Bar',
             'email' => 'model-event-5@email.com',
             'password' => 'password',

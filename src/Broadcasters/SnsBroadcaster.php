@@ -34,8 +34,9 @@ class SnsBroadcaster extends Broadcaster
      * @param  array  $channels
      * @param $event
      * @param  array  $payload
+     * @return void
      */
-    public function broadcast(array $channels, $event, array $payload = [])
+    public function broadcast(array $channels, $event, array $payload = []): void
     {
         $this->snsClient->publish([
             'TopicArn' => $this->topicName($channels),

@@ -5,7 +5,7 @@ namespace PodPoint\SnsBroadcaster\Tests\Unit;
 use Aws\Sns\SnsClient;
 use Mockery;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Events\UserRetrieved;
-use PodPoint\SnsBroadcaster\Tests\Dummies\Events\UserRetrievedWithBroadcastWith;
+use PodPoint\SnsBroadcaster\Tests\Dummies\Events\UserRetrievedWithCustomPayload;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Models\User;
 use PodPoint\SnsBroadcaster\Tests\TestCase;
 
@@ -63,6 +63,6 @@ class CustomEventsTest extends TestCase
                 && $message['data']['foo'] == 'baz';
         }));
 
-        event(new UserRetrievedWithBroadcastWith($user));
+        event(new UserRetrievedWithCustomPayload($user));
     }
 }

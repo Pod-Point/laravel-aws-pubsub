@@ -5,7 +5,7 @@ namespace PodPoint\SnsBroadcaster\Tests\Dummies\Models;
 use Illuminate\Database\Eloquent\Model;
 use PodPoint\SnsBroadcaster\BroadcastsEvents;
 
-class UserWithBroadcastingEventsWithBroadcastEvents extends Model
+class UserWithBroadcastingEventsForSpecificEvents extends Model
 {
     use BroadcastsEvents;
 

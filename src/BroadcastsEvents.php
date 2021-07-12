@@ -42,7 +42,7 @@ trait BroadcastsEvents
      * @param  mixed  $channels
      * @return \Illuminate\Broadcasting\PendingBroadcast|null|void
      */
-    protected function broadcastIfBroadcastChannelsExistForEvent($instance, $event, $channels = null)
+    protected function broadcastIfBroadcastChannelsExistForEvent($instance, string $event, $channels = null)
     {
         if (in_array($event, $this->broadcastEvents())) {
             return $this->eloquentBroadcastIfBroadcastChannelsExistForEvent($instance, $event, $channels);
@@ -54,7 +54,7 @@ trait BroadcastsEvents
      *
      * @return array
      */
-    public function broadcastEvents()
+    public function broadcastEvents(): array
     {
         return ['created', 'updated', 'trashed', 'restored', 'deleted'];
     }

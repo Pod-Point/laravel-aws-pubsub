@@ -5,7 +5,7 @@ namespace PodPoint\SnsBroadcaster\Tests\Dummies\Models;
 use Illuminate\Database\Eloquent\Model;
 use PodPoint\SnsBroadcaster\BroadcastsEvents;
 
-class UserWithBroadcastingEventsWithBroadcastWith extends Model
+class UserWithBroadcastingEventsWithCustomPayloadForSpecificEvents extends Model
 {
     use BroadcastsEvents;
 
@@ -19,6 +19,16 @@ class UserWithBroadcastingEventsWithBroadcastWith extends Model
     }
 
     /**
+     * Get the events to broadcast to.
+     *
+     * @return array
+     */
+    public function broadcastEvents()
+    {
+        return ['updated'];
+    }
+
+    /**
      * Get and format the data to broadcast.
      *
      * @return array
@@ -29,7 +39,7 @@ class UserWithBroadcastingEventsWithBroadcastWith extends Model
             'action' => $event,
             'data' => [
                 'user' => $this,
-                'foo' => 'bar',
+                'foo' => 'baz',
             ],
         ];
     }
