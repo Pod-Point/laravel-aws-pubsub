@@ -5,7 +5,7 @@
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Total Downloads](https://img.shields.io/packagist/dt/pod-point/laravel-sns-broadcaster.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-sns-broadcaster)
 
-Similar to [Pusher](https://laravel.com/docs/master/broadcasting#pusher-channels), this package provides a Laravel [Broadcasting](https://laravel.com/docs/master/broadcasting) driver for AWS SNS (Simple Notification Service).
+Similar to [Pusher](https://laravel.com/docs/master/broadcasting#pusher-channels), this package provides a [Laravel Broadcasting](https://laravel.com/docs/master/broadcasting) driver for [AWS SNS](https://aws.amazon.com/sns/) (Simple Notification Service).
 
 In this context, "channels" can be assimilated to "topics" on SNS.
 
