@@ -13,7 +13,7 @@ We believe this approach of leveraging broadcasting makes sense for a Pub/Sub ar
 
 ## Installation
 
-You can install the package via composer:
+You can install the package on a Laravel 8+ application via composer:
 
 ```bash
 composer require pod-point/laravel-sns-broadcaster:^0.1
