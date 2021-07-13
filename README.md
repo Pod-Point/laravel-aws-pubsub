@@ -9,7 +9,7 @@ Similar to [Pusher](https://laravel.com/docs/master/broadcasting#pusher-channels
 
 In this context, "channels" can be assimilated to "topics" on SNS.
 
-We believe this approach of leveraging broadcasting makes sense for a Pub/Sub architecture where an application would like to publish an event to the outside world about something that just happened.
+We believe this approach of leveraging broadcasting makes sense for a Pub/Sub architecture where an application would like to broadcast an event to the outside world about something that just happened.
 
 ## Installation
 
