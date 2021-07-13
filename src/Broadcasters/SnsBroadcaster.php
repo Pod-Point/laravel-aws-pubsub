@@ -31,9 +31,9 @@ class SnsBroadcaster extends Broadcaster
 
     /**
      * @inheritDoc
-     * @param array  $channels
+     * @param array $channels
      * @param string $event
-     * @param array  $payload
+     * @param array $payload
      * @return void
      */
     public function broadcast(array $channels, $event, array $payload = []): void

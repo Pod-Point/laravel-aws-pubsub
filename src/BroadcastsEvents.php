@@ -37,9 +37,9 @@ trait BroadcastsEvents
     /**
      * Broadcast the given event instance if channels are configured for the model event.
      *
-     * @param mixed  $instance
-     * @param string  $event
-     * @param mixed  $channels
+     * @param mixed $instance
+     * @param string $event
+     * @param mixed $channels
      * @return \Illuminate\Broadcasting\PendingBroadcast|null|void
      */
     protected function broadcastIfBroadcastChannelsExistForEvent($instance, string $event, $channels = null)
