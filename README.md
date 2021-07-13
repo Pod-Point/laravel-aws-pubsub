@@ -1,9 +1,9 @@
-# Laravel SNS Broadcaster
+# Laravel 8 SNS Broadcaster
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/pod-point/laravel-sns-broadcast-driver.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-sns-broadcast-driver)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/pod-point/laravel-sns-broadcast-driver/run-tests?label=tests)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/pod-point/laravel-sns-broadcaster.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-sns-broadcaster)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/pod-point/laravel-sns-broadcaster/run-tests?label=tests)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Total Downloads](https://img.shields.io/packagist/dt/pod-point/laravel-sns-broadcast-driver.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-sns-broadcast-driver)
+[![Total Downloads](https://img.shields.io/packagist/dt/pod-point/laravel-sns-broadcaster.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-sns-broadcaster)
 
 This package adds support for broadcasting events via SNS (Simple Notification Service).
 
@@ -27,7 +27,7 @@ Add the sns driver to `config/broadcasting.php` in the `connections` array:
 ],
 ```
 
-Update the `.env` to use the driver and add the AWS values:
+Update your `.env` to use the driver and add the AWS values:
 
 ```dotenv
 BROADCAST_DRIVER=sns
@@ -74,7 +74,7 @@ public function broadcastOn($event)
 
 By default, the package will publish the default Laravel payload, but you can transform the data that is published by transforming the data using `broadcastWith`.
 
-Here you, can define exactly what payload gets published.
+Here you can define exactly what payload gets published.
 
 The `broadcastWith()` method receives an `$event` parameter that specifies the type of action performed, e.g. created.
 
@@ -98,11 +98,11 @@ public function broadcastWith($event)
 
 #### Defining which actions are publishable
 
-By default, the following actions performed on a Model will be published: 
+By default, the following actions performed on a Model will be published:
 
-`created`, `updated`, `deleted` and if soft delete is enabled, `trashed`, `restored`.
+`created`, `updated`, `deleted` and if soft delete is enabled: `trashed`, `restored`.
 
-To only publish specific actions from the list above, add a `broadcastEvents` method the model and define an array of the publishable actions:
+To only publish specific actions from the list above, add a `broadcastEvents` method to the model and define an array of the publishable actions:
 
 ```injectablephp
 /**
@@ -116,7 +116,7 @@ public function broadcastEvents()
 }
 ```
 
-Now, only the created and updated events for this Model will be published.
+Now only the created and updated events for this Model will be published.
 
 ### Custom Events
 
@@ -146,6 +146,7 @@ public function broadcastOn()
 ```
 
 #### Customizing the published data
+
 By default, all public properties on the Event will be added to the payload that is published.
 
 Unlike a Model Event, you will need to manually set an action as a public property to the Event if you wish to see it in the payload.
@@ -246,9 +247,9 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 ## Credits
 
 - [laravel-sns-broadcaster](https://github.com/maxgaurav/laravel-sns-broadcaster) for some inspiration
-- [Laravel Package Development](https://laravelpackage.com) documentation by [John Braun](https://github.com/Jhnbrn90) 
+- [Laravel Package Development](https://laravelpackage.com) documentation by [John Braun](https://github.com/Jhnbrn90)
 - [Pod Point](https://github.com/pod-point)
-- [All Contributors](https://github.com/pod-point/laravel-sns-broadcast-driver/graphs/contributors)
+- [All Contributors](https://github.com/pod-point/laravel-sns-broadcaster/graphs/contributors)
 
 ## License
 

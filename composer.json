@@ -2,7 +2,7 @@
     "name": "pod-point/laravel-sns-broadcaster",
     "description": "A broadcast driver that allows broadcast events to be published to SNS.",
     "keywords": ["laravel", "sns", "broadcast"],
-    "homepage": "https://github.com/pod-point/laravel-sns-broadcast-driver",
+    "homepage": "https://github.com/pod-point/laravel-sns-broadcaster",
     "license": "MIT",
     "authors": [
         {
@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "php": "^7.4|^8.0",
+        "php": "^7.3|^8.0",
         "ext-json": "*",
         "illuminate/support": "^8.0",
         "aws/aws-sdk-php-laravel": "^3.6"

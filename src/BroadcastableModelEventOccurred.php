@@ -11,7 +11,7 @@ class BroadcastableModelEventOccurred extends EloquentBroadcastableModelEventOcc
      *
      * @return array
      */
-    public function broadcastWith()
+    public function broadcastWith(): array
     {
         return method_exists($this->model, 'broadcastWith') ? $this->model->broadcastWith($this->event) : [
             'model' => $this->model->toArray(),

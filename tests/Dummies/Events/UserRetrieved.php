@@ -12,14 +12,14 @@ class UserRetrieved implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public string $action = 'RETRIEVED';
+    public $action = 'RETRIEVED';
 
-    public string $foo = 'bar';
+    public $foo = 'bar';
 
     /**
      * @var User
      */
-    public User $user;
+    public $user;
 
     /**
      * Create a new event instance.

@@ -11,12 +11,12 @@ class SnsBroadcaster extends Broadcaster
     /**
      * @var SnsClient
      */
-    protected SnsClient $snsClient;
+    protected $snsClient;
 
     /**
      * @var string
      */
-    protected string $arnPrefix;
+    protected $arnPrefix;
 
     /**
      * SnsBroadcaster constructor.
@@ -31,11 +31,12 @@ class SnsBroadcaster extends Broadcaster
 
     /**
      * @inheritDoc
-     * @param  array  $channels
-     * @param $event
-     * @param  array  $payload
+     * @param array $channels
+     * @param string $event
+     * @param array $payload
+     * @return void
      */
-    public function broadcast(array $channels, $event, array $payload = [])
+    public function broadcast(array $channels, $event, array $payload = []): void
     {
         $this->snsClient->publish([
             'TopicArn' => $this->topicName($channels),

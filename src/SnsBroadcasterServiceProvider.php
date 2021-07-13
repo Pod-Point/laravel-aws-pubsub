@@ -17,7 +17,7 @@ class SnsBroadcasterServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->bind(EloquentBroadcastableModelEventOccurred::class, BroadcastableModelEventOccurred::class);
     }
@@ -28,7 +28,7 @@ class SnsBroadcasterServiceProvider extends ServiceProvider
      * @return void
      * @throws BindingResolutionException
      */
-    public function boot()
+    public function boot(): void
     {
         $this->app->singleton(SnsClient::class, function () {
             $config = [
