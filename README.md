@@ -172,7 +172,7 @@ public function broadcastWith()
 }
 ```
 
-Now, when the event is triggered, it will behave like a standard Laravel event, which means other Listners can listen to it, as usual, but it will also be broadcasted to the topic defined by the `broadcastOn` method using the payload defined by the `broadcastWith` method.
+Now, when the event is triggered, it will behave like a standard Laravel event, which means other Listeners can listen to it, as usual, but it will also be broadcasted to the topic defined by the `broadcastOn` method using the payload defined by the `broadcastWith` method.
 
 ### Broadcast Eloquent Model Events
 
@@ -200,7 +200,7 @@ In the context of broadcasting, only the following model events can be broadcast
 - `trashed` __if soft delete is enabled__
 - `restored` __if soft delete is enabled__
 
-By default, all of these events are broadcasted but you can define which events in particular you'd like to broadcast using the `broadcastEvents` method on the model itself:
+By default, all of these events are broadcasted, but you can define which events in particular you'd like to broadcast using the `broadcastEvents` method on the model itself:
 
 ```php
 /**
