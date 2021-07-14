@@ -1,112 +1,210 @@
-# Laravel 8 SNS Broadcaster
+# AWS SNS driver for Laravel Broadcasting
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/pod-point/laravel-sns-broadcaster.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-sns-broadcaster)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/pod-point/laravel-sns-broadcaster/run-tests?label=tests)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Total Downloads](https://img.shields.io/packagist/dt/pod-point/laravel-sns-broadcaster.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-sns-broadcaster)
 
-This package adds support for broadcasting events via SNS (Simple Notification Service).
+Similar to [Pusher](https://laravel.com/docs/master/broadcasting#pusher-channels), this package provides a [Laravel Broadcasting](https://laravel.com/docs/master/broadcasting) driver for [AWS SNS](https://aws.amazon.com/sns/) (Simple Notification Service).
+
+In this context, "channels" can be assimilated to "topics" on SNS.
+
+We believe this approach of leveraging broadcasting makes sense for a Pub/Sub architecture where an application would like to broadcast an event to the outside world about something that just happened.
 
 ## Installation
 
-You can install the package via composer:
+You can install the package on a Laravel 8+ application via composer:
 
 ```bash
 composer require pod-point/laravel-sns-broadcaster:^0.1
 ```
 
-Add the sns driver to `config/broadcasting.php` in the `connections` array:
+Next, you should add the following connection and configure your SNS credentials in the `config/broadcasting.php` configuration file:
 
 ```php
-'sns' => [
-    'driver' => 'sns',
-    'region' => env('AWS_DEFAULT_REGION'),
-    'key' => env('AWS_ACCESS_KEY_ID'),
-    'secret' => env('AWS_SECRET_ACCESS_KEY'),
-    'arn-prefix' => env('BROADCAST_TOPIC_ARN_PREFIX'),
+'connections' => [
+    // ...
+    'sns' => [
+        'driver' => 'sns',
+        'region' => env('AWS_DEFAULT_REGION'),
+        'key' => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'arn-prefix' => env('BROADCAST_TOPIC_ARN_PREFIX'),
+    ],
+    // ...
 ],
 ```
 
-Update your `.env` to use the driver and add the AWS values:
+Make sure to define your [environment variables](https://laravel.com/docs/master/configuration#environment-configuration) accordingly:
+
+```dotenv
+AWS_DEFAULT_REGION=you-region
+AWS_ACCESS_KEY_ID=your-aws-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret
+BROADCAST_TOPIC_ARN_PREFIX=arn:aws:sns:us-east-1:123456789: # up until your topic name
+```
+
+Next, you will need to change your broadcast driver to SNS in your `.env` file:
 
 ```dotenv
 BROADCAST_DRIVER=sns
-AWS_DEFAULT_REGION=eu-west-1
-AWS_ACCESS_KEY_ID=YOUR-AWS-KEY
-AWS_SECRET_ACCESS_KEY=YOUR-AWS-SECRET
-BROADCAST_TOPIC_ARN_PREFIX=arn:aws:sns:eu-east-1:123345666: #note the arn prefix contains colon
 ```
 
-Finally, to use broadcasting, enable `App\Providers\BroadcastServiceProvider::class` in `config/app.php` in the `providers` array.
+Finally, don't forget to enable the [Broadcast Service Provider](https://laravel.com/docs/master/broadcasting#broadcast-service-provider).
 
 ## Usage
 
-### Model Events
+Here we will simply re-use the power of Laravel Broadcasting, out of the box, with some minor additional functionalities for the Eloquent Model Events.
 
-To broadcast Model Events, first add the `PodPoint\SnsBroadcaster\BroadcastsEvents` trait to your Model.
+### Broadcast Events
 
-```injectablephp
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use PodPoint\SnsBroadcaster\BroadcastsEvents;
+Simply follow the default way of broadcasting Laravel events, explained in the [official documentation](https://laravel.com/docs/master/broadcasting#defining-broadcast-events).
 
-class User extends Authenticatable 
+In a similar way, you will have to make sure you're implementing the `Illuminate\Contracts\Broadcasting\ShouldBroadcast` interface and define which channel / topic you'd like to broadcast on.
+
+```php
+use App\Models\Order;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Queue\SerializesModels;
+
+class OrderShipped implements ShouldBroadcast
 {
-    use BroadcastsEvents;
+    use SerializesModels;
+
+    /**
+     * The order that was shipped.
+     *
+     * @var \App\Models\Order
+     */
+    public $order;
+
+    /**
+     * Create a new event instance.
+     *
+     * @param  \App\Models\Order  $order
+     * @return void
+     */
+    public function __construct(Order $order)
+    {
+        $this->order = $order;
+    }
+
+    /**
+     * Get the topics that model events should broadcast on.
+     *
+     * @return array
+     */
+    public function broadcastOn()
+    {
+        return ['orders']; // for the ARN 'arn:aws:sns:us-east-1:123456789:orders'
+    }
 }
 ```
 
-Next, add the topic to the `broadcastOn` method in the Model.
+#### The published payload
 
-```injectablephp
-/**
- * Get the channels that model events should broadcast on.
- *
- * @param string $event
- * @return array
- */
-public function broadcastOn($event)
+By default, the package will publish the default Laravel payload which is already used when broadcasting an Event. Once published, its JSON representation looks like this:
+
+```json
 {
-    return ['users'];
+    "order": {
+        "id": 1,
+        "name": "Some Goods",
+        "total": 123456,
+        "created_at": "2021-06-29T13:21:36.000000Z",
+        "updated_at": "2021-06-29T13:21:36.000000Z"
+    },
+    "connection": null,
+    "queue": null
 }
 ```
 
-#### Customizing the published data
+By default, Laravel will automatically add any additional public property to the payload:
 
-By default, the package will publish the default Laravel payload, but you can transform the data that is published by transforming the data using `broadcastWith`.
+```php
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Queue\SerializesModels;
 
-Here you can define exactly what payload gets published.
+class OrderShipped implements ShouldBroadcast
+{
+    use SerializesModels;
 
-The `broadcastWith()` method receives an `$event` parameter that specifies the type of action performed, e.g. created.
+    public $action = 'parcel_collected';
 
-```injectablephp
+    // ...
+}
+```
+
+Which would produce the following payload:
+
+```json
+{
+    "action": "parcel_collected",
+    "order": {
+        "id": 1,
+        "name": "Some Goods",
+        "total": 123456,
+        "created_at": "2021-06-29T13:21:36.000000Z",
+        "updated_at": "2021-06-29T13:21:36.000000Z"
+    },
+    "connection": null,
+    "queue": null
+}
+```
+
+However, using the `broadcastWith` method, you will be able to define exactly what kind of payload gets published.
+
+```php
 /**
  * Get and format the data to broadcast.
  *
  * @return array
  */
-public function broadcastWith($event)
+public function broadcastWith()
 {
     return [
-        'action' => $event,
+        'action' => 'parcel_collected',
         'data' => [
-            'user' => $this,
-            'foo' => 'bar',
+            'order-id' => $this->order->id,
+            'order-total' => $this->order->total,
         ],
     ];
 }
 ```
 
-#### Defining which actions are publishable
+Now, when the event is triggered, it will behave like a standard Laravel event, which means other Listeners can listen to it, as usual, but it will also be broadcasted to the topic defined by the `broadcastOn` method using the payload defined by the `broadcastWith` method.
 
-By default, the following actions performed on a Model will be published:
+### Broadcast Eloquent Model Events
 
-`created`, `updated`, `deleted` and if soft delete is enabled: `trashed`, `restored`.
+If you're familiar with [Model Observers](https://laravel.com/docs/master/eloquent#observers), you already know that Eloquent models dispatch several events during their lifecycle.
 
-To only publish specific actions from the list above, add a `broadcastEvents` method to the model and define an array of the publishable actions:
+In order to broadcast the model events, you need to use the `PodPoint\SnsBroadcaster\BroadcastsEvents` trait on your Model.
 
-```injectablephp
+```php
+use Illuminate\Database\Eloquent\Model;
+use PodPoint\SnsBroadcaster\BroadcastsEvents;
+
+class Order extends Model
+{
+    use BroadcastsEvents;
+}
+```
+
+#### The Events
+
+In the context of broadcasting, only the following model events can be broadcasted:
+
+- `created`
+- `updated`
+- `deleted`
+- `trashed` __if soft delete is enabled__
+- `restored` __if soft delete is enabled__
+
+By default, all of these events are broadcasted, but you can define which events in particular you'd like to broadcast using the `broadcastEvents` method on the model itself:
+
+```php
 /**
- * Get the events to broadcast to.
+ * Define the model events to broadcast.
  *
  * @return array
  */
@@ -116,117 +214,65 @@ public function broadcastEvents()
 }
 ```
 
-Now only the created and updated events for this Model will be published.
+Now only the `created` and `updated` events for this Model will be published.
 
-### Custom Events
+#### The Channels / Topics
 
-To broadcast any other custom event, add the `ShouldBroadcast` trait to the Event.
+Next, in a similar fashion to what you're used to with Laravel, specify the channel/topic you'd like to use within the `broadcastOn` method on the model.
 
-```injectablephp
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+The `broadcastOn()` method receives an `$event` argument that holds the event name as a string, e.g. `created`.
 
-class UserRegistered implements ShouldBroadcast {
-       
-}
-```
-
-Next, add the topic to the `broadcastOn` method in the Event.
-
-```injectablephp
+```php
 /**
  * Get the channels that model events should broadcast on.
  *
  * @param string $event
  * @return array
  */
-public function broadcastOn()
+public function broadcastOn($event)
 {
-    return ['users'];
+    return ['orders'];
 }
 ```
 
-#### Customizing the published data
+#### The published payload
 
-By default, all public properties on the Event will be added to the payload that is published.
+By default, the package will publish the default Laravel payload which is already used when broadcasting an Event. Once published, its JSON representation looks like this:
 
-Unlike a Model Event, you will need to manually set an action as a public property to the Event if you wish to see it in the payload.
-
-```injectablephp
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
-
-class UserRetrieved implements ShouldBroadcast
+```json
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    public $action = 'registered';
+    "model": {
+        "id": 1,
+        "name": "Some Goods",
+        "total": 123456,
+        "created_at": "2021-06-29T13:21:36.000000Z",
+        "updated_at": "2021-06-29T13:21:36.000000Z"
+    },
+    "connection": null,
+    "queue": null
 }
 ```
 
-However, you can transform the data that is published by transforming the data using `broadcastWith`.
+However, using the `broadcastWith` method, you will be able to define exactly what kind of payload gets published.
 
-```injectablephp
-
-use App\Models\User;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
-
-class UserRetrieved implements ShouldBroadcast {
-
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-    
-    public $action = 'registered';
-    
-    /**
-     * @var User
-     */
-    public $user;
-    
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
-    public function __construct(User $user)
-    {
-        $this->user = $user;
-    }
-    
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel|array
-     */
-    public function broadcastOn()
-    {
-        return ['users-local'];
-    }
-    
-    /**
-     * Get and format the data to broadcast.
-     *
-     * @return array
-     */
-    public function broadcastWith()
-    {
-        return [
-            'action' => $this->action,
-            'data' => [
-                'user' => $this->user,
-                'foo' => 'bar',
-            ],
-        ];
-    }
+```php
+/**
+ * Define and format the payload of data to broadcast.
+ *
+ * @param string $event
+ * @return array
+ */
+public function broadcastWith($event)
+{
+    return [
+        'action' => $event, // could be 'created', 'updated'...
+        'data' => [
+            'order-id' => $this->id,
+            'order-total' => $this->total,
+        ],
+    ];
 }
 ```
-
-Now, when the event is triggered, it will broadcast to the channel defined in the Event with the data defined in the `broadcastWith` method.
-
-An Event Listener will also receive the same payload when the Event has been fired.
 
 ## Testing
 
@@ -261,4 +307,4 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 Travel shouldn't damage the earth 🌍
 
-Made with ❤️ at [Pod Point](https://pod-point.com)
+Made with ❤️&nbsp;&nbsp;at [Pod Point](https://pod-point.com)
