@@ -13,10 +13,10 @@
     "require": {
         "php": "^7.3|^8.0",
         "ext-json": "*",
-        "illuminate/support": "^8.0"
+        "illuminate/support": "^8.0",
+        "aws/aws-sdk-php": "^3.155"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "^3.155",
         "orchestra/testbench": "^6.0"
     },
     "autoload": {
@@ -35,9 +35,6 @@
                 "PodPoint\\SnsBroadcaster\\SnsBroadcasterServiceProvider"
             ]
         }
-    },
-    "suggest": {
-        "aws/aws-sdk-php": "Required to use the SNS broadcasting driver (^3.155)."
     },
     "scripts": {
         "test": "vendor/bin/phpunit --colors=always",
