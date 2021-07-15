@@ -200,7 +200,7 @@ In the context of broadcasting, only the following model events can be broadcast
 - `trashed` __if soft delete is enabled__
 - `restored` __if soft delete is enabled__
 
-By default, all of these events are broadcasted but you can define which events in particular you'd like to broadcast using the `broadcastEvents` method on the model itself:
+By default, all of these events are broadcasted, but you can define which events in particular you'd like to broadcast using the `broadcastEvents` method on the model itself:
 
 ```php
 /**
