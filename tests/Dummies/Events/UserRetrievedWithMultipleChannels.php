@@ -8,11 +8,11 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Models\User;
 
-class UserRetrieved implements ShouldBroadcast
+class UserRetrievedWithMultipleChannels implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $foo = 'bar';
+    public $foo = 'bat';
 
     /**
      * @var User
@@ -36,6 +36,6 @@ class UserRetrieved implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return ['users'];
+        return ['users', 'customers'];
     }
 }

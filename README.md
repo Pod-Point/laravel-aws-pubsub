@@ -30,6 +30,7 @@ Next, you should add the following connection and configure your SNS credentials
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'arn-prefix' => env('BROADCAST_TOPIC_ARN_PREFIX'),
+        'arn-suffix' => env('BROADCAST_TOPIC_ARN_SUFFIX'),
     ],
     // ...
 ],
@@ -42,6 +43,12 @@ AWS_DEFAULT_REGION=you-region
 AWS_ACCESS_KEY_ID=your-aws-key
 AWS_SECRET_ACCESS_KEY=your-aws-secret
 BROADCAST_TOPIC_ARN_PREFIX=arn:aws:sns:us-east-1:123456789: # up until your topic name
+```
+
+The `arn-suffix` can be used to help manage SNS topics for different environments. It will be added to the end when constructing the full TopicARN. 
+
+```dotenv
+BROADCAST_TOPIC_ARN_SUFFIX=-local # optional
 ```
 
 Next, you will need to change your broadcast driver to SNS in your `.env` file:
@@ -174,6 +181,58 @@ public function broadcastWith()
 
 Now, when the event is triggered, it will behave like a standard Laravel event, which means other Listeners can listen to it, as usual, but it will also be broadcasted to the topic defined by the `broadcastOn` method using the payload defined by the `broadcastWith` method.
 
+#### Setting the Subject
+
+By default, the package will set the `Subject` in the following format: `{channel}.{event_class}` = `orders.order_shipped`
+
+You can override this by adding a public property named `$action`.
+
+```php
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Queue\SerializesModels;
+
+class OrderShipped implements ShouldBroadcast
+{
+    use SerializesModels;
+
+    public $action = 'parcel_collected';
+
+    /**
+     * Get the topics that model events should broadcast on.
+     *
+     * @return array
+     */
+    public function broadcastOn()
+    {
+        return ['orders']; // for the ARN 'arn:aws:sns:us-east-1:123456789:orders'
+    }
+}
+```
+
+This will set the Subject to `orders.order_shipped`
+
+If you are using `broadcastWith`, make sure to add the `action` to the output.
+
+```php
+/**
+ * Get and format the data to broadcast.
+ *
+ * @return array
+ */
+public function broadcastWith()
+{
+    return [
+        'action' => 'parcel_collected',
+        'data' => [
+            'order-id' => $this->order->id,
+            'order-total' => $this->order->total,
+        ],
+    ];
+}
+```
+
+The Subject for the above will be `orders.parcel_collected`. 
+
 ### Broadcast Eloquent Model Events
 
 If you're familiar with [Model Observers](https://laravel.com/docs/master/eloquent#observers), you already know that Eloquent models dispatch several events during their lifecycle.
@@ -273,6 +332,73 @@ public function broadcastWith($event)
     ];
 }
 ```
+
+#### Setting the Subject
+
+By default, the package will set the `Subject` in the following format: `{channel}.{event_class}` = `orders.order_shipped`
+
+You can override this by using `broadcastWith` and adding `action` to the output.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use PodPoint\SnsBroadcaster\BroadcastsEvents;
+
+class Order extends Model
+{
+    use BroadcastsEvents;
+    
+    /**
+     * Get the channels that model events should broadcast on.
+     *
+     * @param string $event
+     * @return array
+     */
+    public function broadcastOn($event)
+    {
+        return ['orders'];
+    }
+
+    /**
+     * Define and format the payload of data to broadcast.
+     *
+     * @param string $event
+     * @return array
+     */
+    public function broadcastWith($event)
+    {
+        return [
+            'action' => $event, // could be 'created', 'updated'...
+            'data' => [
+                'order-id' => $this->id,
+                'order-total' => $this->total,
+            ],
+        ];
+    }
+}
+```
+
+The Subject for the above will be `orders.created`.
+
+### Multiple Channels
+
+You can publish to multiple SNS topics by adding them to the `broadcastOn` array.
+
+```php
+/**
+ * Get the channels that model events should broadcast on.
+ *
+ * @param string $event
+ * @return array
+ */
+public function broadcastOn($event)
+{
+    return ['orders', 'installations'];
+}
+```
+
+The Subject for each publication will begin with the name of the channel e.g. `orders.order_created` and `installations.order_created`
+
+*Note: the `arn-prefix` and `arn-suffix` will be added to all channels*
 
 ## Testing
 

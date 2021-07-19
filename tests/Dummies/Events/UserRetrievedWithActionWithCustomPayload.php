@@ -8,11 +8,11 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Models\User;
 
-class UserRetrieved implements ShouldBroadcast
+class UserRetrievedWithActionWithCustomPayload implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $foo = 'bar';
+    public $action = 'retrieved';
 
     /**
      * @var User
@@ -37,5 +37,21 @@ class UserRetrieved implements ShouldBroadcast
     public function broadcastOn()
     {
         return ['users'];
+    }
+
+    /**
+     * Get and format the data to broadcast.
+     *
+     * @return array
+     */
+    public function broadcastWith()
+    {
+        return [
+            'action' => $this->action,
+            'data' => [
+                'user' => $this->user,
+                'foo' => 'baz',
+            ],
+        ];
     }
 }

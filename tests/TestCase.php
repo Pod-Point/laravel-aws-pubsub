@@ -41,6 +41,7 @@ abstract class TestCase extends Orchestra
             'key' => 'foo-bar',
             'secret' => 'foo-baz',
             'arn-prefix' => 'aws:arn:12345:',
+            'arn-suffix' => '-local',
         ]);
 
         $app['config']->set('database.default', 'testbench');

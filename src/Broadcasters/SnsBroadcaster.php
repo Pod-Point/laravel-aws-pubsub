@@ -5,6 +5,7 @@ namespace PodPoint\SnsBroadcaster\Broadcasters;
 use Aws\Sns\SnsClient;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class SnsBroadcaster extends Broadcaster
 {
@@ -19,14 +20,21 @@ class SnsBroadcaster extends Broadcaster
     protected $arnPrefix;
 
     /**
+     * @var string
+     */
+    protected $arnSuffix;
+
+    /**
      * SnsBroadcaster constructor.
      *
      * @param string $arnPrefix
+     * @param string $arnSuffix
      */
-    public function __construct(string $arnPrefix)
+    public function __construct(string $arnPrefix, string $arnSuffix)
     {
         $this->snsClient = app(SnsClient::class);
         $this->arnPrefix = $arnPrefix;
+        $this->arnSuffix = $arnSuffix;
     }
 
     /**
@@ -38,22 +46,41 @@ class SnsBroadcaster extends Broadcaster
      */
     public function broadcast(array $channels, $event, array $payload = []): void
     {
-        $this->snsClient->publish([
-            'TopicArn' => $this->topicName($channels),
-            'Message' => json_encode(Arr::except($payload, 'socket')),
-        ]);
+        foreach ($channels as $channel) {
+            $this->snsClient->publish([
+                'TopicArn' => $this->formatTopic($channel),
+                'Message' => json_encode(Arr::except($payload, 'socket')),
+                'Subject' => $this->formatSubject($channel, $event, $payload),
+            ]);
+        }
     }
 
     /**
-     * Returns topic name built for SNS.
+     * Format the Topic.
      *
-     * @param array $channels
-     *
+     * @param string $channel
      * @return string
      */
-    private function topicName(array $channels): string
+    protected function formatTopic(string $channel): string
     {
-        return $this->arnPrefix . Arr::first($channels);
+        return $this->arnPrefix . $channel . $this->arnSuffix;
+    }
+
+    /**
+     * Format the Subject name.
+     *
+     * @param string $channel
+     * @param string $event
+     * @param array $payload
+     * @return string
+     */
+    protected function formatSubject(string $channel, string $event, array $payload): string
+    {
+        $default = Str::snake(class_basename($event));
+
+        $action = Arr::get($payload, 'action', $default);
+
+        return Str::lower("{$channel}.{$action}");
     }
 
     /**
