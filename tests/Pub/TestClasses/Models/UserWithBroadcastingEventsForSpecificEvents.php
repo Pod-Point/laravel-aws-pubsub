@@ -10,12 +10,14 @@ class UserWithBroadcastingEventsForSpecificEvents extends User
 
     public function broadcastOn($event)
     {
-        return match ($event) {
-            'created' => [],
-            'updated' => ['users'],
-            'trashed' => [],
-            'restored' => [],
-            'deleted' => [],
-        };
+        switch ($event) {
+            case 'created':
+            case 'trashed':
+            case 'restored':
+            case 'deleted':
+                return [];
+            case 'updated':
+                return ['users'];
+        }
     }
 }
