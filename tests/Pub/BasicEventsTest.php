@@ -1,22 +1,22 @@
 <?php
 
-namespace PodPoint\SnsBroadcaster\Tests\Unit;
+namespace PodPoint\AwsPubSub\Tests\Pub;
 
 use Aws\Sns\SnsClient;
 use Mockery;
 use Mockery\MockInterface;
-use PodPoint\SnsBroadcaster\Tests\Dummies\Events\UserRetrieved;
-use PodPoint\SnsBroadcaster\Tests\Dummies\Events\UserRetrievedWithCustomName;
-use PodPoint\SnsBroadcaster\Tests\Dummies\Events\UserRetrievedWithCustomPayload;
-use PodPoint\SnsBroadcaster\Tests\Dummies\Events\UserRetrievedWithMultipleChannels;
-use PodPoint\SnsBroadcaster\Tests\Dummies\Events\UserRetrievedWithPublicProperties;
-use PodPoint\SnsBroadcaster\Tests\Dummies\Models\User;
-use PodPoint\SnsBroadcaster\Tests\TestCase;
+use PodPoint\AwsPubSub\Tests\Pub\Dummies\Events\UserRetrieved;
+use PodPoint\AwsPubSub\Tests\Pub\Dummies\Events\UserRetrievedWithCustomName;
+use PodPoint\AwsPubSub\Tests\Pub\Dummies\Events\UserRetrievedWithCustomPayload;
+use PodPoint\AwsPubSub\Tests\Pub\Dummies\Events\UserRetrievedWithMultipleChannels;
+use PodPoint\AwsPubSub\Tests\Pub\Dummies\Events\UserRetrievedWithPublicProperties;
+use PodPoint\AwsPubSub\Tests\Pub\Dummies\Models\User;
+use PodPoint\AwsPubSub\Tests\TestCase;
 
-class StandardEventsTest extends TestCase
+class BasicEventsTest extends TestCase
 {
     /** @test */
-    public function it_broadcasts_custom_event()
+    public function it_broadcasts_basic_event()
     {
         $this->mock(SnsClient::class, function (MockInterface $mock) {
             $mock->shouldReceive('publish')
@@ -37,7 +37,7 @@ class StandardEventsTest extends TestCase
     }
 
     /** @test */
-    public function it_broadcasts_standard_event_with_action()
+    public function it_broadcasts_basic_event_with_action()
     {
         $this->mock(SnsClient::class, function (MockInterface $mock) {
             $mock->shouldReceive('publish')
@@ -59,7 +59,7 @@ class StandardEventsTest extends TestCase
     }
 
     /** @test */
-    public function it_broadcasts_standard_event_with_action_and_custom_payload()
+    public function it_broadcasts_basic_event_with_action_and_custom_payload()
     {
         $this->mock(SnsClient::class, function (MockInterface $mock) {
             $mock->shouldReceive('publish')
@@ -81,7 +81,7 @@ class StandardEventsTest extends TestCase
     }
 
     /** @test */
-    public function it_broadcasts_standard_event_to_multiple_channels()
+    public function it_broadcasts_basic_event_to_multiple_channels()
     {
         $this->mock(SnsClient::class, function (MockInterface $mock) {
             $mock->shouldReceive('publish')
@@ -102,7 +102,7 @@ class StandardEventsTest extends TestCase
     }
 
     /** @test */
-    public function it_broadcasts_standard_event_name_as_subject()
+    public function it_broadcasts_basic_event_name_as_subject()
     {
         $this->mock(SnsClient::class, function (MockInterface $mock) {
             $mock->shouldReceive('publish')
@@ -123,7 +123,7 @@ class StandardEventsTest extends TestCase
     }
 
     /** @test */
-    public function it_broadcasts_standard_event_name_as_subject_if_specified()
+    public function it_broadcasts_basic_event_name_as_subject_if_specified()
     {
         $this->mock(SnsClient::class, function (MockInterface $mock) {
             $mock->shouldReceive('publish')

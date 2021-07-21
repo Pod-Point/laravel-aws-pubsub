@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\SnsBroadcaster;
+namespace PodPoint\AwsPubSub\Pub\Database\Eloquent;
 
 use Illuminate\Database\Eloquent\BroadcastableModelEventOccurred as EloquentBroadcastableModelEventOccurred;
 

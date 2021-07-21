@@ -1,10 +1,9 @@
 <?php
 
-namespace PodPoint\SnsBroadcaster\Broadcasters;
+namespace PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters;
 
 use Aws\Sns\SnsClient;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
-use Illuminate\Support\Arr;
 
 class SnsBroadcaster extends Broadcaster
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace PodPoint\SnsBroadcaster\Tests\Dummies\Models;
+namespace PodPoint\AwsPubSub\Tests\Pub\Dummies\Models;
 
-use PodPoint\SnsBroadcaster\BroadcastsEvents;
+use PodPoint\AwsPubSub\Pub\Database\Eloquent\BroadcastsEvents;
 
 class UserWithBroadcastingEvents extends User
 {

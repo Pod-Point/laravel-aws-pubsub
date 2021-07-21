@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\SnsBroadcaster;
+namespace PodPoint\AwsPubSub\Pub\Database\Eloquent;
 
 use Illuminate\Database\Eloquent\BroadcastsEvents as EloquentBroadcastsEvents;
 
@@ -50,7 +50,7 @@ trait BroadcastsEvents
     }
 
     /**
-     * Get the events that should be broadcasted.
+     * Get the events that should broadcast.
      *
      * @return array
      */

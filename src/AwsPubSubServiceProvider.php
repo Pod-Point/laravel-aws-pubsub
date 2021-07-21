@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\SnsBroadcaster;
+namespace PodPoint\AwsPubSub;
 
 use Aws\Sns\SnsClient;
 use Illuminate\Broadcasting\BroadcastManager;
@@ -8,10 +8,19 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\BroadcastableModelEventOccurred as EloquentBroadcastableModelEventOccurred;
 use Illuminate\Support\ServiceProvider;
-use PodPoint\SnsBroadcaster\Broadcasters\SnsBroadcaster;
+use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
+use PodPoint\AwsPubSub\Pub\Database\Eloquent\BroadcastableModelEventOccurred;
+use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
 
-class SnsBroadcasterServiceProvider extends ServiceProvider
+class AwsPubSubServiceProvider extends ServiceProvider
 {
+    /**
+     * The event handler mappings for subscribing to PubSub events.
+     *
+     * @var array
+     */
+    protected $listen = [];
+
     /**
      * Register any application services.
      *
@@ -19,7 +28,10 @@ class SnsBroadcasterServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(EloquentBroadcastableModelEventOccurred::class, BroadcastableModelEventOccurred::class);
+        $this->app->bind(
+            EloquentBroadcastableModelEventOccurred::class,
+            BroadcastableModelEventOccurred::class
+        );
     }
 
     /**
@@ -29,6 +41,17 @@ class SnsBroadcasterServiceProvider extends ServiceProvider
      * @throws BindingResolutionException
      */
     public function boot(): void
+    {
+        $this->registerPub();
+        $this->registerSub();
+    }
+
+    /**
+     * Register anything related to the Publication of PubSub events.
+     *
+     * @throws BindingResolutionException
+     */
+    protected function registerPub()
     {
         $this->app->singleton(SnsClient::class, function () {
             $config = [
@@ -55,6 +78,18 @@ class SnsBroadcasterServiceProvider extends ServiceProvider
                 $config['arn-prefix'] ?? '',
                 $config['arn-suffix'] ?? ''
             );
+        });
+    }
+
+    /**
+     * Register anything related to the Subscription of PubSub events.
+     *
+     * @return void
+     */
+    protected function registerSub()
+    {
+        $this->app['queue']->extend('sqs-sns', function () {
+            return new SqsSnsConnector($this->listen);
         });
     }
 }

@@ -1,18 +1,16 @@
 <?php
 
-namespace PodPoint\SnsBroadcaster\Tests\Dummies\Events;
+namespace PodPoint\AwsPubSub\Tests\Pub\Dummies\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use PodPoint\SnsBroadcaster\Tests\Dummies\Models\User;
+use PodPoint\AwsPubSub\Tests\Pub\Dummies\Models\User;
 
-class UserRetrievedWithPublicProperties implements ShouldBroadcast
+class UserRetrieved implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    public $action = 'retrieved';
 
     public $foo = 'bar';
 
