@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\BroadcastsEvents as EloquentBroadcastsEvents;
 
 trait BroadcastsEvents
 {
-    use EloquentBroadcastsEvents {
-        broadcastIfBroadcastChannelsExistForEvent as eloquentBroadcastIfBroadcastChannelsExistForEvent;
-    }
+    use EloquentBroadcastsEvents;
 
     /**
      * Create a new broadcastable model event using our own Event class.
@@ -32,30 +30,5 @@ trait BroadcastsEvents
                 ? $this->broadcastAfterCommit
                 : $this->broadcastAfterCommit();
         });
-    }
-
-    /**
-     * Broadcast the given event instance if channels are configured for the model event.
-     *
-     * @param mixed $instance
-     * @param string $event
-     * @param mixed $channels
-     * @return \Illuminate\Broadcasting\PendingBroadcast|null|void
-     */
-    protected function broadcastIfBroadcastChannelsExistForEvent($instance, string $event, $channels = null)
-    {
-        if (in_array($event, $this->broadcastEvents())) {
-            return $this->eloquentBroadcastIfBroadcastChannelsExistForEvent($instance, $event, $channels);
-        }
-    }
-
-    /**
-     * Get the events that should broadcast.
-     *
-     * @return array
-     */
-    public function broadcastEvents(): array
-    {
-        return ['created', 'updated', 'trashed', 'restored', 'deleted'];
     }
 }

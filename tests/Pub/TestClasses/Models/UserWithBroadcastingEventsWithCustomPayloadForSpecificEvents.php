@@ -10,12 +10,13 @@ class UserWithBroadcastingEventsWithCustomPayloadForSpecificEvents extends User
 
     public function broadcastOn($event)
     {
-        return ['users'];
-    }
-
-    public function broadcastEvents()
-    {
-        return ['updated'];
+        return match ($event) {
+            'created' => [],
+            'updated' => ['users'],
+            'trashed' => [],
+            'restored' => [],
+            'deleted' => [],
+        };
     }
 
     public function broadcastWith($event)

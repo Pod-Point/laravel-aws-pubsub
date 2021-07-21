@@ -238,17 +238,21 @@ In the context of broadcasting, only the following model events can be broadcast
 - `trashed` _if soft delete is enabled_
 - `restored` _if soft delete is enabled_
 
-By default, all of these events are broadcasted, but you can define which events in particular you'd like to broadcast using the `broadcastEvents` method on the model itself:
+By default, all of these events would broadcast, but you can define which events in particular you'd like to broadcast using the `broadcastOn` method on the model itself, just like Laravel suggest it:
 
 ```php
 /**
- * Define the model events to broadcast.
+ * Get the channels that model events should broadcast on.
  *
- * @return array
+ * @param  string  $event
+ * @return \Illuminate\Broadcasting\Channel|array
  */
-public function broadcastEvents()
+public function broadcastOn($event)
 {
-    return ['created', 'updated'];
+    return match ($event) {
+        'deleted' => [], // disable broadcasting of the 'deleted' model event
+        default => ['users'],
+    };
 }
 ```
 
