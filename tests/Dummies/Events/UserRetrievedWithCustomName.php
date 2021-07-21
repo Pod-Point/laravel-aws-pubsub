@@ -8,36 +8,24 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Models\User;
 
-class UserRetrievedWithAction implements ShouldBroadcast
+class UserRetrievedWithCustomName implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $action = 'retrieved';
-
-    public $foo = 'bar';
-
-    /**
-     * @var User
-     */
     public $user;
 
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
     public function __construct(User $user)
     {
         $this->user = $user;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel|array
-     */
     public function broadcastOn()
     {
         return ['users'];
+    }
+
+    public function broadcastAs()
+    {
+        return 'user.retrieved';
     }
 }

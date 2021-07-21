@@ -4,9 +4,11 @@ namespace PodPoint\SnsBroadcaster\Tests\Unit;
 
 use Aws\Sns\SnsClient;
 use Mockery;
+use Mockery\MockInterface;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Models\User;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEvents;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEventsForSpecificEvents;
+use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEventsWithCustomName;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEventsWithCustomPayload;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEventsWithCustomPayloadForSpecificEvents;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Models\UserWithBroadcastingEventsWithMultipleChannels;
@@ -14,168 +16,179 @@ use PodPoint\SnsBroadcaster\Tests\TestCase;
 
 class ModelEventsTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     /** @test */
-    public function test_broadcasts_model_event()
+    public function it_broadcasts_model_event()
     {
-        $mocked = Mockery::mock(SnsClient::class);
+        $this->mock(SnsClient::class, function (MockInterface $mock) {
+            $mock->shouldReceive('publish')
+                ->once()
+                ->with(Mockery::on(function ($argument) {
+                    $message = json_decode($argument['Message'], true);
 
-        $this->app->instance(SnsClient::class, $mocked);
+                    return $message['model']['email'] === 'john@doe.com';
+                }));
+        });
 
-        $userData = [
-            'name' => 'Foo Bar',
-            'email' => 'model-event-1@email.com',
-            'password' => 'password',
-        ];
-
-        $mocked->shouldReceive('publish')->once()->with(Mockery::on(function ($argument) use ($userData) {
-            $message = json_decode($argument['Message'], true);
-
-            return $message['model']['email'] == $userData['email']
-                && $argument['Subject'] == 'users.user_with_broadcasting_events_created';
-        }));
-
-        UserWithBroadcastingEvents::create($userData);
-    }
-
-    /** @test */
-    public function test_does_not_broadcast_model_events_without_trait()
-    {
-        $mocked = Mockery::mock(SnsClient::class);
-
-        $this->app->instance(SnsClient::class, $mocked);
-
-        $mocked->shouldNotHaveReceived('publish');
-
-        $user = User::create([
-            'name' => 'Foo Bar',
-            'email' => 'model-event-2@email.com',
-            'password' => 'password',
+        UserWithBroadcastingEvents::create([
+            'name' => $this->faker->name(),
+            'email' => 'john@doe.com',
+            'password' => $this->faker->password(),
         ]);
     }
 
     /** @test */
-    public function test_broadcasts_model_event_with_custom_payload()
+    public function it_does_not_broadcast_model_events_without_trait()
     {
-        $mocked = Mockery::mock(SnsClient::class);
+        $this->mock(SnsClient::class, function (MockInterface $mock) {
+            $mock->shouldNotHaveReceived('publish');
+        });
 
-        $this->app->instance(SnsClient::class, $mocked);
-
-        $userData = [
-            'name' => 'Foo Bar',
-            'email' => 'model-event-3@email.com',
-            'password' => 'password',
-        ];
-
-        $mocked->shouldReceive('publish')->once()->with(Mockery::on(function ($argument) use ($userData) {
-            $message = json_decode($argument['Message'], true);
-
-            return $message['data']['user']['email'] == $userData['email']
-                && $message['action'] == 'created'
-                && $message['data']['foo'] == 'bar'
-                && $argument['Subject'] == 'users.created';
-        }));
-
-        UserWithBroadcastingEventsWithCustomPayload::create($userData);
+        User::create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->email(),
+            'password' => $this->faker->password(),
+        ]);
     }
 
     /** @test */
-    public function test_broadcasts_model_event_with_specified_event()
+    public function it_broadcasts_model_event_with_custom_payload()
     {
-        $mocked = Mockery::mock(SnsClient::class);
+        $this->mock(SnsClient::class, function (MockInterface $mock) {
+            $mock->shouldReceive('publish')
+                ->once()
+                ->with(Mockery::on(function ($argument) {
+                    $message = json_decode($argument['Message'], true);
 
-        $this->app->instance(SnsClient::class, $mocked);
+                    return $message['data']['user']['email'] === 'john@doe.com'
+                        && $message['action'] === 'created'
+                        && $message['data']['foo'] === 'bar';
+                }));
+        });
 
+        UserWithBroadcastingEventsWithCustomPayload::create([
+            'name' => $this->faker->name(),
+            'email' => 'john@doe.com',
+            'password' => $this->faker->password(),
+        ]);
+    }
+
+    /** @test */
+    public function it_broadcasts_model_event_with_specified_event()
+    {
         $user = UserWithBroadcastingEventsForSpecificEvents::create([
-            'name' => 'Foo Bar',
-            'email' => 'model-event-4@email.com',
-            'password' => 'password',
+            'name' => $this->faker->name(),
+            'email' => $this->faker->email(),
+            'password' => $this->faker->password(),
         ]);
 
-        $mocked->shouldReceive('publish')->once()->with(Mockery::on(function ($argument) use ($user) {
-            $message = json_decode($argument['Message'], true);
+        $this->mock(SnsClient::class, function (MockInterface $mock) {
+            $mock->shouldReceive('publish')
+                ->once()
+                ->with(Mockery::on(function ($argument) {
+                    $message = json_decode($argument['Message'], true);
 
-            return $message['model']['id'] == $user->id && $message['model']['email'] == 'model-event-4-updated@email.com'
-                && $argument['Subject'] == 'users.user_with_broadcasting_events_for_specific_events_updated';
-        }));
+                    return $message['model']['email'] === 'john@doe.com';
+                }));
+        });
 
         $user->update([
-            'email' => 'model-event-4-updated@email.com',
+            'email' => 'john@doe.com',
         ]);
     }
 
     /** @test */
-    public function test_does_not_broadcast_model_event_without_specified_event()
+    public function it_does_not_broadcast_model_event_without_specified_event()
     {
-        $mocked = Mockery::mock(SnsClient::class);
+        $this->mock(SnsClient::class, function (MockInterface $mock) {
+            $mock->shouldNotHaveReceived('publish');
+        });
 
-        $this->app->instance(SnsClient::class, $mocked);
-
-        $mocked->shouldNotHaveReceived('publish');
-
-        $user = UserWithBroadcastingEventsForSpecificEvents::create([
-            'name' => 'Foo Bar',
-            'email' => 'model-event-5@email.com',
-            'password' => 'password',
-        ]);
-
-        $user->delete();
+        UserWithBroadcastingEventsForSpecificEvents::create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->email(),
+            'password' => $this->faker->password(),
+        ])->delete();
     }
 
     /** @test */
-    public function test_broadcasts_model_event_with_specified_event_and_custom_payload()
+    public function it_broadcasts_model_event_with_specified_event_and_custom_payload()
     {
-        $mocked = Mockery::mock(SnsClient::class);
-
-        $this->app->instance(SnsClient::class, $mocked);
-
         $user = UserWithBroadcastingEventsWithCustomPayloadForSpecificEvents::create([
-            'name' => 'Foo Bar',
-            'email' => 'model-event-6@email.com',
-            'password' => 'password',
+            'name' => $this->faker->name(),
+            'email' => $this->faker->email(),
+            'password' => $this->faker->password(),
         ]);
 
-        $mocked->shouldReceive('publish')->once()->with(Mockery::on(function ($argument) use ($user) {
-            $message = json_decode($argument['Message'], true);
+        $this->mock(SnsClient::class, function (MockInterface $mock) {
+            $mock->shouldReceive('publish')
+                ->once()
+                ->with(Mockery::on(function ($argument) {
+                    $message = json_decode($argument['Message'], true);
 
-            return $message['data']['user']['email'] == 'model-event-6-updated@email.com'
-                && $message['action'] == 'updated'
-                && $message['data']['foo'] == 'baz'
-                && $argument['Subject'] == 'users.updated';
-        }));
+                    return $message['data']['user']['email'] === 'john@doe.com'
+                        && $message['action'] === 'updated'
+                        && $message['data']['foo'] === 'baz';
+                }));
+        });
 
         $user->update([
-            'email' => 'model-event-6-updated@email.com',
+            'email' => 'john@doe.com',
         ]);
     }
 
     /** @test */
-    public function test_broadcasts_model_events_to_multiple_channels()
+    public function it_broadcasts_model_events_to_multiple_channels()
     {
-        $mocked = Mockery::mock(SnsClient::class);
+        $this->mock(SnsClient::class, function (MockInterface $mock) {
+            $mock->shouldReceive('publish')
+                ->twice()
+                ->with(Mockery::on(function ($argument) {
+                    $message = json_decode($argument['Message'], true);
 
-        $this->app->instance(SnsClient::class, $mocked);
+                    return $message['model']['email'] === 'john@doe.com';
+                }));
+        });
 
-        $userData = [
-            'name' => 'Foo Bar',
-            'email' => 'model-event-7@email.com',
-            'password' => 'password',
-        ];
+        UserWithBroadcastingEventsWithMultipleChannels::create([
+            'name' => $this->faker->name(),
+            'email' => 'john@doe.com',
+            'password' => $this->faker->password(),
+        ]);
+    }
 
-        $mocked->shouldReceive('publish')->twice()->with(Mockery::on(function ($argument) use ($userData) {
-            $message = json_decode($argument['Message'], true);
+    /** @test */
+    public function it_broadcasts_model_event_name_as_subject()
+    {
+        $this->mock(SnsClient::class, function (MockInterface $mock) {
+            $mock->shouldReceive('publish')
+                ->once()
+                ->with(Mockery::on(function ($argument) {
+                    return $argument['Subject'] === 'UserWithBroadcastingEventsCreated';
+                }));
+        });
 
-            return $message['model']['email'] == $userData['email']
-                && in_array($argument['Subject'], [
-                    'users.user_with_broadcasting_events_with_multiple_channels_created',
-                    'customers.user_with_broadcasting_events_with_multiple_channels_created',
-                ]);
-        }));
+        UserWithBroadcastingEvents::create([
+            'name' => $this->faker->name(),
+            'email' => 'john@doe.com',
+            'password' => $this->faker->password(),
+        ]);
+    }
 
-        UserWithBroadcastingEventsWithMultipleChannels::create($userData);
+    /** @test */
+    public function it_broadcasts_model_event_name_as_subject_if_specified()
+    {
+        $this->mock(SnsClient::class, function (MockInterface $mock) {
+            $mock->shouldReceive('publish')
+                ->once()
+                ->with(Mockery::on(function ($argument) {
+                    return $argument['Subject'] === 'user.created';
+                }));
+        });
+
+        UserWithBroadcastingEventsWithCustomName::create([
+            'name' => $this->faker->name(),
+            'email' => 'john@doe.com',
+            'password' => $this->faker->password(),
+        ]);
     }
 }
