@@ -15,63 +15,44 @@ class SqsSnsJobTest extends TestCase
      */
     private $sqsClient;
 
-    /**
-     * @var Container
-     */
-    private $container;
-
     protected function setUp(): void
     {
         $this->sqsClient = $this->getMockBuilder(SqsClient::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->container = new Container;
     }
 
-    private function getSqsSnsJobSubjectBinding(): SqsSnsJob
+    private function getJobWithTopicAndSubject(): SqsSnsJob
     {
-        return new SqsSnsJob(
-            $this->container,
-            $this->sqsClient,
-            [
-                'Body' => json_encode([
-                    'MessageId' => '4f4749d6-b004-478a-bc38-d934124914b2',
-                    'Type' => 'Notification',
-                    'TopicArn' => 'TopicArn:123456',
-                    'Subject' => 'Subject#action',
-                    'Message' => 'The Message',
-                ]),
-                'ListenerName' => '\\Listener',
-            ],
-            'connection_name',
-            'default_queue'
-        );
+        return new SqsSnsJob(new Container, $this->sqsClient, [
+            'Body' => json_encode([
+                'MessageId' => '4f4749d6-b004-478a-bc38-d934124914b2',
+                'Type' => 'Notification',
+                'TopicArn' => 'TopicArn:123456',
+                'Subject' => 'Subject#action',
+                'Message' => '{ "foo": "bar" }',
+            ]),
+            'ListenerName' => '\\SubjectListener',
+        ], 'connection_name', 'default');
     }
 
-    private function getSqsSnsJobTopicBinding(): SqsSnsJob
+    private function getJobWithTopicOnly(): SqsSnsJob
     {
-        return new SqsSnsJob(
-            $this->container,
-            $this->sqsClient,
-            [
-                'Body' => json_encode([
-                    'MessageId' => '4f4749d6-b004-478a-bc38-d934124914b2',
-                    'Type' => 'Notification',
-                    'TopicArn' => 'TopicArn:123456',
-                    'Message' => 'The Message',
-                ]),
-                'ListenerName' => '\\Listener',
-            ],
-            'connection_name',
-            'default_queue'
-        );
+        return new SqsSnsJob(new Container, $this->sqsClient, [
+            'Body' => json_encode([
+                'MessageId' => '4f4749d6-b004-478a-bc38-d934124914b2',
+                'Type' => 'Notification',
+                'TopicArn' => 'TopicArn:123456',
+                'Message' => '{ "foo": "bar" }',
+            ]),
+            'ListenerName' => '\\TopicListener',
+        ], 'connection_name', 'default');
     }
 
     /** @test */
     public function it_will_resolve_sqs_subscription_job()
     {
-        $jobPayload = $this->getSqsSnsJobSubjectBinding()->payload();
+        $jobPayload = $this->getJobWithTopicAndSubject()->payload();
 
         $this->assertEquals('Illuminate\\Queue\\CallQueuedHandler@call', $jobPayload['job']);
     }
@@ -79,7 +60,7 @@ class SqsSnsJobTest extends TestCase
     /** @test */
     public function it_will_resolve_sqs_subscription_command_name()
     {
-        $jobPayload = $this->getSqsSnsJobSubjectBinding()->payload();
+        $jobPayload = $this->getJobWithTopicAndSubject()->payload();
 
         $this->assertEquals('Illuminate\Events\CallQueuedListener', $jobPayload['data']['commandName']);
     }
@@ -87,10 +68,10 @@ class SqsSnsJobTest extends TestCase
     /** @test */
     public function it_will_resolve_sqs_subscription_command()
     {
-        $jobPayload = $this->getSqsSnsJobSubjectBinding()->payload();
+        $jobPayload = $this->getJobWithTopicAndSubject()->payload();
 
-        $expectedCommand = serialize(new CallQueuedListener('\Listener', 'handle', [
-            'payload' => null,
+        $expectedCommand = serialize(new CallQueuedListener('\SubjectListener', 'handle', [
+            'payload' => ['foo' => 'bar'],
             'subject' => 'Subject#action',
         ]));
 
@@ -100,7 +81,7 @@ class SqsSnsJobTest extends TestCase
     /** @test */
     public function it_will_resolve_sqs_subscription_job_topic_binding()
     {
-        $jobPayload = $this->getSqsSnsJobTopicBinding()->payload();
+        $jobPayload = $this->getJobWithTopicOnly()->payload();
 
         $this->assertEquals('Illuminate\\Queue\\CallQueuedHandler@call', $jobPayload['job']);
     }
@@ -108,18 +89,18 @@ class SqsSnsJobTest extends TestCase
     /** @test */
     public function it_will_resolve_sqs_subscription_command_name_topic_binding()
     {
-        $jobPayload = $this->getSqsSnsJobTopicBinding()->payload();
+        $jobPayload = $this->getJobWithTopicOnly()->payload();
 
-        $this->assertEquals('Illuminate\Events\CallQueuedListener', $jobPayload['data']['commandName']);
+        $this->assertEquals(CallQueuedListener::class, $jobPayload['data']['commandName']);
     }
 
     /** @test */
     public function it_will_resolve_sqs_subscription_command_topic_binding()
     {
-        $jobPayload = $this->getSqsSnsJobTopicBinding()->payload();
+        $jobPayload = $this->getJobWithTopicOnly()->payload();
 
-        $expectedCommand = serialize(new CallQueuedListener('\Listener', 'handle', [
-            'payload' => null,
+        $expectedCommand = serialize(new CallQueuedListener('\TopicListener', 'handle', [
+            'payload' => ['foo' => 'bar'],
             'subject' => '',
         ]));
 
@@ -129,33 +110,19 @@ class SqsSnsJobTest extends TestCase
     /** @test */
     public function it_will_leave_default_sqs_job_untouched()
     {
-        $defaultSqsJob = new SqsSnsJob(
-            $this->container,
-            $this->sqsClient,
-            [
-                'Body' => json_encode([
-                    'MessageId' => '123456789',
-                    'Message' => 'The Message',
-                ]),
-                'ListenerName' => '\\Listener',
-            ],
-            'connection_name',
-            'default_queue'
-        );
+        $jobPayload = $this->getJobWithTopicOnly()->payload();
 
-        $jobPayload = $defaultSqsJob->payload();
-
-        $expectedCommand = serialize(new CallQueuedListener('\Listener', 'handle', [
-            'payload' => null,
+        $expectedCommand = serialize(new CallQueuedListener('\TopicListener', 'handle', [
+            'payload' => ['foo' => 'bar'],
             'subject' => '',
         ]));
 
         $this->assertEquals([
-            'uuid' => '123456789',
-            'displayName' => '\Listener',
+            'uuid' => '4f4749d6-b004-478a-bc38-d934124914b2',
+            'displayName' => '\TopicListener',
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'data' => [
-                'commandName' => 'Illuminate\Events\CallQueuedListener',
+                'commandName' => CallQueuedListener::class,
                 'command' => $expectedCommand,
             ],
         ], $jobPayload);

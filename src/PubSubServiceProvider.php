@@ -12,7 +12,7 @@ use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
 use PodPoint\AwsPubSub\Pub\Database\Eloquent\BroadcastableModelEventOccurred;
 use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
 
-class AwsPubSubServiceProvider extends ServiceProvider
+class PubSubServiceProvider extends ServiceProvider
 {
     /**
      * The event handler mappings for subscribing to PubSub events.
@@ -47,7 +47,7 @@ class AwsPubSubServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register anything related to the Publication of PubSub events.
+     * Register anything related to the Publication of PubSub events on AWS.
      *
      * @throws BindingResolutionException
      */
@@ -82,7 +82,7 @@ class AwsPubSubServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register anything related to the Subscription of PubSub events.
+     * Register anything related to the Subscription of PubSub events on AWS.
      *
      * @return void
      */
