@@ -1,18 +1,18 @@
 <?php
 
-namespace PodPoint\AwsPubSub\Tests\Pub\Dummies\Events;
+namespace PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Models\User;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
 
-class UserRetrieved implements ShouldBroadcast
+class UserRetrievedWithMultipleChannels implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $foo = 'bar';
+    public $foo = 'bat';
 
     public $user;
 
@@ -23,6 +23,6 @@ class UserRetrieved implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return ['users'];
+        return ['users', 'customers'];
     }
 }

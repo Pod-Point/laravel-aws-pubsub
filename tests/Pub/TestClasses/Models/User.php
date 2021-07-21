@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\AwsPubSub\Tests\Pub\Dummies\Models;
+namespace PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

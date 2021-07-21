@@ -5,13 +5,13 @@ namespace PodPoint\AwsPubSub\Tests\Pub;
 use Aws\Sns\SnsClient;
 use Mockery;
 use Mockery\MockInterface;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Models\User;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Models\UserWithBroadcastingEvents;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Models\UserWithBroadcastingEventsForSpecificEvents;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Models\UserWithBroadcastingEventsWithCustomName;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Models\UserWithBroadcastingEventsWithCustomPayload;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Models\UserWithBroadcastingEventsWithCustomPayloadForSpecificEvents;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Models\UserWithBroadcastingEventsWithMultipleChannels;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEvents;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsForSpecificEvents;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsWithCustomName;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsWithCustomPayload;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsWithCustomPayloadForSpecificEvents;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsWithMultipleChannels;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
 class ModelEventsTest extends TestCase

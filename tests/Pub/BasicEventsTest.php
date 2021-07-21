@@ -5,12 +5,12 @@ namespace PodPoint\AwsPubSub\Tests\Pub;
 use Aws\Sns\SnsClient;
 use Mockery;
 use Mockery\MockInterface;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Events\UserRetrieved;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Events\UserRetrievedWithCustomName;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Events\UserRetrievedWithCustomPayload;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Events\UserRetrievedWithMultipleChannels;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Events\UserRetrievedWithPublicProperties;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Models\User;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrieved;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithCustomName;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithCustomPayload;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithMultipleChannels;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithPublicProperties;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
 class BasicEventsTest extends TestCase

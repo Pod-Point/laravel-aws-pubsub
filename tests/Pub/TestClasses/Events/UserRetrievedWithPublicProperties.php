@@ -1,16 +1,20 @@
 <?php
 
-namespace PodPoint\AwsPubSub\Tests\Pub\Dummies\Events;
+namespace PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use PodPoint\AwsPubSub\Tests\Pub\Dummies\Models\User;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
 
-class UserRetrievedWithCustomName implements ShouldBroadcast
+class UserRetrievedWithPublicProperties implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public $action = 'retrieved';
+
+    public $foo = 'bar';
 
     public $user;
 
@@ -22,10 +26,5 @@ class UserRetrievedWithCustomName implements ShouldBroadcast
     public function broadcastOn()
     {
         return ['users'];
-    }
-
-    public function broadcastAs()
-    {
-        return 'user.retrieved';
     }
 }

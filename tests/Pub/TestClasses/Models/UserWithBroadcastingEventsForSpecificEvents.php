@@ -1,10 +1,10 @@
 <?php
 
-namespace PodPoint\AwsPubSub\Tests\Pub\Dummies\Models;
+namespace PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models;
 
 use PodPoint\AwsPubSub\Pub\Database\Eloquent\BroadcastsEvents;
 
-class UserWithBroadcastingEventsWithCustomName extends User
+class UserWithBroadcastingEventsForSpecificEvents extends User
 {
     use BroadcastsEvents;
 
@@ -13,8 +13,8 @@ class UserWithBroadcastingEventsWithCustomName extends User
         return ['users'];
     }
 
-    public function broadcastAs($event)
+    public function broadcastEvents()
     {
-        return "user.{$event}";
+        return ['updated'];
     }
 }

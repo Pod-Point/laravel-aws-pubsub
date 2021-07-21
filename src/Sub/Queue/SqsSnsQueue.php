@@ -5,6 +5,7 @@ namespace PodPoint\AwsPubSub\Sub\Queue;
 use Aws\Sqs\SqsClient;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use PodPoint\AwsPubSub\Sub\Queue\Jobs\SqsSnsJob;
 
 class SqsSnsQueue extends SqsQueue
@@ -74,7 +75,7 @@ class SqsSnsQueue extends SqsQueue
         $body = json_decode($messages[0]['Body'], true);
 
         if (is_null($body) || is_null(Arr::get($body, 'Type'))) {
-            logger()->error('SqsSnsQueue: Invalid SNS payload. ' .
+            Log::error('SqsSnsQueue: Invalid SNS payload. ' .
                 'Make sure your JSON is a valid JSON object and raw ' .
                 'message delivery is disabled for your SQS subscription.', $response->toArray());
 

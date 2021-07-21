@@ -4,6 +4,7 @@ namespace PodPoint\AwsPubSub\Tests\Sub;
 
 use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Log;
 use Mockery as m;
 use PodPoint\AwsPubSub\Sub\Queue\SqsSnsQueue;
 use PodPoint\AwsPubSub\Sub\Queue\Jobs\SqsSnsJob;
@@ -26,8 +27,15 @@ class SqsSnsQueueTest extends TestCase
      */
     protected $mockedMessageDataWithTopicAndSubject;
 
+    /**
+     * @var array
+     */
+    protected $mockedRawMessageData;
+
     protected function setUp():void
     {
+        parent::setUp();
+
         $this->mockedSqsClient = $this->getMockBuilder(SqsClient::class)
             ->addMethods(['receiveMessage', 'deleteMessage'])
             ->disableOriginalConstructor()
@@ -37,24 +45,26 @@ class SqsSnsQueueTest extends TestCase
             'Body' => json_encode([
                 'Type' => 'Notification',
                 'TopicArn' => 'TopicArn:123456',
-                'Message' => 'foo',
+                'Message' => '{ "foo": "bar" }',
                 'MessageId' => 'e3cd03ee-59a3-4ad8-b0aa-ee2e3808ac81',
             ]),
         ];
+
         $this->mockedMessageDataWithTopicAndSubject = [
             'Body' => json_encode([
                 'Type' => 'Notification',
                 'TopicArn' => 'TopicArn:123456',
                 'Subject' => 'Subject#action',
-                'Message' => 'foo',
+                'Message' => '{ "foo": "bar" }',
                 'MessageId' => 'e3cd03ee-59a3-4ad8-b0aa-ee2e3808ac81',
             ]),
         ];
-    }
 
-    protected function tearDown(): void
-    {
-        m::close();
+        $this->mockedRawMessageData = [
+            'Body' => json_encode([
+                'foo' => 'bar',
+            ]),
+        ];
     }
 
     /** @test */
@@ -91,8 +101,7 @@ class SqsSnsQueueTest extends TestCase
         $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
             "TopicArn:123456" => '\\TopicListener',
         ]);
-        $queue->setContainer($this->createMock(Container::class));
-
+        $queue->setContainer(new Container);
         $job = $queue->pop();
 
         $this->assertInstanceOf(SqsSnsJob::class, $job);
@@ -112,8 +121,7 @@ class SqsSnsQueueTest extends TestCase
             "Subject#action" => '\\SubjectListener',
             "TopicArn:123456" => '\\TopicListener',
         ]);
-        $queue->setContainer($this->createMock(Container::class));
-
+        $queue->setContainer(new Container);
         $job = $queue->pop();
 
         $this->assertInstanceOf(SqsSnsJob::class, $job);
@@ -132,10 +140,30 @@ class SqsSnsQueueTest extends TestCase
         $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
             "TopicArn:123456" => '\\TopicListener',
         ]);
-        $queue->setContainer($this->createMock(Container::class));
-
+        $queue->setContainer(new Container);
         $job = $queue->pop();
 
         $this->assertInstanceOf(SqsSnsJob::class, $job);
+    }
+
+    /** @test */
+    public function it_will_only_handle_rich_notifications_not_the_ones_with_raw_payloads()
+    {
+        Log::shouldReceive('error')
+            ->once()
+            ->with(
+                m::pattern('/^SqsSnsQueue: Invalid SNS payload/'),
+                m::type('array')
+            );
+
+        $this->mockedSqsClient
+            ->method('receiveMessage')
+            ->willReturn(new \Aws\Result([
+                'Messages' => [$this->mockedRawMessageData],
+            ]));
+
+        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default');
+        $queue->setContainer(new Container);
+        $queue->pop();
     }
 }
