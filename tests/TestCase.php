@@ -2,15 +2,15 @@
 
 namespace PodPoint\SnsBroadcaster\Tests;
 
-use Aws\Sns\SnsClient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
+use Illuminate\Foundation\Testing\WithFaker;
 use Orchestra\Testbench\TestCase as Orchestra;
 use PodPoint\SnsBroadcaster\SnsBroadcasterServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
-    use RefreshDatabase;
+    use RefreshDatabase,
+        WithFaker;
 
     /**
      * Get package providers.
@@ -41,6 +41,7 @@ abstract class TestCase extends Orchestra
             'key' => 'foo-bar',
             'secret' => 'foo-baz',
             'arn-prefix' => 'aws:arn:12345:',
+            'arn-suffix' => '-local',
         ]);
 
         $app['config']->set('database.default', 'testbench');
@@ -59,13 +60,5 @@ abstract class TestCase extends Orchestra
     protected function defineDatabaseMigrations()
     {
         $this->loadLaravelMigrations();
-    }
-
-    /**
-     * @return Mockery\MockInterface
-     */
-    protected function getMockedSnsClient()
-    {
-        return Mockery::mock(SnsClient::class);
     }
 }

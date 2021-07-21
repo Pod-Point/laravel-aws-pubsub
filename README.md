@@ -7,9 +7,11 @@
 
 Similar to [Pusher](https://laravel.com/docs/master/broadcasting#pusher-channels), this package provides a [Laravel Broadcasting](https://laravel.com/docs/master/broadcasting) driver for [AWS SNS](https://aws.amazon.com/sns/) (Simple Notification Service).
 
-In this context, "channels" can be assimilated to "topics" on SNS.
+We understand [Broadcasting](https://laravel.com/docs/master/broadcasting) is usually used to "broadcast" your server-side Laravel [Events](https://laravel.com/docs/master/events) over a WebSocket connection to your client-side JavaScript application.
 
-We believe this approach of leveraging broadcasting makes sense for a Pub/Sub architecture where an application would like to broadcast an event to the outside world about something that just happened.
+However, we believe this approach of leveraging broadcasting makes sense for a Pub/Sub architecture where an application would like to broadcast an event to the outside world about something that just happened.
+
+In this context, "channels" can be assimilated to "topics" on SNS.
 
 ## Installation
 
@@ -30,6 +32,7 @@ Next, you should add the following connection and configure your SNS credentials
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'arn-prefix' => env('BROADCAST_TOPIC_ARN_PREFIX'),
+        'arn-suffix' => env('BROADCAST_TOPIC_ARN_SUFFIX'),
     ],
     // ...
 ],
@@ -42,11 +45,14 @@ AWS_DEFAULT_REGION=you-region
 AWS_ACCESS_KEY_ID=your-aws-key
 AWS_SECRET_ACCESS_KEY=your-aws-secret
 BROADCAST_TOPIC_ARN_PREFIX=arn:aws:sns:us-east-1:123456789: # up until your topic name
+BROADCAST_TOPIC_ARN_SUFFIX=-local # optional
 ```
 
-Next, you will need to change your broadcast driver to SNS in your `.env` file:
+The `arn-suffix` can be used to help manage SNS topics for different environments. It will be added to the end when constructing the full SNS Topic ARN.
 
-```dotenv
+Next, you will need to make sure you're using the `sns` broadcast driver when broadcasting in your `.env` file:
+
+```php
 BROADCAST_DRIVER=sns
 ```
 
@@ -56,7 +62,7 @@ Finally, don't forget to enable the [Broadcast Service Provider](https://laravel
 
 Here we will simply re-use the power of Laravel Broadcasting, out of the box, with some minor additional functionalities for the Eloquent Model Events.
 
-### Broadcast Events
+### Basic Events
 
 Simply follow the default way of broadcasting Laravel events, explained in the [official documentation](https://laravel.com/docs/master/broadcasting#defining-broadcast-events).
 
@@ -96,14 +102,14 @@ class OrderShipped implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return ['orders']; // for the ARN 'arn:aws:sns:us-east-1:123456789:orders'
+        return ['orders']; // This is the Topic name for the ARN 'arn:aws:sns:us-east-1:123456789:orders' for example
     }
 }
 ```
 
-#### The published payload
+#### Broadcast Data
 
-By default, the package will publish the default Laravel payload which is already used when broadcasting an Event. Once published, its JSON representation looks like this:
+By default, the package will publish the default Laravel payload which is already used when broadcasting an Event. Once published, its JSON representation could look like this:
 
 ```json
 {
@@ -129,7 +135,7 @@ class OrderShipped implements ShouldBroadcast
 {
     use SerializesModels;
 
-    public $action = 'parcel_collected';
+    public $action = 'parcel_handled';
 
     // ...
 }
@@ -139,7 +145,7 @@ Which would produce the following payload:
 
 ```json
 {
-    "action": "parcel_collected",
+    "action": "parcel_handled",
     "order": {
         "id": 1,
         "name": "Some Goods",
@@ -163,7 +169,7 @@ However, using the `broadcastWith` method, you will be able to define exactly wh
 public function broadcastWith()
 {
     return [
-        'action' => 'parcel_collected',
+        'action' => 'parcel_handled',
         'data' => [
             'order-id' => $this->order->id,
             'order-total' => $this->order->total,
@@ -172,11 +178,32 @@ public function broadcastWith()
 }
 ```
 
-Now, when the event is triggered, it will behave like a standard Laravel event, which means other Listeners can listen to it, as usual, but it will also be broadcasted to the topic defined by the `broadcastOn` method using the payload defined by the `broadcastWith` method.
+Now, when the event is being triggered, it will behave like a standard Laravel event, which means other Listeners can listen to it, as usual, but it will also broadcast to the topic defined by the `broadcastOn` method using the payload defined by the `broadcastWith` method.
 
-### Broadcast Eloquent Model Events
+#### Broadcast Name / Subject
+
+In a Pub/Sub context, it can be handy to specify a `Subject` on each notification which broadcast to SNS. This can be an easy way to configure a listener for each specific kind of subject you can receive and process later on within queues.
+
+By default, the package will use the standard [Laravel broadcast name](https://laravel.com/docs/8.x/broadcasting#broadcast-name) in order to define the `Subject` of the notification sent. Feel free to customize it as you wish.
+
+```php
+/**
+ * The event's broadcast name/subject.
+ *
+ * @return string
+ */
+public function broadcastAs()
+{
+    return "{$this->order->getTable()}.{$this->action}";
+}
+```
+
+### Model Broadcasting
 
 If you're familiar with [Model Observers](https://laravel.com/docs/master/eloquent#observers), you already know that Eloquent models dispatch several events during their lifecycle.
+
+> **Note:** [Model Broadcasting](https://laravel.com/docs/8.x/broadcasting#model-broadcasting) is **only available from Laravel 8.x**.
+> If you'd like to do something similar with an older version of Laravel, we recommend to manually dispatch some "broadcastable" Events you'd be creating yourself from the [Model Observer](https://laravel.com/docs/master/eloquent#observers) functions.
 
 In order to broadcast the model events, you need to use the `PodPoint\SnsBroadcaster\BroadcastsEvents` trait on your Model.
 
@@ -187,18 +214,29 @@ use PodPoint\SnsBroadcaster\BroadcastsEvents;
 class Order extends Model
 {
     use BroadcastsEvents;
+
+    /**
+     * Get the channels that model events should broadcast on.
+     *
+     * @param string $event
+     * @return array
+     */
+    public function broadcastOn($event)
+    {
+        return ['orders'];
+    }
 }
 ```
 
-#### The Events
+#### Events
 
 In the context of broadcasting, only the following model events can be broadcasted:
 
 - `created`
 - `updated`
 - `deleted`
-- `trashed` __if soft delete is enabled__
-- `restored` __if soft delete is enabled__
+- `trashed` _if soft delete is enabled_
+- `restored` _if soft delete is enabled_
 
 By default, all of these events are broadcasted, but you can define which events in particular you'd like to broadcast using the `broadcastEvents` method on the model itself:
 
@@ -214,30 +252,11 @@ public function broadcastEvents()
 }
 ```
 
-Now only the `created` and `updated` events for this Model will be published.
+Now only the `created` and `updated` events for this Model will broadcast.
 
-#### The Channels / Topics
+#### Broadcast Data
 
-Next, in a similar fashion to what you're used to with Laravel, specify the channel/topic you'd like to use within the `broadcastOn` method on the model.
-
-The `broadcastOn()` method receives an `$event` argument that holds the event name as a string, e.g. `created`.
-
-```php
-/**
- * Get the channels that model events should broadcast on.
- *
- * @param string $event
- * @return array
- */
-public function broadcastOn($event)
-{
-    return ['orders'];
-}
-```
-
-#### The published payload
-
-By default, the package will publish the default Laravel payload which is already used when broadcasting an Event. Once published, its JSON representation looks like this:
+By default, the package will publish the default Laravel payload which is already used when broadcasting an Event. Once published, its JSON representation could look like this:
 
 ```json
 {
@@ -253,7 +272,7 @@ By default, the package will publish the default Laravel payload which is alread
 }
 ```
 
-However, using the `broadcastWith` method, you will be able to define exactly what kind of payload gets published.
+However, using the `broadcastWith` method, you will be able to define exactly what kind of payload is used when broadcasting, here is an example:
 
 ```php
 /**
@@ -273,6 +292,24 @@ public function broadcastWith($event)
     ];
 }
 ```
+
+#### Broadcast Name / Subject
+
+If you wish to customize the `Subject` of your SNS notification here, it's exactly like for basic events, the only difference being that the actual event name (`created`, `updated`...) is given to you within the `broadcastAs()` method so you can decide wether you want to use it or not. Here is an example:
+
+```php
+/**
+ * The event's broadcast name/subject.
+ *
+ * @return string
+ */
+public function broadcastAs($event)
+{
+    return "orders.{$event}";
+}
+```
+
+Remember that if you don't use `broadcastAs()` at all, Laravel will default to use the event class name, and here for an Order model for example you could see `OrderCreated` as the `Subject`.
 
 ## Testing
 

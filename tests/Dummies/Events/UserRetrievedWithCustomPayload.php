@@ -12,38 +12,20 @@ class UserRetrievedWithCustomPayload implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $action = 'RETRIEVED';
+    public $action = 'retrieved';
 
-    /**
-     * @var User
-     */
     public $user;
 
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
     public function __construct(User $user)
     {
         $this->user = $user;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel|array
-     */
     public function broadcastOn()
     {
-        return ['users-local'];
+        return ['users'];
     }
 
-    /**
-     * Get and format the data to broadcast.
-     *
-     * @return array
-     */
     public function broadcastWith()
     {
         return [

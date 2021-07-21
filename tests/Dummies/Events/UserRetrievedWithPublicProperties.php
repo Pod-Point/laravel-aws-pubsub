@@ -8,9 +8,11 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use PodPoint\SnsBroadcaster\Tests\Dummies\Models\User;
 
-class UserRetrieved implements ShouldBroadcast
+class UserRetrievedWithPublicProperties implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public $action = 'retrieved';
 
     public $foo = 'bar';
 

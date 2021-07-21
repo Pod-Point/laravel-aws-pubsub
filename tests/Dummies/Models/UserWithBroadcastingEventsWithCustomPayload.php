@@ -2,27 +2,17 @@
 
 namespace PodPoint\SnsBroadcaster\Tests\Dummies\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use PodPoint\SnsBroadcaster\BroadcastsEvents;
 
-class UserWithBroadcastingEventsWithCustomPayload extends Model
+class UserWithBroadcastingEventsWithCustomPayload extends User
 {
     use BroadcastsEvents;
-
-    protected $table = 'users';
-
-    protected $guarded = [];
 
     public function broadcastOn($event)
     {
         return ['users'];
     }
 
-    /**
-     * Get and format the data to broadcast.
-     *
-     * @return array
-     */
     public function broadcastWith($event)
     {
         return [

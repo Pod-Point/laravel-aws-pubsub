@@ -38,13 +38,12 @@ class SnsBroadcasterServiceProvider extends ServiceProvider
 
             $key = config('broadcasting.connections.sns.key');
             $secret = config('broadcasting.connections.sns.secret');
-            $token = config('broadcasting.connections.sns.token');
 
             if ($key && $secret) {
                 $config['credentials'] = [
                     'key' => $key,
                     'secret' => $secret,
-                    'token' => $token,
+                    'token' => config('broadcasting.connections.sns.token'),
                 ];
             }
 
@@ -52,7 +51,10 @@ class SnsBroadcasterServiceProvider extends ServiceProvider
         });
 
         $this->app->make(BroadcastManager::class)->extend('sns', function(Container $app, array $config) {
-            return new SnsBroadcaster($config['arn-prefix']);
+            return new SnsBroadcaster(
+                $config['arn-prefix'] ?? '',
+                $config['arn-suffix'] ?? ''
+            );
         });
     }
 }
