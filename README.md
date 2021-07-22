@@ -1,9 +1,9 @@
 # AWS PubSub for Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/pod-point/laravel-aws-pubsub.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-aws-pubusb)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/pod-point/laravel-aws-pubusb/run-tests?label=tests)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/pod-point/laravel-aws-pubsub.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-aws-pubsub)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/pod-point/laravel-aws-pubsub/run-tests?label=tests)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Total Downloads](https://img.shields.io/packagist/dt/pod-point/laravel-aws-pubusb.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-aws-pubusb)
+[![Total Downloads](https://img.shields.io/packagist/dt/pod-point/laravel-aws-pubsub.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-aws-pubsub)
 
 **The Pub**
 
@@ -32,10 +32,10 @@ This part is pretty straight forward, we simply have to listen to these messages
 You can install the package on a Laravel 8+ application via composer:
 
 ```bash
-composer require pod-point/laravel-aws-pubusb
+composer require pod-point/laravel-aws-pubsub
 ```
 
-Next, you should add the following connection and configure your SNS credentials in the `config/broadcasting.php` configuration file:
+Next, you will need to add the following connection and configure your SNS credentials in the `config/broadcasting.php` configuration file:
 
 ```php
 'connections' => [
@@ -331,7 +331,29 @@ Remember that if you don't use `broadcastAs()` at all, Laravel will default to u
 
 ## Subscribing / Listening
 
-// @todo
+### Configuration
+
+Similar to what you would do for a standard Laravel SQS queue, you will need to add the following connection and configure your credentials in the `config/queue.php` configuration file:
+
+```php
+'connections' => [
+    // ...
+    'sqs-sns' => [
+        'driver' => 'sqs-sns',
+        'key' => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'prefix' => env('SQS_SNS_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),
+        'queue' => env('SQS_SNS_QUEUE', 'pub-sub'),
+        'suffix' => env('SQS_SNS_SUFFIX'),
+        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+    ],
+    // ...
+],
+```
+
+### Usage
+
+####
 
 ## Testing
 
@@ -355,7 +377,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 - [laravel-sqs-sns-subscription-queue](https://github.com/joblocal/laravel-sqs-sns-subscription-queue) for more inspiration
 - [Laravel Package Development](https://laravelpackage.com) documentation by [John Braun](https://github.com/Jhnbrn90)
 - [Pod Point](https://github.com/pod-point)
-- [All Contributors](https://github.com/pod-point/laravel-aws-pubusb/graphs/contributors)
+- [All Contributors](https://github.com/pod-point/laravel-aws-pubsub/graphs/contributors)
 
 ## License
 
