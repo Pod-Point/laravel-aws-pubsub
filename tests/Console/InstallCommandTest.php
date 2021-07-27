@@ -1,10 +1,10 @@
 <?php
 
-namespace PodPoint\AwsPubSub\Tests\Sub;
+namespace PodPoint\AwsPubSub\Tests\Console;
 
 use PodPoint\AwsPubSub\Tests\TestCase;
 
-class InstallationTest extends TestCase
+class InstallCommandTest extends TestCase
 {
     public function setUp(): void
     {
