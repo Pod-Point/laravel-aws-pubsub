@@ -28,12 +28,10 @@ class EventServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if (class_exists(EloquentBroadcastableModelEventOccurred::class)) {
-            $this->app->bind(
-                EloquentBroadcastableModelEventOccurred::class,
-                BroadcastableModelEventOccurred::class
-            );
-        }
+        $this->app->bind(
+            EloquentBroadcastableModelEventOccurred::class,
+            BroadcastableModelEventOccurred::class
+        );
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace PodPoint\AwsPubSub\Tests\Pub;
 
 use Aws\Sns\SnsClient;
-use Illuminate\Database\Eloquent\BroadcastsEvents;
 use Mockery;
 use Mockery\MockInterface;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
@@ -17,15 +16,6 @@ use PodPoint\AwsPubSub\Tests\TestCase;
 
 class ModelEventsTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        if (! trait_exists(BroadcastsEvents::class)) {
-            $this->markTestSkipped('Model Broadcasting is only supported from Laravel 8.x');
-        }
-    }
-
     /** @test */
     public function it_broadcasts_model_event()
     {
