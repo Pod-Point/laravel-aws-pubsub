@@ -15,7 +15,7 @@ In this context, "channels" can be assimilated to "topics" on SNS.
 
 **The Sub**
 
-This part is pretty straight forward, we simply have to listen to these messages pushed to an SQS queue and act upon. The only difference here is that we don't use the default Laravel SQS driver as the messages pushed are not exactly following Laravel's standard payload for queued Jobs/Events, as the messages from SNS are a bit simpler.
+This part is pretty straight forward, we simply have to listen to these messages pushed to an SQS queue and act upon. The only difference here is that we don't use the default Laravel SQS driver as the messages pushed are not following Laravel's classic JSON payload for queued Jobs/Events pushed from a Laravel application. The messages from SNS are simpler.
 
 ## Prerequisites
 
