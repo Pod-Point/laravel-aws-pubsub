@@ -72,6 +72,8 @@ BROADCAST_DRIVER=sns
 
 Finally, don't forget to enable the [Broadcast Service Provider](https://laravel.com/docs/master/broadcasting#broadcast-service-provider).
 
+---
+
 ### Usage: Basic Events
 
 Simply follow the default way of broadcasting Laravel events, explained in the [official documentation](https://laravel.com/docs/master/broadcasting#defining-broadcast-events).
@@ -207,6 +209,8 @@ public function broadcastAs()
     return "orders.{$this->action}";
 }
 ```
+
+---
 
 ### Usage: Model Broadcasting
 
@@ -422,7 +426,7 @@ We also provide a convenient command to generate these classes for you:
 artisan pubsub:make:listener SendShipmentNotification
 ```
 
-**Note:** you will still need to make sure the mapping within the `PubSubEventServiceProvider` is declared.
+**Note:** you will still need to make sure the mapping within the `PubSubEventServiceProvider` is configured.
 
 ## Testing
 
