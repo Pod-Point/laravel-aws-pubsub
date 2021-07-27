@@ -362,7 +362,7 @@ You'll need a separate Service Provider in order to define the mapping for each 
 The `listen` property contains an array of all events (keys) and their listeners (values). Unlike the standard Laravel `EventServiceProvider`, you can only define one listener per event, however you may add as many events to this array as your application requires.
 ##### Using the Broadcast Name / Subject of an SNS message
 
-You can define a PubSub event by using its [Broadcast Name / Subject](#broadcast-name-subject). For example, let's add an event with `orders.shipped` as its `Subject` (aka. Broadcast Name):
+You can define a PubSub event by using its [Broadcast Name / Subject](#broadcast-name--subject). For example, let's add an event with `orders.shipped` as its `Subject` (aka. Broadcast Name):
 
 ```php
 use App\Listeners\PubSub\SendShipmentNotification;
