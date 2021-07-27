@@ -72,11 +72,7 @@ BROADCAST_DRIVER=sns
 
 Finally, don't forget to enable the [Broadcast Service Provider](https://laravel.com/docs/master/broadcasting#broadcast-service-provider).
 
-### Usage
-
-Here we will simply re-use the power of Laravel Broadcasting, out of the box, with some minor additional functionalities for the Eloquent Model Events.
-
-#### Basic Events
+### Usage: Basic Events
 
 Simply follow the default way of broadcasting Laravel events, explained in the [official documentation](https://laravel.com/docs/master/broadcasting#defining-broadcast-events).
 
@@ -121,7 +117,7 @@ class OrderShipped implements ShouldBroadcast
 }
 ```
 
-##### Broadcast Data
+#### Broadcast Data
 
 By default, the package will publish the default Laravel payload which is already used when broadcasting an Event. Once published, its JSON representation could look like this:
 
@@ -194,7 +190,7 @@ public function broadcastWith()
 
 Now, when the event is being triggered, it will behave like a standard Laravel event, which means other Listeners can listen to it, as usual, but it will also broadcast to the topic defined by the `broadcastOn` method using the payload defined by the `broadcastWith` method.
 
-##### Broadcast Name / Subject
+#### Broadcast Name / Subject
 
 In a Pub/Sub context, it can be handy to specify a `Subject` on each notification which broadcast to SNS. This can be an easy way to configure a listener for each specific kind of subject you can receive and process later on within queues.
 
@@ -212,7 +208,7 @@ public function broadcastAs()
 }
 ```
 
-#### Model Broadcasting
+### Usage: Model Broadcasting
 
 If you're familiar with [Model Observers](https://laravel.com/docs/master/eloquent#observers), you already know that Eloquent models dispatch several events during their lifecycle.
 
@@ -242,7 +238,7 @@ class Order extends Model
 }
 ```
 
-##### Events
+#### Events
 
 In the context of broadcasting, only the following model events can be broadcasted:
 
@@ -272,7 +268,7 @@ public function broadcastOn($event)
 
 Now only the `created` and `updated` events for this Model will broadcast (if soft delete is disabled).
 
-##### Broadcast Data
+#### Broadcast Data
 
 By default, the package will publish the default Laravel payload which is already used when broadcasting an Event. Once published, its JSON representation could look like this:
 
@@ -311,7 +307,7 @@ public function broadcastWith($event)
 }
 ```
 
-##### Broadcast Name / Subject
+#### Broadcast Name / Subject
 
 If you wish to customize the `Subject` of your SNS notification here, it's exactly like for basic events, the only difference being that the actual event name (`created`, `updated`...) is given to you within the `broadcastAs()` method so you can decide wether you want to use it or not. Here is an example:
 
@@ -351,16 +347,15 @@ Once the package is installed and similar to what you would do for a standard La
 ],
 ```
 
-### Usage
-
 Once your queue is configured properly, you will need to be able to define which listeners you would like to use for which kind of incoming events. In order to do so, you'll need to create Laravel Listeners and associate the events through a Service Provider the package can create for you.
 
-#### Registering Events & Listeners
+### Registering Events & Listeners
 
 You'll need a separate Service Provider in order to define the mapping for each PubSub event and its listener. We provide a Service Provider you can install and use by running `artisan pubsub:install`. This will create `App\Providers\PubSubEventServiceProvider` and load it within your `config/app.php` file automatically.
 
 The `listen` property contains an array of all events (keys) and their listeners (values). Unlike the standard Laravel `EventServiceProvider`, you can only define one listener per event, however you may add as many events to this array as your application requires.
-##### Using the Broadcast Name / Subject of an SNS message
+
+#### Using the Broadcast Name / Subject of an SNS message
 
 You can define a PubSub event by using its [Broadcast Name / Subject](#broadcast-name--subject). For example, let's add an event with `orders.shipped` as its `Subject` (aka. Broadcast Name):
 
@@ -377,7 +372,7 @@ protected $listen = [
 ];
 ```
 
-##### Using the SNS Topic Name
+#### Using the SNS Topic Name
 
 As a fallback, you can also use the ARN of an SNS Topic itself and have a more generic Listener for any event coming from that topic **which haven't been already mapped** to an existing subject-based event/listener couple.
 
@@ -401,7 +396,7 @@ It's up to you do do whatever you want from that generic `OrdersListener`, you c
 
 **Note:** Topic-based event/listener couples should be registered last so the Subject-based ones take priority.
 
-#### Defining Listeners
+### Defining Listeners
 
 Here we are simply re-using standard Laravel event Listeners. The only difference being the function definition of the main `handle()` method which differs slightly. Instead of expecting an instance of an Event class passed, we simply receive the `payload` and the `subject`, if it's found.
 
@@ -419,7 +414,7 @@ public function handle(array $payload, string $subject = '')
 
 Feel free to queue these listeners, just like you would with an Laravel listener.
 
-##### Generating Listeners
+#### Generating Listeners
 
 We also provide a convenient command to generate these classes for you:
 
