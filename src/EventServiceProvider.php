@@ -74,7 +74,7 @@ class EventServiceProvider extends ServiceProvider
             return new SnsClient($config);
         });
 
-        $this->app->make(BroadcastManager::class)->extend('sns', function(Container $app, array $config) {
+        $this->app->make(BroadcastManager::class)->extend('sns', function (Container $app, array $config) {
             return new SnsBroadcaster(
                 $config['arn-prefix'] ?? '',
                 $config['arn-suffix'] ?? ''
