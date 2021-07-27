@@ -12,7 +12,7 @@ use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
 use PodPoint\AwsPubSub\Pub\Database\Eloquent\BroadcastableModelEventOccurred;
 use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
 
-class PubSubServiceProvider extends ServiceProvider
+class EventServiceProvider extends ServiceProvider
 {
     /**
      * The event handler mappings for subscribing to PubSub events.
@@ -28,10 +28,12 @@ class PubSubServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(
-            EloquentBroadcastableModelEventOccurred::class,
-            BroadcastableModelEventOccurred::class
-        );
+        if (class_exists(EloquentBroadcastableModelEventOccurred::class)) {
+            $this->app->bind(
+                EloquentBroadcastableModelEventOccurred::class,
+                BroadcastableModelEventOccurred::class
+            );
+        }
     }
 
     /**
@@ -43,6 +45,7 @@ class PubSubServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerPub();
+
         $this->registerSub();
     }
 

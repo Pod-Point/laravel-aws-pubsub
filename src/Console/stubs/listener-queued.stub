@@ -1,0 +1,23 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+
+class DummyClass implements ShouldQueue
+{
+    use InteractsWithQueue;
+
+    /**
+     * Handle the event.
+     *
+     * @param  array  $payload
+     * @param  string  $subject
+     * @return void
+     */
+    public function handle(array $payload, string $subject)
+    {
+        //
+    }
+}

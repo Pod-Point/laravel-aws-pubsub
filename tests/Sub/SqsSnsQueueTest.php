@@ -76,6 +76,39 @@ class SqsSnsQueueTest extends TestCase
     }
 
     /** @test */
+    public function it_can_receive_a_message_and_pop_it_off_the_queue()
+    {
+        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+            'Messages' => [$this->mockedMessageDataWithTopicOnly],
+        ]));
+
+        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
+            "TopicArn:123456" => '\\TopicListener',
+        ]);
+        $queue->setContainer(new Container);
+        $job = $queue->pop();
+
+        $this->assertInstanceOf(SqsSnsJob::class, $job);
+    }
+
+    /** @test */
+    public function it_will_only_handle_rich_notifications_not_the_ones_with_raw_payloads()
+    {
+        Log::shouldReceive('error')->once()->with(
+            m::pattern('/^SqsSnsQueue: Invalid SNS payload/'),
+            m::type('array')
+        );
+
+        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+            'Messages' => [$this->mockedRawMessageData],
+        ]));
+
+        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default');
+        $queue->setContainer(new Container);
+        $queue->pop();
+    }
+
+    /** @test */
     public function it_will_set_the_event_listeners_mapping()
     {
         $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
@@ -92,11 +125,9 @@ class SqsSnsQueueTest extends TestCase
     /** @test */
     public function it_will_resolve_the_listener_name_based_on_the_topic_arn()
     {
-        $this->mockedSqsClient
-            ->method('receiveMessage')
-            ->willReturn(new \Aws\Result([
-                'Messages' => [$this->mockedMessageDataWithTopicOnly],
-            ]));
+        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+            'Messages' => [$this->mockedMessageDataWithTopicOnly],
+        ]));
 
         $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
             "TopicArn:123456" => '\\TopicListener',
@@ -111,11 +142,9 @@ class SqsSnsQueueTest extends TestCase
     /** @test */
     public function it_will_resolve_the_listener_name_based_on_the_subject_first_if_present()
     {
-        $this->mockedSqsClient
-            ->method('receiveMessage')
-            ->willReturn(new \Aws\Result([
-                'Messages' => [$this->mockedMessageDataWithTopicAndSubject],
-            ]));
+        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+            'Messages' => [$this->mockedMessageDataWithTopicAndSubject],
+        ]));
 
         $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
             "Subject#action" => '\\SubjectListener',
@@ -129,41 +158,18 @@ class SqsSnsQueueTest extends TestCase
     }
 
     /** @test */
-    public function it_can_receive_a_message_and_pop_it_off_the_queue()
+    public function it_will_not_do_anything_if_the_event_listeners_mapping_does_not_match()
     {
-        $this->mockedSqsClient
-            ->method('receiveMessage')
-            ->willReturn(new \Aws\Result([
-                'Messages' => [$this->mockedMessageDataWithTopicOnly],
-            ]));
+        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+            'Messages' => [$this->mockedMessageDataWithTopicOnly],
+        ]));
 
         $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
-            "TopicArn:123456" => '\\TopicListener',
+            "i_do_not_exist" => '\\SomeListener',
         ]);
         $queue->setContainer(new Container);
         $job = $queue->pop();
 
-        $this->assertInstanceOf(SqsSnsJob::class, $job);
-    }
-
-    /** @test */
-    public function it_will_only_handle_rich_notifications_not_the_ones_with_raw_payloads()
-    {
-        Log::shouldReceive('error')
-            ->once()
-            ->with(
-                m::pattern('/^SqsSnsQueue: Invalid SNS payload/'),
-                m::type('array')
-            );
-
-        $this->mockedSqsClient
-            ->method('receiveMessage')
-            ->willReturn(new \Aws\Result([
-                'Messages' => [$this->mockedRawMessageData],
-            ]));
-
-        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default');
-        $queue->setContainer(new Container);
-        $queue->pop();
+        $this->assertNull($job);
     }
 }

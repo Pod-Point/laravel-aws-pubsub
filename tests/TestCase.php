@@ -5,7 +5,8 @@ namespace PodPoint\AwsPubSub\Tests;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Orchestra\Testbench\TestCase as Orchestra;
-use PodPoint\AwsPubSub\PubSubServiceProvider;
+use PodPoint\AwsPubSub\AwsPubSubServiceProvider;
+use PodPoint\AwsPubSub\EventServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
@@ -22,7 +23,8 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            PubSubServiceProvider::class,
+            AwsPubSubServiceProvider::class,
+            EventServiceProvider::class,
         ];
     }
 
