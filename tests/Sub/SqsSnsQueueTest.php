@@ -6,8 +6,8 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Log;
 use Mockery as m;
-use PodPoint\AwsPubSub\Sub\Queue\SqsSnsQueue;
 use PodPoint\AwsPubSub\Sub\Queue\Jobs\SqsSnsJob;
+use PodPoint\AwsPubSub\Sub\Queue\SqsSnsQueue;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
 class SqsSnsQueueTest extends TestCase
@@ -32,7 +32,7 @@ class SqsSnsQueueTest extends TestCase
      */
     protected $mockedRawMessageData;
 
-    protected function setUp():void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -83,7 +83,7 @@ class SqsSnsQueueTest extends TestCase
         ]));
 
         $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
-            "TopicArn:123456" => '\\TopicListener',
+            'TopicArn:123456' => '\\TopicListener',
         ]);
         $queue->setContainer(new Container);
         $job = $queue->pop();
@@ -112,14 +112,14 @@ class SqsSnsQueueTest extends TestCase
     public function it_will_set_the_event_listeners_mapping()
     {
         $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
-            "Subject#action" => '\\SubjectListener',
+            'Subject#action' => '\\SubjectListener',
         ]);
 
         $queueReflection = new \ReflectionClass($queue);
         $eventsProperty = $queueReflection->getProperty('events');
         $eventsProperty->setAccessible(true);
 
-        $this->assertEquals(["Subject#action" => '\\SubjectListener'], $eventsProperty->getValue($queue));
+        $this->assertEquals(['Subject#action' => '\\SubjectListener'], $eventsProperty->getValue($queue));
     }
 
     /** @test */
@@ -130,7 +130,7 @@ class SqsSnsQueueTest extends TestCase
         ]));
 
         $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
-            "TopicArn:123456" => '\\TopicListener',
+            'TopicArn:123456' => '\\TopicListener',
         ]);
         $queue->setContainer(new Container);
         $job = $queue->pop();
@@ -147,8 +147,8 @@ class SqsSnsQueueTest extends TestCase
         ]));
 
         $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
-            "Subject#action" => '\\SubjectListener',
-            "TopicArn:123456" => '\\TopicListener',
+            'Subject#action' => '\\SubjectListener',
+            'TopicArn:123456' => '\\TopicListener',
         ]);
         $queue->setContainer(new Container);
         $job = $queue->pop();
@@ -165,7 +165,7 @@ class SqsSnsQueueTest extends TestCase
         ]));
 
         $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
-            "i_do_not_exist" => '\\SomeListener',
+            'i_do_not_exist' => '\\SomeListener',
         ]);
         $queue->setContainer(new Container);
         $job = $queue->pop();

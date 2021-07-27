@@ -33,7 +33,7 @@ class SqsSnsJob extends SqsJob
     }
 
     /**
-     * Resolves SNS queue messages
+     * Resolves SNS queue messages.
      *
      * @param array $job
      * @return array

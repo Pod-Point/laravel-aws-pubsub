@@ -43,5 +43,4 @@ class AwsPubSubServiceProvider extends ServiceProvider
             Console\ListenerMakeCommand::class,
         ]);
     }
-
 }

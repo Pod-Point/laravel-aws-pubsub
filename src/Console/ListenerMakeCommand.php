@@ -36,10 +36,10 @@ class ListenerMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('queued')) {
-            return __DIR__ . '/stubs/listener-queued.stub';
+            return __DIR__.'/stubs/listener-queued.stub';
         }
 
-        return __DIR__ . '/stubs/listener.stub';
+        return __DIR__.'/stubs/listener.stub';
     }
 
     /**
@@ -50,7 +50,7 @@ class ListenerMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace . '\Listeners\PubSub';
+        return $rootNamespace.'\Listeners\PubSub';
     }
 
     /**

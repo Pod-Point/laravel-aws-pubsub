@@ -16,7 +16,7 @@ class SqsSnsQueue extends SqsQueue
     protected $events;
 
     /**
-     * Create a new Amazon SQS SNS subscription queue instance
+     * Create a new Amazon SQS SNS subscription queue instance.
      *
      * @param \Aws\Sqs\SqsClient $sqs
      * @param string $default
@@ -75,8 +75,8 @@ class SqsSnsQueue extends SqsQueue
         $body = json_decode($messages[0]['Body'], true);
 
         if (is_null($body) || is_null(Arr::get($body, 'Type'))) {
-            Log::error('SqsSnsQueue: Invalid SNS payload. ' .
-                'Make sure your JSON is a valid JSON object and raw ' .
+            Log::error('SqsSnsQueue: Invalid SNS payload. '.
+                'Make sure your JSON is a valid JSON object and raw '.
                 'message delivery is disabled for your SQS subscription.', $response->toArray());
 
             return false;
