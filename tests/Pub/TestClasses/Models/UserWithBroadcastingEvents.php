@@ -2,7 +2,7 @@
 
 namespace PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models;
 
-use PodPoint\AwsPubSub\Pub\Database\Eloquent\BroadcastsEvents;
+use Illuminate\Database\Eloquent\BroadcastsEvents;
 
 class UserWithBroadcastingEvents extends User
 {

@@ -66,17 +66,17 @@ BROADCAST_TOPIC_ARN_SUFFIX=-local # optional
 
 The `arn-suffix` can be used to help manage SNS topics for different environments. It will be added to the end when constructing the full SNS Topic ARN.
 
-Next, you will need to make sure you're using the `sns` broadcast driver when broadcasting in your `.env` file:
+Next, you will need to make sure you're using the `sns` broadcast driver as your default driver when broadcasting in your `.env` file:
 
 ```php
 BROADCAST_DRIVER=sns
 ```
 
+**Remember** that you can define the connection at the Event level if you ever need to be able to use [two drivers concurrently](https://github.com/laravel/framework/pull/38086).
+
 Finally, don't forget to enable the [Broadcast Service Provider](https://laravel.com/docs/master/broadcasting#broadcast-service-provider).
 
----
-
-### Usage: Basic Events
+### Usage
 
 Simply follow the default way of broadcasting Laravel events, explained in the [official documentation](https://laravel.com/docs/master/broadcasting#defining-broadcast-events).
 
@@ -212,41 +212,11 @@ public function broadcastAs()
 }
 ```
 
----
+#### Model Broadcasting
 
-### Usage: Model Broadcasting
+If you're familiar with [Model Broadcasting](https://laravel.com/docs/master/broadcasting#model-broadcasting), you already know that Eloquent models dispatch several events during their lifecycle and broadcast them accordingly.
 
-If you're familiar with [Model Observers](https://laravel.com/docs/master/eloquent#observers), you already know that Eloquent models dispatch several events during their lifecycle.
-
-> **Note:** [Model Broadcasting](https://laravel.com/docs/master/broadcasting#model-broadcasting) is **only available from Laravel 8.x**.
-> If you'd like to do something similar with an older version of Laravel, we recommend to manually dispatch some "broadcastable" Events you'd be creating yourself from the [Model Observer](https://laravel.com/docs/master/eloquent#observers) functions.
-
-In order to broadcast the model events, you need to use the `PodPoint\SnsBroadcaster\BroadcastsEvents` trait on your Model.
-
-```php
-use Illuminate\Database\Eloquent\Model;
-use PodPoint\SnsBroadcaster\BroadcastsEvents;
-
-class Order extends Model
-{
-    use BroadcastsEvents;
-
-    /**
-     * Get the channels that model events should broadcast on.
-     *
-     * @param string $event
-     * @return array
-     */
-    public function broadcastOn($event)
-    {
-        return ['orders'];
-    }
-}
-```
-
-#### Events
-
-In the context of broadcasting, only the following model events can be broadcasted:
+In the context of model broadcasting, only the following model events can be broadcasted:
 
 - `created`
 - `updated`
@@ -254,82 +224,12 @@ In the context of broadcasting, only the following model events can be broadcast
 - `trashed` _if soft delete is enabled_
 - `restored` _if soft delete is enabled_
 
-By default, all of these events would broadcast, but you can define which events in particular you'd like to broadcast using the `broadcastOn` method on the model itself, just like Laravel suggests it:
+In order to broadcast the model events, you need to use the `Illuminate\Database\Eloquent\BroadcastsEvents` trait on your Model and follow the official [documentation]((https://laravel.com/docs/master/broadcasting#model-broadcasting)).
 
-```php
-/**
- * Get the channels that model events should broadcast on.
- *
- * @param  string  $event
- * @return \Illuminate\Broadcasting\Channel|array
- */
-public function broadcastOn($event)
-{
-    return match ($event) {
-        'deleted' => [], // disable broadcasting of the 'deleted' model event
-        default => ['users'],
-    };
-}
-```
+You can use `broadcastOn()`, `broadcastWith()` and `broadcastAs()` methods on your model in order to customize the Topic names, the payload and the Subject respectively.
 
-Now only the `created` and `updated` events for this Model will broadcast (if soft delete is disabled).
-
-#### Broadcast Data
-
-By default, the package will publish the default Laravel payload which is already used when broadcasting an Event. Once published, its JSON representation could look like this:
-
-```json
-{
-    "model": {
-        "id": 1,
-        "name": "Some Goods",
-        "total": 123456,
-        "created_at": "2021-06-29T13:21:36.000000Z",
-        "updated_at": "2021-06-29T13:21:36.000000Z"
-    },
-    "connection": null,
-    "queue": null
-}
-```
-
-However, using the `broadcastWith` method, you will be able to define exactly what kind of payload is used when broadcasting, here is an example:
-
-```php
-/**
- * Define and format the payload of data to broadcast.
- *
- * @param string $event
- * @return array
- */
-public function broadcastWith($event)
-{
-    return [
-        'action' => $event, // could be 'created', 'updated'...
-        'data' => [
-            'order-id' => $this->id,
-            'order-total' => $this->total,
-        ],
-    ];
-}
-```
-
-#### Broadcast Name / Subject
-
-If you wish to customize the `Subject` of your SNS notification here, it's exactly like for basic events, the only difference being that the actual event name (`created`, `updated`...) is given to you within the `broadcastAs()` method so you can decide wether you want to use it or not. Here is an example:
-
-```php
-/**
- * The event's broadcast name/subject.
- *
- * @return string
- */
-public function broadcastAs($event)
-{
-    return "orders.{$event}";
-}
-```
-
-Remember that if you don't use `broadcastAs()` at all, Laravel will default to use the event class name, and here for an Order model for example you could see `OrderCreated` as the `Subject`.
+> **Note:** Model Broadcasting is **only available from Laravel 8.x**.
+> If you'd like to do something similar with an older version of Laravel, we recommend to manually dispatch some "broadcastable" Events you'd be creating yourself from the [Model Observer](https://laravel.com/docs/master/eloquent#observers) functions.
 
 ## Subscribing / Listening
 

@@ -6,10 +6,8 @@ use Aws\Sns\SnsClient;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Database\Eloquent\BroadcastableModelEventOccurred as EloquentBroadcastableModelEventOccurred;
 use Illuminate\Support\ServiceProvider;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
-use PodPoint\AwsPubSub\Pub\Database\Eloquent\BroadcastableModelEventOccurred;
 use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
 
 class EventServiceProvider extends ServiceProvider
@@ -28,10 +26,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(
-            EloquentBroadcastableModelEventOccurred::class,
-            BroadcastableModelEventOccurred::class
-        );
+        // ...
     }
 
     /**
