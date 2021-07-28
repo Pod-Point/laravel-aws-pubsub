@@ -57,7 +57,7 @@ class SqsSnsQueue extends SqsQueue
     }
 
     /**
-     * Check wether there is a message pushed from SNS to SQS
+     * Check whether there is a message pushed from SNS to SQS
      * to process or not, validate it and see if we are
      * listening for it or not based on the mapping.
      *

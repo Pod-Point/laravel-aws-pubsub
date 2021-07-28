@@ -15,7 +15,7 @@ In this context, "channels" can be assimilated to "topics" on SNS.
 
 **The Sub**
 
-This part is pretty straight forward, we simply have to listen to these messages pushed to an SQS queue and act upon. The only difference here is that we don't use the default Laravel SQS driver as the messages pushed are not following Laravel's classic JSON payload for queued Jobs/Events pushed from a Laravel application. The messages from SNS are simpler.
+This part is pretty straight forward, we simply have to listen to these messages pushed to an SQS queue and act upon them. The only difference here is that we don't use the default Laravel SQS driver as the messages pushed are not following Laravel's classic JSON payload for queued Jobs/Events pushed from a Laravel application. The messages from SNS are simpler.
 
 ## Prerequisites
 
@@ -25,9 +25,7 @@ This part is pretty straight forward, we simply have to listen to these messages
 4. An [SQS subscription](./docs/sqs-subscription.jpg) between your SNS topic and your SQS queue with "raw message delivery" [disabled](./docs/raw-message-delivery.jpg)
 5. The relevant [Access policies configured](https://docs.aws.amazon.com/sns/latest/dg/sns-access-policy-use-cases.html), especially if you want to be able to publish messages directly from the AWS Console.
 
-## Publishing / Broadcasting
-
-### Installation
+## Installation
 
 You can install the package on a Laravel 8+ application via composer:
 
@@ -35,7 +33,11 @@ You can install the package on a Laravel 8+ application via composer:
 composer require pod-point/laravel-aws-pubsub
 ```
 
-Next, you will need to add the following connection and configure your SNS credentials in the `config/broadcasting.php` configuration file:
+## Publishing / Broadcasting
+
+### Configuration
+
+You will need to add the following connection and configure your SNS credentials in the `config/broadcasting.php` configuration file:
 
 ```php
 'connections' => [
@@ -190,7 +192,7 @@ public function broadcastWith()
 }
 ```
 
-Now, when the event is being triggered, it will behave like a standard Laravel event, which means other Listeners can listen to it, as usual, but it will also broadcast to the topic defined by the `broadcastOn` method using the payload defined by the `broadcastWith` method.
+Now, when the event is being triggered, it will behave like a standard Laravel event, which means other listeners can listen to it, as usual, but it will also broadcast to the topic defined by the `broadcastOn` method using the payload defined by the `broadcastWith` method.
 
 #### Broadcast Name / Subject
 
@@ -252,7 +254,7 @@ In the context of broadcasting, only the following model events can be broadcast
 - `trashed` _if soft delete is enabled_
 - `restored` _if soft delete is enabled_
 
-By default, all of these events would broadcast, but you can define which events in particular you'd like to broadcast using the `broadcastOn` method on the model itself, just like Laravel suggest it:
+By default, all of these events would broadcast, but you can define which events in particular you'd like to broadcast using the `broadcastOn` method on the model itself, just like Laravel suggests it:
 
 ```php
 /**
@@ -351,7 +353,7 @@ Once the package is installed and similar to what you would do for a standard La
 ],
 ```
 
-Once your queue is configured properly, you will need to be able to define which listeners you would like to use for which kind of incoming events. In order to do so, you'll need to create Laravel Listeners and associate the events through a Service Provider the package can create for you.
+Once your queue is configured properly, you will need to be able to define which listeners you would like to use for which kind of incoming events. In order to do so, you'll need to create Laravel listeners and associate the events through a Service Provider the package can create for you.
 
 ### Registering Events & Listeners
 
@@ -402,7 +404,7 @@ It's up to you do do whatever you want from that generic `OrdersListener`, you c
 
 ### Defining Listeners
 
-Here we are simply re-using standard Laravel event Listeners. The only difference being the function definition of the main `handle()` method which differs slightly. Instead of expecting an instance of an Event class passed, we simply receive the `payload` and the `subject`, if it's found.
+Here we are simply re-using standard Laravel event listeners. The only difference being the function definition of the main `handle()` method which differs slightly. Instead of expecting an instance of an Event class passed, we simply receive the `payload` and the `subject`, if it's found.
 
 ```php
 /**

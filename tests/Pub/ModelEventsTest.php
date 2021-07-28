@@ -7,10 +7,10 @@ use Mockery;
 use Mockery\MockInterface;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEvents;
-use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsForSpecificEvents;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsWhenUpdatedOnly;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsWithCustomName;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsWithCustomPayload;
-use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsWithCustomPayloadForSpecificEvents;
+use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsWithCustomPayloadWhenUpdatedOnly;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsWithMultipleChannels;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
@@ -75,7 +75,7 @@ class ModelEventsTest extends TestCase
     /** @test */
     public function it_broadcasts_model_event_with_specified_event()
     {
-        $user = UserWithBroadcastingEventsForSpecificEvents::create([
+        $user = UserWithBroadcastingEventsWhenUpdatedOnly::create([
             'name' => $this->faker->name(),
             'email' => $this->faker->email(),
             'password' => $this->faker->password(),
@@ -103,7 +103,7 @@ class ModelEventsTest extends TestCase
             $mock->shouldNotHaveReceived('publish');
         });
 
-        UserWithBroadcastingEventsForSpecificEvents::create([
+        UserWithBroadcastingEventsWhenUpdatedOnly::create([
             'name' => $this->faker->name(),
             'email' => $this->faker->email(),
             'password' => $this->faker->password(),
@@ -113,7 +113,7 @@ class ModelEventsTest extends TestCase
     /** @test */
     public function it_broadcasts_model_event_with_specified_event_and_custom_payload()
     {
-        $user = UserWithBroadcastingEventsWithCustomPayloadForSpecificEvents::create([
+        $user = UserWithBroadcastingEventsWithCustomPayloadWhenUpdatedOnly::create([
             'name' => $this->faker->name(),
             'email' => $this->faker->email(),
             'password' => $this->faker->password(),

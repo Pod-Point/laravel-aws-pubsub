@@ -136,7 +136,7 @@ class SqsSnsQueueTest extends TestCase
         $job = $queue->pop();
 
         $this->assertInstanceOf(SqsSnsJob::class, $job);
-        $this->assertEquals('\\TopicListener', $job->getSqsJob()['ListenerName']);
+        $this->assertEquals('\\TopicListener', $job->getSqsSnsJob()['ListenerName']);
     }
 
     /** @test */
@@ -154,7 +154,7 @@ class SqsSnsQueueTest extends TestCase
         $job = $queue->pop();
 
         $this->assertInstanceOf(SqsSnsJob::class, $job);
-        $this->assertEquals('\\SubjectListener', $job->getSqsJob()['ListenerName']);
+        $this->assertEquals('\\SubjectListener', $job->getSqsSnsJob()['ListenerName']);
     }
 
     /** @test */

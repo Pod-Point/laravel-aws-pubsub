@@ -4,7 +4,7 @@ namespace PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models;
 
 use PodPoint\AwsPubSub\Pub\Database\Eloquent\BroadcastsEvents;
 
-class UserWithBroadcastingEventsWithCustomPayloadForSpecificEvents extends User
+class UserWithBroadcastingEventsWhenUpdatedOnly extends User
 {
     use BroadcastsEvents;
 
@@ -19,16 +19,5 @@ class UserWithBroadcastingEventsWithCustomPayloadForSpecificEvents extends User
             case 'updated':
                 return ['users'];
         }
-    }
-
-    public function broadcastWith($event)
-    {
-        return [
-            'action' => $event,
-            'data' => [
-                'user' => $this,
-                'foo' => 'baz',
-            ],
-        ];
     }
 }

@@ -46,7 +46,7 @@ class InstallCommand extends Command
      * @param  string  $name
      * @return void
      */
-    protected function installServiceProviderAfter($after, $name)
+    protected function installServiceProviderAfter(string $after, string $name): void
     {
         if (! Str::contains($appConfig = file_get_contents(config_path('app.php')), 'App\\Providers\\'.$name.'::class')) {
             file_put_contents(config_path('app.php'), str_replace(
