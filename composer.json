@@ -1,8 +1,8 @@
 {
-    "name": "pod-point/laravel-sns-broadcaster",
-    "description": "A Laravel broadcasting driver that publishes events to AWS SNS.",
-    "keywords": ["laravel", "broadcasting", "broadcast", "pubsub", "aws", "sns"],
-    "homepage": "https://github.com/pod-point/laravel-sns-broadcaster",
+    "name": "pod-point/laravel-aws-pubsub",
+    "description": "A Laravel broadcasting driver and queue driver that broadcasts and listens to events published to AWS SNS and SQS.",
+    "keywords": ["laravel", "broadcasting", "broadcast", "queue", "listeners", "pubsub", "aws", "sns", "sqs"],
+    "homepage": "https://github.com/pod-point/laravel-aws-pubsub",
     "license": "MIT",
     "authors": [
         {
@@ -13,26 +13,26 @@
     "require": {
         "php": "^7.3|^8.0",
         "ext-json": "*",
-        "illuminate/support": "^8.0",
-        "aws/aws-sdk-php": "^3.155"
+        "aws/aws-sdk-php": "^3.155",
+        "illuminate/support": "^8.52"
     },
     "require-dev": {
         "orchestra/testbench": "^6.0"
     },
     "autoload": {
         "psr-4": {
-            "PodPoint\\SnsBroadcaster\\": "src"
+            "PodPoint\\AwsPubSub\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "PodPoint\\SnsBroadcaster\\Tests\\": "tests"
+            "PodPoint\\AwsPubSub\\Tests\\": "tests"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "PodPoint\\SnsBroadcaster\\SnsBroadcasterServiceProvider"
+                "PodPoint\\AwsPubSub\\AwsPubSubServiceProvider"
             ]
         }
     },
