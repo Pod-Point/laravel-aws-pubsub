@@ -21,8 +21,8 @@ This part is pretty straight forward, we simply have to listen to these messages
 
 1. This package installed and configured on both Laravel applications: the publisher and the subscriber
 2. An SQS queue
-3. An SNS topic
-4. An [SQS subscription](./docs/sqs-subscription.jpg) between your SNS topic and your SQS queue with "raw message delivery" [disabled](./docs/raw-message-delivery.jpg)
+3. An SNS Topic
+4. An [SQS subscription](./docs/sqs-subscription.jpg) between your SNS Topic and your SQS queue with "raw message delivery" [disabled](./docs/raw-message-delivery.jpg)
 5. The relevant [Access policies configured](https://docs.aws.amazon.com/sns/latest/dg/sns-access-policy-use-cases.html), especially if you want to be able to publish messages directly from the AWS Console.
 
 ## Installation
@@ -60,7 +60,7 @@ Make sure to define your [environment variables](https://laravel.com/docs/master
 AWS_DEFAULT_REGION=you-region
 AWS_ACCESS_KEY_ID=your-aws-key
 AWS_SECRET_ACCESS_KEY=your-aws-secret
-BROADCAST_TOPIC_ARN_PREFIX=arn:aws:sns:us-east-1:123456789: # up until your topic name
+BROADCAST_TOPIC_ARN_PREFIX=arn:aws:sns:us-east-1:123456789: # up until your Topic name
 BROADCAST_TOPIC_ARN_SUFFIX=-local # optional
 ```
 
@@ -80,7 +80,7 @@ Finally, don't forget to enable the [Broadcast Service Provider](https://laravel
 
 Simply follow the default way of broadcasting Laravel events, explained in the [official documentation](https://laravel.com/docs/master/broadcasting#defining-broadcast-events).
 
-In a similar way, you will have to make sure you're implementing the `Illuminate\Contracts\Broadcasting\ShouldBroadcast` interface and define which channel / topic you'd like to broadcast on.
+In a similar way, you will have to make sure you're implementing the `Illuminate\Contracts\Broadcasting\ShouldBroadcast` interface and define which channel / Topic you'd like to broadcast on.
 
 ```php
 use App\Models\Order;
@@ -192,11 +192,11 @@ public function broadcastWith()
 }
 ```
 
-Now, when the event is being triggered, it will behave like a standard Laravel event, which means other listeners can listen to it, as usual, but it will also broadcast to the topic defined by the `broadcastOn` method using the payload defined by the `broadcastWith` method.
+Now, when the event is being triggered, it will behave like a standard Laravel event, which means other listeners can listen to it, as usual, but it will also broadcast to the Topic defined by the `broadcastOn` method using the payload defined by the `broadcastWith` method.
 
 #### Broadcast Name / Subject
 
-In a Pub/Sub context, it can be handy to specify a `Subject` on each notification which broadcast to SNS. This can be an easy way to configure a listener for each specific kind of subject you can receive and process later on within queues.
+In a Pub/Sub context, it can be handy to specify a `Subject` on each notification which broadcast to SNS. This can be an easy way to configure a Listeners for each specific kind of subject you can receive and process later on within queues.
 
 By default, the package will use the standard [Laravel broadcast name](https://laravel.com/docs/master/broadcasting#broadcast-name) in order to define the `Subject` of the notification sent. Feel free to customize it as you wish.
 
@@ -257,9 +257,9 @@ Once your queue is configured properly, you will need to be able to define which
 
 ### Registering Events & Listeners
 
-You'll need a separate Service Provider in order to define the mapping for each PubSub event and its listener. We provide a Service Provider you can install and use by running `artisan pubsub:install`. This will create `App\Providers\PubSubEventServiceProvider` and load it within your `config/app.php` file automatically.
+You'll need a separate Service Provider in order to define the mapping for each PubSub event and its Listeners. We provide a Service Provider you can install and use by running `artisan pubsub:install`. This will create `App\Providers\PubSubEventServiceProvider` and load it within your `config/app.php` file automatically.
 
-The `listen` property contains an array of all events (keys) and their listeners (values). Unlike the standard Laravel `EventServiceProvider`, you can only define one listener per event, however you may add as many events to this array as your application requires.
+The `listen` property contains an array of all events (keys) and their listeners (values). Unlike the standard Laravel `EventServiceProvider`, you can only define one Listeners per event, however you may add as many events to this array as your application requires.
 
 #### Using the Broadcast Name / Subject of an SNS message
 
@@ -280,7 +280,7 @@ protected $listen = [
 
 #### Using the SNS Topic Name
 
-As a fallback, you can also use the ARN of an SNS Topic itself and have a more generic Listener for any event coming from that topic **which haven't been already mapped** to an existing subject-based event/listener couple.
+As a fallback, you can also use the ARN of an SNS Topic itself and have a more generic Listener for any event coming from that Topic **which haven't been already mapped** to an existing subject-based event/Listeners couple.
 
 For example, let's add a generic Listener for any event pushed to a given SNS Topic as a fallback:
 
@@ -300,7 +300,7 @@ protected $listen = [
 
 It's up to you do do whatever you want from that generic `OrdersListener`, you could even [dispatch more events](https://laravel.com/docs/master/events) internally within your application.
 
-**Note:** Topic-based event/listener couples should be registered last so the Subject-based ones take priority.
+**Note:** Topic-based event/Listeners couples should be registered last so the Subject-based ones take priority.
 
 ### Defining Listeners
 
@@ -318,14 +318,14 @@ public function handle(array $payload, string $subject = '')
 }
 ```
 
-Feel free to queue these listeners, just like you would with an Laravel listener.
+Feel free to queue these listeners, just like you would with an Laravel Listeners.
 
 #### Generating Listeners
 
 We also provide a convenient command to generate these classes for you:
 
 ```bash
-artisan pubsub:make:listener SendShipmentNotification
+artisan pubsub:make:Listeners SendShipmentNotification
 ```
 
 **Note:** you will still need to make sure the mapping within the `PubSubEventServiceProvider` is configured.
