@@ -7,9 +7,9 @@
 
 **The Pub**
 
-Similar to [Pusher](https://laravel.com/docs/master/broadcasting#pusher-channels), this package provides a [Laravel Broadcasting](https://laravel.com/docs/master/broadcasting) driver for [AWS SNS](https://aws.amazon.com/sns/) (Simple Notification Service) in order to publish server-side events.
+Similar to [Pusher](https://laravel.com/docs/8.x/broadcasting#pusher-channels), this package provides a [Laravel Broadcasting](https://laravel.com/docs/8.x/broadcasting) driver for [AWS SNS](https://aws.amazon.com/sns/) (Simple Notification Service) in order to publish server-side events.
 
-We understand [Broadcasting](https://laravel.com/docs/master/broadcasting) is usually used to "broadcast" your server-side Laravel [Events](https://laravel.com/docs/master/events) over a WebSocket connection to your client-side JavaScript application. However, we believe this approach of leveraging broadcasting makes sense for a Pub/Sub architecture where an application would like to broadcast a server-side event to the outside world about something that just happened.
+We understand [Broadcasting](https://laravel.com/docs/8.x/broadcasting) is usually used to "broadcast" your server-side Laravel [Events](https://laravel.com/docs/8.x/events) over a WebSocket connection to your client-side JavaScript application. However, we believe this approach of leveraging broadcasting makes sense for a Pub/Sub architecture where an application would like to broadcast a server-side event to the outside world about something that just happened.
 
 In this context, "channels" can be assimilated to "topics" on SNS.
 
@@ -60,7 +60,7 @@ You will need to add the following connection and configure your SNS credentials
 ],
 ```
 
-Make sure to define your [environment variables](https://laravel.com/docs/master/configuration#environment-configuration) accordingly:
+Make sure to define your [environment variables](https://laravel.com/docs/8.x/configuration#environment-configuration) accordingly:
 
 ```dotenv
 AWS_DEFAULT_REGION=you-region
@@ -80,11 +80,11 @@ BROADCAST_DRIVER=sns
 
 **Remember** that you can define the connection at the Event level if you ever need to be able to use [two drivers concurrently](https://github.com/laravel/framework/pull/38086).
 
-Finally, don't forget to enable the [Broadcast Service Provider](https://laravel.com/docs/master/broadcasting#broadcast-service-provider).
+Finally, don't forget to enable the [Broadcast Service Provider](https://laravel.com/docs/8.x/broadcasting#broadcast-service-provider).
 
 ### Usage
 
-Simply follow the default way of broadcasting Laravel events, explained in the [official documentation](https://laravel.com/docs/master/broadcasting#defining-broadcast-events).
+Simply follow the default way of broadcasting Laravel events, explained in the [official documentation](https://laravel.com/docs/8.x/broadcasting#defining-broadcast-events).
 
 In a similar way, you will have to make sure you're implementing the `Illuminate\Contracts\Broadcasting\ShouldBroadcast` interface and define which channel / Topic you'd like to broadcast on.
 
@@ -204,7 +204,7 @@ Now, when the event is being triggered, it will behave like a standard Laravel e
 
 In a Pub/Sub context, it can be handy to specify a `Subject` on each notification which broadcast to SNS. This can be an easy way to configure a Listener for each specific kind of subject you can receive and process later on within queues.
 
-By default, the package will use the standard [Laravel broadcast name](https://laravel.com/docs/master/broadcasting#broadcast-name) in order to define the `Subject` of the notification sent. Feel free to customize it as you wish.
+By default, the package will use the standard [Laravel broadcast name](https://laravel.com/docs/8.x/broadcasting#broadcast-name) in order to define the `Subject` of the notification sent. Feel free to customize it as you wish.
 
 ```php
 /**
@@ -220,7 +220,7 @@ public function broadcastAs()
 
 #### Model Broadcasting
 
-If you're familiar with [Model Broadcasting](https://laravel.com/docs/master/broadcasting#model-broadcasting), you already know that Eloquent models dispatch several events during their lifecycle and broadcast them accordingly.
+If you're familiar with [Model Broadcasting](https://laravel.com/docs/8.x/broadcasting#model-broadcasting), you already know that Eloquent models dispatch several events during their lifecycle and broadcast them accordingly.
 
 In the context of model broadcasting, only the following model events can be broadcasted:
 
@@ -230,12 +230,12 @@ In the context of model broadcasting, only the following model events can be bro
 - `trashed` _if soft delete is enabled_
 - `restored` _if soft delete is enabled_
 
-In order to broadcast the model events, you need to use the `Illuminate\Database\Eloquent\BroadcastsEvents` trait on your Model and follow the official [documentation]((https://laravel.com/docs/master/broadcasting#model-broadcasting)).
+In order to broadcast the model events, you need to use the `Illuminate\Database\Eloquent\BroadcastsEvents` trait on your Model and follow the official [documentation]((https://laravel.com/docs/8.x/broadcasting#model-broadcasting)).
 
 You can use `broadcastOn()`, `broadcastWith()` and `broadcastAs()` methods on your model in order to customize the Topic names, the payload and the Subject respectively.
 
 > **Note:** Model Broadcasting is **only available from Laravel 8.x**.
-> If you'd like to do something similar with an older version of Laravel, we recommend to manually dispatch some "broadcastable" Events you'd be creating yourself from the [Model Observer](https://laravel.com/docs/master/eloquent#observers) functions.
+> If you'd like to do something similar with an older version of Laravel, we recommend to manually dispatch some "broadcastable" Events you'd be creating yourself from the [Model Observer](https://laravel.com/docs/8.x/eloquent#observers) functions.
 
 ## Subscribing / Listening
 
@@ -304,7 +304,7 @@ protected $listen = [
 ];
 ```
 
-It's up to you do do whatever you want from that generic `OrdersListener`, you could even [dispatch more events](https://laravel.com/docs/master/events) internally within your application.
+It's up to you do do whatever you want from that generic `OrdersListener`, you could even [dispatch more events](https://laravel.com/docs/8.x/events) internally within your application.
 
 **Note:** Topic-based Event/Listener couples should be registered last so the Subject-based ones take priority.
 
