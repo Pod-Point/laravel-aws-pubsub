@@ -33,12 +33,6 @@ You can install the package on a Laravel 8+ application via composer:
 composer require pod-point/laravel-aws-pubsub
 ```
 
-Similar to the default `EventServiceProvider` shipping with Laravel, you will need to install a new Service Provider within your application, this can be done by running:
-
-```bash
-php artisan pubsub:install
-```
-
 ## Publishing / Broadcasting
 
 ### Configuration
@@ -50,11 +44,11 @@ You will need to add the following connection and configure your SNS credentials
     // ...
     'sns' => [
         'driver' => 'sns',
+        'region' => env('AWS_DEFAULT_REGION'),
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'arn-prefix' => env('BROADCAST_TOPIC_ARN_PREFIX'),
         'arn-suffix' => env('BROADCAST_TOPIC_ARN_SUFFIX'),
-        'region' => env('AWS_DEFAULT_REGION'),
     ],
     // ...
 ],
@@ -202,7 +196,7 @@ Now, when the event is being triggered, it will behave like a standard Laravel e
 
 #### Broadcast Name / Subject
 
-In a Pub/Sub context, it can be handy to specify a `Subject` on each notification which broadcast to SNS. This can be an easy way to configure a Listener for each specific kind of subject you can receive and process later on within queues.
+In a Pub/Sub context, it can be handy to specify a `Subject` on each notification which broadcast to SNS. This can be an easy way to configure a Listeners for each specific kind of subject you can receive and process later on within queues.
 
 By default, the package will use the standard [Laravel broadcast name](https://laravel.com/docs/8.x/broadcasting#broadcast-name) in order to define the `Subject` of the notification sent. Feel free to customize it as you wish.
 
@@ -263,9 +257,9 @@ Once your queue is configured properly, you will need to be able to define which
 
 ### Registering Events & Listeners
 
-You'll need a separate Service Provider in order to define the mapping for each PubSub event and its Listener. We provide a Service Provider you can install and use by running `artisan pubsub:install`. This will create `App\Providers\PubSubEventServiceProvider` and load it within your `config/app.php` file automatically.
+You'll need a separate Service Provider in order to define the mapping for each PubSub event and its Listeners. We provide a Service Provider you can install and use by running `artisan pubsub:install`. This will create `App\Providers\PubSubEventServiceProvider` and load it within your `config/app.php` file automatically.
 
-The `listen` property contains an array of all events (keys) and their listeners (values). Unlike the standard Laravel `EventServiceProvider`, you can only define one Listener per event, however you may add as many events to this array as your application requires.
+The `listen` property contains an array of all events (keys) and their listeners (values). Unlike the standard Laravel `EventServiceProvider`, you can only define one Listeners per event, however you may add as many events to this array as your application requires.
 
 #### Using the Broadcast Name / Subject of an SNS message
 
@@ -286,7 +280,7 @@ protected $listen = [
 
 #### Using the SNS Topic Name
 
-As a fallback, you can also use the ARN of an SNS Topic itself and have a more generic Listener for any event coming from that Topic **which haven't been already mapped** to an existing subject-based Event/Listener couple.
+As a fallback, you can also use the ARN of an SNS Topic itself and have a more generic Listener for any event coming from that Topic **which haven't been already mapped** to an existing subject-based event/Listeners couple.
 
 For example, let's add a generic Listener for any event pushed to a given SNS Topic as a fallback:
 
@@ -306,7 +300,7 @@ protected $listen = [
 
 It's up to you do do whatever you want from that generic `OrdersListener`, you could even [dispatch more events](https://laravel.com/docs/8.x/events) internally within your application.
 
-**Note:** Topic-based Event/Listener couples should be registered last so the Subject-based ones take priority.
+**Note:** Topic-based event/Listeners couples should be registered last so the Subject-based ones take priority.
 
 ### Defining Listeners
 
@@ -324,14 +318,14 @@ public function handle(array $payload, string $subject = '')
 }
 ```
 
-Feel free to queue these listeners, just like you would with a standard Laravel Listener.
+Feel free to queue these listeners, just like you would with an Laravel Listeners.
 
 #### Generating Listeners
 
 We also provide a convenient command to generate these classes for you:
 
 ```bash
-artisan pubsub:make:listener SendShipmentNotification
+artisan pubsub:make:Listeners SendShipmentNotification
 ```
 
 **Note:** you will still need to make sure the mapping within the `PubSubEventServiceProvider` is configured.
