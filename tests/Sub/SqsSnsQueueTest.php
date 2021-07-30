@@ -158,6 +158,24 @@ class SqsSnsQueueTest extends TestCase
     }
 
     /** @test */
+    public function it_will_fallback_to_the_listener_name_based_on_the_topic_arn_if_subject_cannot_be_matched()
+    {
+        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+            'Messages' => [$this->mockedMessageDataWithTopicAndSubject],
+        ]));
+
+        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default', '', '', [
+            'Subject#i_do_not_exist' => '\\SubjectListener',
+            'TopicArn:123456' => '\\TopicListener',
+        ]);
+        $queue->setContainer(new Container);
+        $job = $queue->pop();
+
+        $this->assertInstanceOf(SqsSnsJob::class, $job);
+        $this->assertEquals('\\TopicListener', $job->getSqsSnsJob()['ListenerName']);
+    }
+
+    /** @test */
     public function it_will_not_do_anything_if_the_event_listeners_mapping_does_not_match()
     {
         $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([

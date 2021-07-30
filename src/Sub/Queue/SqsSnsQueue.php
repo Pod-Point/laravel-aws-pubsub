@@ -82,8 +82,10 @@ class SqsSnsQueue extends SqsQueue
             return false;
         }
 
+        $default = Arr::get($this->events, Arr::get($body, 'TopicArn'));
+
         $event = Arr::get($body, 'Subject', Arr::get($body, 'TopicArn'));
 
-        return Arr::get($this->events, $event);
+        return Arr::get($this->events, $event, $default);
     }
 }
