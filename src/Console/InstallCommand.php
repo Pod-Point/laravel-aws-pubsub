@@ -37,6 +37,8 @@ class InstallCommand extends Command
         copy(__DIR__.'/../Sub/stubs/app/Providers/PubSubEventServiceProvider.php', app_path('Providers/PubSubEventServiceProvider.php'));
 
         $this->installServiceProviderAfter('EventServiceProvider', 'PubSubEventServiceProvider');
+
+        $this->info('PubSubEventServiceProvider created successfully.');
     }
 
     /**
