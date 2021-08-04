@@ -280,7 +280,7 @@ protected $listen = [
 
 #### Using the SNS Topic Name
 
-As a fallback, you can also use the ARN of an SNS Topic itself and have a more generic Listener for any event coming from that Topic **which haven't been already mapped** to an existing subject-based event/Listeners couple.
+As a fallback, you can also use the ARN of an SNS Topic itself and have a more generic Listener for any event coming from that Topic **which haven't been already mapped** to an existing subject-based Event/Listeners couple.
 
 For example, let's add a generic Listener for any event pushed to a given SNS Topic as a fallback:
 
@@ -300,7 +300,7 @@ protected $listen = [
 
 It's up to you do do whatever you want from that generic `OrdersListener`, you could even [dispatch more events](https://laravel.com/docs/8.x/events) internally within your application.
 
-**Note:** Topic-based event/Listeners couples should be registered last so the Subject-based ones take priority.
+**Note:** Topic-based Event/Listeners couples should be registered last so the Subject-based ones take priority.
 
 ### Defining Listeners
 
@@ -325,7 +325,7 @@ Feel free to queue these listeners, just like you would with an Laravel Listener
 We also provide a convenient command to generate these classes for you:
 
 ```bash
-artisan pubsub:make:Listeners SendShipmentNotification
+artisan pubsub:make:listeners SendShipmentNotification
 ```
 
 **Note:** you will still need to make sure the mapping within the `PubSubEventServiceProvider` is configured.
