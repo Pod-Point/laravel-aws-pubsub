@@ -325,7 +325,7 @@ Feel free to queue these listeners, just like you would with an Laravel Listener
 We also provide a convenient command to generate these classes for you:
 
 ```bash
-artisan pubsub:make:listeners SendShipmentNotification
+artisan pubsub:make:listener SendShipmentNotification
 ```
 
 **Note:** you will still need to make sure the mapping within the `PubSubEventServiceProvider` is configured.
