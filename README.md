@@ -20,7 +20,7 @@ This part is pretty straight forward, we simply have to listen to these messages
 ## Prerequisites
 
 1. This package installed and configured on both Laravel applications: the publisher and the subscriber
-2. At least one SQS Queue **one queue per Laravel application subscribing**
+2. At least one SQS Queue - **one queue per Laravel application subscribing**
 3. At least one SNS Topic
 4. An [SQS subscription](./docs/sqs-subscription.jpg) between your SNS Topic and your SQS Queue with "raw message delivery" [disabled](./docs/raw-message-delivery.jpg)
 5. The relevant [Access policies configured](https://docs.aws.amazon.com/sns/latest/dg/sns-access-policy-use-cases.html), especially if you want to be able to publish messages directly from the AWS Console.
