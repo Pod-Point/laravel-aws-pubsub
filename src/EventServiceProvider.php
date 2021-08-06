@@ -4,8 +4,8 @@ namespace PodPoint\AwsPubSub;
 
 use Aws\Sns\SnsClient;
 use Illuminate\Broadcasting\BroadcastManager;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
 use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
@@ -24,68 +24,70 @@ class EventServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register(): void
+    public function register()
     {
-        // ...
+        $this->registerSnsBroadcaster();
+        $this->registerSqsSnsQueueConnector();
     }
 
     /**
      * Bootstrap any application services.
      *
      * @return void
-     * @throws BindingResolutionException
      */
-    public function boot(): void
+    public function boot()
     {
-        $this->registerPub();
-
-        $this->registerSub();
+        //
     }
 
     /**
-     * Register anything related to the Publication of PubSub events on AWS.
-     *
-     * @throws BindingResolutionException
-     */
-    protected function registerPub()
-    {
-        $this->app->singleton(SnsClient::class, function () {
-            $config = [
-                'region' => config('broadcasting.connections.sns.region'),
-                'version' => 'latest',
-            ];
-
-            $key = config('broadcasting.connections.sns.key');
-            $secret = config('broadcasting.connections.sns.secret');
-
-            if ($key && $secret) {
-                $config['credentials'] = [
-                    'key' => $key,
-                    'secret' => $secret,
-                    'token' => config('broadcasting.connections.sns.token'),
-                ];
-            }
-
-            return new SnsClient($config);
-        });
-
-        $this->app->make(BroadcastManager::class)->extend('sns', function (Container $app, array $config) {
-            return new SnsBroadcaster(
-                $config['arn-prefix'] ?? '',
-                $config['arn-suffix'] ?? ''
-            );
-        });
-    }
-
-    /**
-     * Register anything related to the Subscription of PubSub events on AWS.
+     * Register the SNS broadcaster for the Broadcast components.
      *
      * @return void
      */
-    protected function registerSub()
+    protected function registerSnsBroadcaster()
     {
-        $this->app['queue']->extend('sqs-sns', function () {
-            return new SqsSnsConnector($this->listen);
+        $this->app->resolving(BroadcastManager::class, function (BroadcastManager $manager) {
+            $manager->extend('sns', function (Container $app, array $config) {
+                return $this->createSnsDriver($config);
+            });
+        });
+    }
+
+    /**
+     * Create an instance of the SNS driver for broadcasting.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     */
+    protected function createSnsDriver(array $config)
+    {
+        if ($config['key'] && $config['secret']) {
+            $config['credentials'] = [
+                'key' => $config['key'],
+                'secret' => $config['secret'],
+                'token' => $config['token'] ?? null,
+            ];
+        }
+
+        return new SnsBroadcaster(
+            new SnsClient(array_merge($config, ['version' => 'latest'])),
+            $config['arn-prefix'] ?? '',
+            $config['arn-suffix'] ?? ''
+        );
+    }
+
+    /**
+     * Register the SQS SNS connector for the Queue components.
+     *
+     * @return void
+     */
+    protected function registerSqsSnsQueueConnector()
+    {
+        $this->app->resolving('queue', function (QueueManager $manager) {
+            $manager->extend('sqs-sns', function () {
+                return new SqsSnsConnector($this->listen);
+            });
         });
     }
 }
