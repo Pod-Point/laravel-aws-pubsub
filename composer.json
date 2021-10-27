@@ -17,7 +17,7 @@
         "illuminate/support": "^5.4|^8.52"
     },
     "require-dev": {
-        "orchestra/testbench": "^6.0"
+        "orchestra/testbench": "^3"
     },
     "autoload": {
         "psr-4": {
