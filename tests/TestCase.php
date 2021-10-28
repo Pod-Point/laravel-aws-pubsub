@@ -8,7 +8,6 @@ use PodPoint\AwsPubSub\EventServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
-
     /**
      * Get package providers.
      *
