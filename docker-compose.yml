@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+  php:
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: "tail -f /dev/null"
