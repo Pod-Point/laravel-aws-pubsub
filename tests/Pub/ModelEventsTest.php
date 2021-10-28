@@ -30,9 +30,9 @@ class ModelEventsTest extends TestCase
         });
 
         UserWithBroadcastingEvents::create([
-            'name' => $this->faker->name(),
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
-            'password' => $this->faker->password(),
+            'password' => 'pas$word',
         ]);
     }
 
@@ -44,9 +44,9 @@ class ModelEventsTest extends TestCase
         });
 
         User::create([
-            'name' => $this->faker->name(),
-            'email' => $this->faker->email(),
-            'password' => $this->faker->password(),
+            'name' => 'John Doe',
+            'email' => 'john@doe.com',
+            'password' => 'pas$word',
         ]);
     }
 
@@ -66,9 +66,9 @@ class ModelEventsTest extends TestCase
         });
 
         UserWithBroadcastingEventsWithCustomPayload::create([
-            'name' => $this->faker->name(),
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
-            'password' => $this->faker->password(),
+            'password' => 'pas$word',
         ]);
     }
 
@@ -76,9 +76,9 @@ class ModelEventsTest extends TestCase
     public function it_broadcasts_model_event_with_specified_event()
     {
         $user = UserWithBroadcastingEventsWhenUpdatedOnly::create([
-            'name' => $this->faker->name(),
-            'email' => $this->faker->email(),
-            'password' => $this->faker->password(),
+            'name' => 'John Doe',
+            'email' => 'john.doe@test.com',
+            'password' => 'pas$word',
         ]);
 
         $this->mock(SnsClient::class, function (MockInterface $mock) {
@@ -104,9 +104,9 @@ class ModelEventsTest extends TestCase
         });
 
         UserWithBroadcastingEventsWhenUpdatedOnly::create([
-            'name' => $this->faker->name(),
-            'email' => $this->faker->email(),
-            'password' => $this->faker->password(),
+            'name' => 'John Doe',
+            'email' => 'john@doe.com',
+            'password' => 'pas$word',
         ])->delete();
     }
 
@@ -114,9 +114,9 @@ class ModelEventsTest extends TestCase
     public function it_broadcasts_model_event_with_specified_event_and_custom_payload()
     {
         $user = UserWithBroadcastingEventsWithCustomPayloadWhenUpdatedOnly::create([
-            'name' => $this->faker->name(),
-            'email' => $this->faker->email(),
-            'password' => $this->faker->password(),
+            'name' => 'John Doe',
+            'email' => 'john.doe@test.com',
+            'password' => 'pas$word',
         ]);
 
         $this->mock(SnsClient::class, function (MockInterface $mock) {
@@ -150,9 +150,9 @@ class ModelEventsTest extends TestCase
         });
 
         UserWithBroadcastingEventsWithMultipleChannels::create([
-            'name' => $this->faker->name(),
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
-            'password' => $this->faker->password(),
+            'password' => 'pas$word',
         ]);
     }
 
@@ -168,9 +168,9 @@ class ModelEventsTest extends TestCase
         });
 
         UserWithBroadcastingEvents::create([
-            'name' => $this->faker->name(),
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
-            'password' => $this->faker->password(),
+            'password' => 'pas$word',
         ]);
     }
 
@@ -186,9 +186,9 @@ class ModelEventsTest extends TestCase
         });
 
         UserWithBroadcastingEventsWithCustomName::create([
-            'name' => $this->faker->name(),
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
-            'password' => $this->faker->password(),
+            'password' => 'pas$word',
         ]);
     }
 }
