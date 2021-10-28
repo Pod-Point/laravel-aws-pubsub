@@ -50,7 +50,6 @@ abstract class TestCase extends Orchestra
             'secret' => 'dummy-secret',
             'prefix' => 'https://sqs.eu-west-1.amazonaws.com/13245',
             'queue' => 'default',
-            'suffix' => '',
             'region' => 'eu-west-1',
         ]);
 
