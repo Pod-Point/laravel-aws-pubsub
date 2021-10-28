@@ -6,7 +6,7 @@ jobs:
   test:
     runs-on: ubuntu-18.04
     strategy:
-#      fail-fast: true
+      fail-fast: true
       matrix:
         php: [ 7.1, 7.3, 8.0 ]
         laravel: [ 5.4 ]
