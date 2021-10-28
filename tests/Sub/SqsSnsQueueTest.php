@@ -37,7 +37,7 @@ class SqsSnsQueueTest extends TestCase
         parent::setUp();
 
         $this->mockedSqsClient = $this->getMockBuilder(SqsClient::class)
-            ->addMethods(['receiveMessage', 'deleteMessage'])
+            ->setMethods(['receiveMessage', 'deleteMessage'])
             ->disableOriginalConstructor()
             ->getMock();
 
