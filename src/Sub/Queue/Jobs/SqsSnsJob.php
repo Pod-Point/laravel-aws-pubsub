@@ -67,13 +67,11 @@ class SqsSnsJob extends SqsJob
         $payload = json_decode($body['Message'], true);
         $subject = Arr::get($body, 'Subject', '');
 
-        $instance = $this->container->make(CallQueuedListener::class, [
-            'class' => $listenerName,
-            'method' => 'handle',
-            'data' => compact('payload', 'subject'),
-        ]);
-
-        return serialize($instance);
+        return serialize(new CallQueuedListener(
+            $listenerName,
+            'handle',
+            compact('payload', 'subject')
+        ));
     }
 
     /**
