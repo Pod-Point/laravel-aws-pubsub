@@ -11,14 +11,18 @@ class InstallCommandTest extends TestCase
         parent::setUp();
 
         copy(config_path('app.php'), config_path('app.original'));
+
+        if (! file_exists(app_path('Providers'))) {
+            mkdir(app_path('Providers'));
+        }
     }
 
     public function tearDown(): void
     {
-        parent::tearDown();
-
         unlink(app_path('Providers').'/PubSubEventServiceProvider.php');
         copy(config_path('app.original'), config_path('app.php'));
+
+        parent::tearDown();
     }
 
     /** @test */

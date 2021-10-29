@@ -11,7 +11,9 @@ class ListenerMakeCommandTest extends TestCase
     {
         // Must be before parent::tearDown() as it flushes the container,
         // which is required to be populated for the `app_path` helper.
-        File::delete(app_path('Listeners/PubSub/SomeListener.php'));
+        @unlink(app_path('Listeners/PubSub/SomeListener.php'));
+        @rmdir(app_path('Listeners/PubSub'));
+        @rmdir(app_path('Listeners'));
 
         parent::tearDown();
     }
