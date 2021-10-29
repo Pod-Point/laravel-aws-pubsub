@@ -45,7 +45,9 @@ class InstallCommandTest extends TestCase
         $this->assertFileExists(app_path('Providers').'/PubSubEventServiceProvider.php');
         $this->assertStringContainsString('PubSubEventServiceProvider', file_get_contents(config_path('app.php')));
 
-        $this->assertNotEquals(0, $this->artisan('pubsub:install'));
+        $exitCode = $this->artisan('pubsub:install');
+
+        $this->assertEquals(1, $exitCode);
 
         $this->assertFileExists(app_path('Providers').'/PubSubEventServiceProvider.php');
         $this->assertStringContainsString('PubSubEventServiceProvider', file_get_contents(config_path('app.php')));
