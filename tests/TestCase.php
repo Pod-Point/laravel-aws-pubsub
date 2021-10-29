@@ -2,6 +2,7 @@
 
 namespace PodPoint\AwsPubSub\Tests;
 
+use Closure;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -26,6 +27,17 @@ abstract class TestCase extends Orchestra
             AwsPubSubServiceProvider::class,
             EventServiceProvider::class,
         ];
+    }
+
+    protected function setTestDatabase($app)
+    {
+        /** DATABASE */
+        $app['config']->set('database.default', 'testbench');
+        $app['config']->set('database.connections.testbench', [
+            'driver'   => 'sqlite',
+            'database' => ':memory:',
+            'prefix'   => '',
+        ]);
     }
 
     /**
@@ -58,13 +70,8 @@ abstract class TestCase extends Orchestra
             'region' => 'eu-west-1',
         ]);
 
-        /** DATABASE */
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
-            'prefix'   => '',
-        ]);
+        $this->setTestDatabase($app);
+
     }
 
     /**

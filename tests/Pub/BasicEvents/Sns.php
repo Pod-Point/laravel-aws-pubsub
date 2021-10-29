@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\AwsPubSub\Tests\Pub;
+namespace PodPoint\AwsPubSub\Tests\Pub\BasicEvents;
 
 use Aws\Sns\SnsClient;
 use Mockery;
@@ -13,7 +13,7 @@ use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithPublicPrope
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
-class BasicEventsTest extends TestCase
+class Sns extends TestCase
 {
     /** @test */
     public function it_broadcasts_basic_event()
