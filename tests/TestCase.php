@@ -2,7 +2,12 @@
 
 namespace PodPoint\AwsPubSub\Tests;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Orchestra\Testbench\Concerns\WithLaravelMigrations;
 use Orchestra\Testbench\TestCase as Orchestra;
+use PHPUnit\Framework\Constraint\FileExists;
+use PHPUnit\Framework\Constraint\LogicalNot;
+use PodPoint\AwsPubSub\ArtisanCommandsServiceProvider;
 use PodPoint\AwsPubSub\AwsPubSubServiceProvider;
 use PodPoint\AwsPubSub\EventServiceProvider;
 
@@ -20,6 +25,7 @@ abstract class TestCase extends Orchestra
         return [
             AwsPubSubServiceProvider::class,
             EventServiceProvider::class,
+            ArtisanCommandsServiceProvider::class,
         ];
     }
 
@@ -69,5 +75,16 @@ abstract class TestCase extends Orchestra
     protected function defineDatabaseMigrations()
     {
         $this->loadLaravelMigrations();
+    }
+
+    /**
+     * Added for backwards compatability with Laravel 5.4 as it otherwise doesn't exist.
+     *
+     * @param string $filename
+     * @param string $message
+     */
+    public function assertFileDoesNotExist(string $filename, string $message = '')
+    {
+        static::assertThat($filename, new LogicalNot(new FileExists), $message);
     }
 }

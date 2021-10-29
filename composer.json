@@ -14,12 +14,11 @@
         "php": "^7.1|^7.2|^7.3",
         "ext-json": "*",
         "aws/aws-sdk-php": "^3.155",
-        "illuminate/support": "^5.4"
+        "illuminate/support": "5.4.*"
     },
     "require-dev": {
         "orchestra/testbench": "^3.0.0",
-        "phpunit/phpunit": "^7.5",
-        "mockery/mockery": "^1.0"
+        "phpunit/phpunit": "^7.5"
     },
     "autoload": {
         "psr-4": {

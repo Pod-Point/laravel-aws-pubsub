@@ -27,9 +27,7 @@ class InstallCommandTest extends TestCase
         $this->assertFileDoesNotExist(app_path('Providers').'/PubSubEventServiceProvider.php');
         $this->assertStringNotContainsString('PubSubEventServiceProvider', file_get_contents(config_path('app.php')));
 
-        $this->artisan('pubsub:install')
-            ->expectsOutput('PubSubEventServiceProvider created successfully.')
-            ->assertExitCode(0);
+        $this->artisan('pubsub:install');
 
         $this->assertFileExists(app_path('Providers').'/PubSubEventServiceProvider.php');
         $this->assertStringContainsString('PubSubEventServiceProvider', file_get_contents(config_path('app.php')));
@@ -38,14 +36,12 @@ class InstallCommandTest extends TestCase
     /** @test */
     public function it_does_not_install_the_service_provider_if_already_existing()
     {
-        $this->artisan('pubsub:install')->assertExitCode(0);
+        $this->artisan('pubsub:install');
 
         $this->assertFileExists(app_path('Providers').'/PubSubEventServiceProvider.php');
         $this->assertStringContainsString('PubSubEventServiceProvider', file_get_contents(config_path('app.php')));
 
-        $this->artisan('pubsub:install')
-            ->expectsOutput('PubSubEventServiceProvider already exists!')
-            ->assertExitCode(1);
+        $this->artisan('pubsub:install');
 
         $this->assertFileExists(app_path('Providers').'/PubSubEventServiceProvider.php');
         $this->assertStringContainsString('PubSubEventServiceProvider', file_get_contents(config_path('app.php')));
