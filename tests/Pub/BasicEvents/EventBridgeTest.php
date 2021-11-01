@@ -44,11 +44,7 @@ class EventBridgeTest extends TestCase
     /** @test */
     public function it_broadcasts_basic_event_with_the_event_name_as_the_detail_type_and_serialised_event_as_the_detail()
     {
-        $jane = User::create([
-            'name' => 'Jane',
-            'email' => 'jane@doe.com',
-            'password' => 'shh',
-        ])->fresh();
+        $jane = $this->createJane();
 
         $janeRetrieved = new UserRetrieved($jane);
 
@@ -74,11 +70,7 @@ class EventBridgeTest extends TestCase
     /** @test */
     public function it_broadcasts_basic_event_with_action()
     {
-        $jane = User::create([
-            'name' => 'Jane',
-            'email' => 'jane@doe.com',
-            'password' => 'shh',
-        ])->fresh();
+        $jane = $this->createJane();
 
         $janeRetrieved = new UserRetrievedWithCustomName($jane);
 
@@ -104,11 +96,7 @@ class EventBridgeTest extends TestCase
     /** @test */
     public function it_broadcasts_basic_event_with_action_and_custom_payload()
     {
-        $jane = User::create([
-            'name' => 'Jane',
-            'email' => 'jane@doe.com',
-            'password' => 'shh',
-        ])->fresh();
+        $jane = $this->createJane();
 
         $janeRetrieved = new UserRetrievedWithCustomPayload($jane);
 
@@ -141,11 +129,7 @@ class EventBridgeTest extends TestCase
     /** @test */
     public function it_broadcasts_basic_event_to_multiple_channels_as_buses()
     {
-        $jane = User::create([
-            'name' => 'Jane',
-            'email' => 'jane@doe.com',
-            'password' => 'shh',
-        ])->fresh();
+        $jane = $this->createJane();
 
         $janeRetrieved = new UserRetrievedWithMultipleChannels($jane);
 
@@ -171,5 +155,17 @@ class EventBridgeTest extends TestCase
             ->with($expectedPayload);
 
         event($janeRetrieved);
+    }
+
+    /**
+     * @return User
+     */
+    protected function createJane()
+    {
+        return User::create([
+            'name' => 'Jane',
+            'email' => 'jane@doe.com',
+            'password' => 'shh',
+        ])->fresh();
     }
 }
