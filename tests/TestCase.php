@@ -16,8 +16,6 @@ use PodPoint\AwsPubSub\EventServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
-    use DatabaseMigrations;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -39,6 +37,17 @@ abstract class TestCase extends Orchestra
             EventServiceProvider::class,
             ArtisanCommandsServiceProvider::class,
         ];
+    }
+
+    protected function setTestDatabase($app)
+    {
+        /** DATABASE */
+        $app['config']->set('database.default', 'testbench');
+        $app['config']->set('database.connections.testbench', [
+            'driver'   => 'sqlite',
+            'database' => ':memory:',
+            'prefix'   => '',
+        ]);
     }
 
     /**
@@ -70,13 +79,8 @@ abstract class TestCase extends Orchestra
             'region' => 'eu-west-1',
         ]);
 
-        /** DATABASE */
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
-            'prefix'   => '',
-        ]);
+        $this->setTestDatabase($app);
+
     }
 
     /**
@@ -103,7 +107,7 @@ abstract class TestCase extends Orchestra
      */
     protected function mock(string $abstract, Closure $mock = null): MockInterface
     {
-        $mock = Mockery::mock($abstract, $mock);
+        $mock = Mockery::mock(...array_filter(func_get_args()));
 
         $this->app->instance($abstract, $mock);
 

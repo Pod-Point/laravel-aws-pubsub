@@ -2,11 +2,13 @@
 
 namespace PodPoint\AwsPubSub;
 
+use Aws\EventBridge\EventBridgeClient;
 use Aws\Sns\SnsClient;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\ServiceProvider;
+use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\EventBridgeBroadcaster;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
 use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
 
@@ -69,10 +71,37 @@ class EventServiceProvider extends ServiceProvider
             return new SnsClient($config);
         });
 
+        $this->app->singleton(EventBridgeClient::class, function () {
+            $config = [
+                'region' => config('broadcasting.connections.sns.region'),
+                'version' => 'latest',
+            ];
+
+            $key = config('broadcasting.connections.eventbridge.key');
+            $secret = config('broadcasting.connections.eventbridge.secret');
+
+            if ($key && $secret) {
+                $config['credentials'] = [
+                    'key' => $key,
+                    'secret' => $secret,
+                    'token' => config('broadcasting.connections.sns.token'),
+                ];
+            }
+
+            return new EventBridgeClient($config);
+        });
+
         $this->app->make(BroadcastManager::class)->extend('sns', function (Container $app, array $config) {
             return new SnsBroadcaster(
                 $config['arn-prefix'] ?? '',
                 $config['arn-suffix'] ?? ''
+            );
+        });
+
+        $this->app->make(BroadcastManager::class)->extend('eventbridge', function (Container $app, array $config) {
+            return new EventBridgeBroadcaster(
+                $config['source'] ?? '',
+                $config['event'] ?? ''
             );
         });
     }
