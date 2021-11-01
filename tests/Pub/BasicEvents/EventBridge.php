@@ -3,8 +3,6 @@
 namespace PodPoint\AwsPubSub\Tests\Pub\BasicEvents;
 
 use Aws\EventBridge\EventBridgeClient;
-use Aws\Sns\SnsClient;
-use Mockery;
 use Mockery\MockInterface;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrieved;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithCustomName;
@@ -44,8 +42,7 @@ class EventBridge extends TestCase
     }
 
     /** @test */
-    public function it_broadcasts_basic_event_with_the_event_name_as_the_detail_type_and_serialised_event_as_the_detail(
-    )
+    public function it_broadcasts_basic_event_with_the_event_name_as_the_detail_type_and_serialised_event_as_the_detail()
     {
         $jane = User::create([
             'name' => 'Jane',
