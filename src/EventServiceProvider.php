@@ -68,6 +68,11 @@ class EventServiceProvider extends ServiceProvider
         });
     }
 
+    /**
+     * Register everything relevant to the Event Bridge broadcaster.
+     *
+     * @return void
+     */
     protected function registerSnsBroadcaster(): void
     {
         $this->app->singleton(SnsClient::class, function () {
@@ -99,7 +104,9 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register everything relevant to the Event Bridge broadcaster.
      * 
+     * @return void
      */
     protected function registerEventBridgeBroadcaster(): void
     {
