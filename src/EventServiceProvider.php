@@ -51,6 +51,25 @@ class EventServiceProvider extends ServiceProvider
      */
     protected function registerPub()
     {
+        $this->registerSnsBroadcaster();
+
+        $this->registerEventBridgeBroadcaster();
+    }
+
+    /**
+     * Register anything related to the Subscription of PubSub events on AWS.
+     *
+     * @return void
+     */
+    protected function registerSub()
+    {
+        $this->app['queue']->extend('sqs-sns', function () {
+            return new SqsSnsConnector($this->listen);
+        });
+    }
+
+    protected function registerSnsBroadcaster(): void
+    {
         $this->app->singleton(SnsClient::class, function () {
             $config = [
                 'region' => config('broadcasting.connections.sns.region'),
@@ -71,6 +90,19 @@ class EventServiceProvider extends ServiceProvider
             return new SnsClient($config);
         });
 
+        $this->app->make(BroadcastManager::class)->extend('sns', function (Container $app, array $config) {
+            return new SnsBroadcaster(
+                $config['arn-prefix'] ?? '',
+                $config['arn-suffix'] ?? ''
+            );
+        });
+    }
+
+    /**
+     * 
+     */
+    protected function registerEventBridgeBroadcaster(): void
+    {
         $this->app->singleton(EventBridgeClient::class, function () {
             $config = [
                 'region' => config('broadcasting.connections.sns.region'),
@@ -91,30 +123,11 @@ class EventServiceProvider extends ServiceProvider
             return new EventBridgeClient($config);
         });
 
-        $this->app->make(BroadcastManager::class)->extend('sns', function (Container $app, array $config) {
-            return new SnsBroadcaster(
-                $config['arn-prefix'] ?? '',
-                $config['arn-suffix'] ?? ''
-            );
-        });
-
         $this->app->make(BroadcastManager::class)->extend('eventbridge', function (Container $app, array $config) {
             return new EventBridgeBroadcaster(
                 $config['source'] ?? '',
                 $config['event'] ?? ''
             );
-        });
-    }
-
-    /**
-     * Register anything related to the Subscription of PubSub events on AWS.
-     *
-     * @return void
-     */
-    protected function registerSub()
-    {
-        $this->app['queue']->extend('sqs-sns', function () {
-            return new SqsSnsConnector($this->listen);
         });
     }
 }
