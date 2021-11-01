@@ -17,6 +17,7 @@
         "illuminate/support": "5.4.*"
     },
     "require-dev": {
+        "mockery/mockery": "^1.3",
         "orchestra/testbench": "^3.0.0",
         "phpunit/phpunit": "^7.5"
     },
