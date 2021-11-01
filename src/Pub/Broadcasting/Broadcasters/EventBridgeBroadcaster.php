@@ -8,11 +8,6 @@ use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 class EventBridgeBroadcaster extends Broadcaster
 {
     /**
-     * @var EventBridgeClient
-     */
-    protected $eventBridgeClient;
-
-    /**
      * @var string
      */
     protected $source;
@@ -23,6 +18,11 @@ class EventBridgeBroadcaster extends Broadcaster
     protected $eventBusName;
 
     /**
+     * @var EventBridgeClient
+     */
+    protected $eventBridgeClient;
+
+    /**
      * EventBridgeBroadcaster constructor.
      *
      * @param  string  $source
@@ -30,9 +30,9 @@ class EventBridgeBroadcaster extends Broadcaster
      */
     public function __construct(string $source = '', string $eventBusName = '')
     {
-        $this->eventBridgeClient = app(EventBridgeClient::class);
         $this->source = $source;
         $this->eventBusName = $eventBusName;
+        $this->eventBridgeClient = app(EventBridgeClient::class);
     }
 
     /**
