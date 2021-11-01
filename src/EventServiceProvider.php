@@ -105,7 +105,7 @@ class EventServiceProvider extends ServiceProvider
 
     /**
      * Register everything relevant to the Event Bridge broadcaster.
-     * 
+     *
      * @return void
      */
     protected function registerEventBridgeBroadcaster(): void

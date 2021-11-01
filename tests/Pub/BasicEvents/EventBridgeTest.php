@@ -11,7 +11,7 @@ use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithMultipleCha
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
-class EventBridge extends TestCase
+class EventBridgeTest extends TestCase
 {
     /**
      * @var MockInterface
