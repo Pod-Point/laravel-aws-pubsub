@@ -2,8 +2,11 @@
 
 namespace PodPoint\AwsPubSub\Tests;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Orchestra\Testbench\Concerns\WithLaravelMigrations;
+use Closure;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Mockery;
+use Mockery\MockInterface;
 use Orchestra\Testbench\TestCase as Orchestra;
 use PHPUnit\Framework\Constraint\FileExists;
 use PHPUnit\Framework\Constraint\LogicalNot;
@@ -13,10 +16,19 @@ use PodPoint\AwsPubSub\EventServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
+    use DatabaseMigrations;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->loadLaravelMigrations();
+    }
+
     /**
      * Get package providers.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      *
      * @return array
      */
@@ -32,7 +44,7 @@ abstract class TestCase extends Orchestra
     /**
      * Define environment setup.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      * @return void
      */
     protected function getEnvironmentSetUp($app)
@@ -68,17 +80,9 @@ abstract class TestCase extends Orchestra
     }
 
     /**
-     * Define database migrations.
-     *
-     * @return void
-     */
-    protected function defineDatabaseMigrations()
-    {
-        $this->loadLaravelMigrations();
-    }
-
-    /**
      * Added for backwards compatability with Laravel 5.4 as it otherwise doesn't exist.
+     *
+     * Check that the given filename doesn't exist in the filesystem.
      *
      * @param string $filename
      * @param string $message
@@ -86,5 +90,23 @@ abstract class TestCase extends Orchestra
     public function assertFileDoesNotExist(string $filename, string $message = '')
     {
         static::assertThat($filename, new LogicalNot(new FileExists), $message);
+    }
+
+    /**
+     * Added for backwards compatability with Laravel 5.4 as it otherwise doesn't exist.
+     *
+     * Mock an instance of an object in the container.
+     *
+     * @param  string  $abstract
+     * @param  Closure|null  $mock
+     * @return  MockInterface
+     */
+    protected function mock(string $abstract, Closure $mock = null): MockInterface
+    {
+        $mock = Mockery::mock($abstract, $mock);
+
+        $this->app->instance($abstract, $mock);
+
+        return $mock;
     }
 }
