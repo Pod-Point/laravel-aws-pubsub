@@ -13,7 +13,7 @@ use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithPublicPrope
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
-class Sns extends TestCase
+class SnsTest extends TestCase
 {
     /** @test */
     public function it_broadcasts_basic_event()
