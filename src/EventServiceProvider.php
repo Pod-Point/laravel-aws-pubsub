@@ -112,7 +112,7 @@ class EventServiceProvider extends ServiceProvider
     {
         $this->app->singleton(EventBridgeClient::class, function () {
             $config = [
-                'region' => config('broadcasting.connections.sns.region'),
+                'region' => config('broadcasting.connections.eventbridge.region'),
                 'version' => 'latest',
             ];
 
@@ -123,7 +123,7 @@ class EventServiceProvider extends ServiceProvider
                 $config['credentials'] = [
                     'key' => $key,
                     'secret' => $secret,
-                    'token' => config('broadcasting.connections.sns.token'),
+                    'token' => config('broadcasting.connections.eventbridge.token'),
                 ];
             }
 
