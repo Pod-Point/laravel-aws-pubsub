@@ -2,9 +2,9 @@
 
 namespace PodPoint\AwsPubSub\Tests\Pub;
 
-use Aws\Sns\SnsClient;
-use Mockery;
+use Mockery as m;
 use Mockery\MockInterface;
+use PodPoint\AwsPubSub\Tests\Pub\Concerns\InteractsWithSns;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEvents;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\UserWithBroadcastingEventsWhenUpdatedOnly;
@@ -16,13 +16,15 @@ use PodPoint\AwsPubSub\Tests\TestCase;
 
 class ModelEventsTest extends TestCase
 {
+    use InteractsWithSns;
+
     /** @test */
     public function it_broadcasts_model_event()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->once()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     $message = json_decode($argument['Message'], true);
 
                     return $message['model']['email'] === 'john@doe.com';
@@ -39,8 +41,8 @@ class ModelEventsTest extends TestCase
     /** @test */
     public function it_does_not_broadcast_model_events_without_trait()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldNotHaveReceived('publish');
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldNotHaveReceived('publish');
         });
 
         User::create([
@@ -53,10 +55,10 @@ class ModelEventsTest extends TestCase
     /** @test */
     public function it_broadcasts_model_event_with_custom_payload()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->once()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     $message = json_decode($argument['Message'], true);
 
                     return $message['data']['user']['email'] === 'john@doe.com'
@@ -81,10 +83,10 @@ class ModelEventsTest extends TestCase
             'password' => $this->faker->password(),
         ]);
 
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->once()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     $message = json_decode($argument['Message'], true);
 
                     return $message['model']['email'] === 'john@doe.com';
@@ -99,8 +101,8 @@ class ModelEventsTest extends TestCase
     /** @test */
     public function it_does_not_broadcast_model_event_without_specified_event()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldNotHaveReceived('publish');
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldNotHaveReceived('publish');
         });
 
         UserWithBroadcastingEventsWhenUpdatedOnly::create([
@@ -119,10 +121,10 @@ class ModelEventsTest extends TestCase
             'password' => $this->faker->password(),
         ]);
 
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->once()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     $message = json_decode($argument['Message'], true);
 
                     return $message['data']['user']['email'] === 'john@doe.com'
@@ -139,10 +141,10 @@ class ModelEventsTest extends TestCase
     /** @test */
     public function it_broadcasts_model_events_to_multiple_channels()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->twice()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     $message = json_decode($argument['Message'], true);
 
                     return $message['model']['email'] === 'john@doe.com';
@@ -159,10 +161,10 @@ class ModelEventsTest extends TestCase
     /** @test */
     public function it_broadcasts_model_event_name_as_subject()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->once()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     return $argument['Subject'] === 'UserWithBroadcastingEventsCreated';
                 }));
         });
@@ -177,10 +179,10 @@ class ModelEventsTest extends TestCase
     /** @test */
     public function it_broadcasts_model_event_name_as_subject_if_specified()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->once()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     return $argument['Subject'] === 'user.created';
                 }));
         });

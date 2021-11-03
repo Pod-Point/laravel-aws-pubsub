@@ -25,12 +25,13 @@ class SnsBroadcaster extends Broadcaster
     /**
      * SnsBroadcaster constructor.
      *
-     * @param string $arnPrefix
-     * @param string $arnSuffix
+     * @param  SnsClient  $snsClient
+     * @param  string  $arnPrefix
+     * @param  string  $arnSuffix
      */
-    public function __construct(string $arnPrefix = '', string $arnSuffix = '')
+    public function __construct(SnsClient $snsClient, string $arnPrefix = '', string $arnSuffix = '')
     {
-        $this->snsClient = app(SnsClient::class);
+        $this->snsClient = $snsClient;
         $this->arnPrefix = $arnPrefix;
         $this->arnSuffix = $arnSuffix;
     }
@@ -54,7 +55,7 @@ class SnsBroadcaster extends Broadcaster
      */
     public function auth($request)
     {
-        return true;
+        //
     }
 
     /**
@@ -62,6 +63,6 @@ class SnsBroadcaster extends Broadcaster
      */
     public function validAuthenticationResponse($request, $result)
     {
-        return true;
+        //
     }
 }
