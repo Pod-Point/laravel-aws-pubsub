@@ -18,11 +18,11 @@ class SqsSnsQueue extends SqsQueue
     /**
      * Create a new Amazon SQS SNS subscription queue instance.
      *
-     * @param \Aws\Sqs\SqsClient $sqs
-     * @param string $default
-     * @param string $prefix
-     * @param string $suffix
-     * @param array $events
+     * @param  \Aws\Sqs\SqsClient  $sqs
+     * @param  string  $default
+     * @param  string  $prefix
+     * @param  string  $suffix
+     * @param  array  $events
      */
     public function __construct(SqsClient $sqs, $default, $prefix = '', $suffix = '', $events = [])
     {
@@ -34,7 +34,7 @@ class SqsSnsQueue extends SqsQueue
     /**
      * Pop the next job off of the queue.
      *
-     * @param string $queue
+     * @param  string  $queue
      * @return \PodPoint\AwsPubSub\Sub\Queue\Jobs\SqsSnsJob|null
      */
     public function pop($queue = null)
@@ -61,7 +61,7 @@ class SqsSnsQueue extends SqsQueue
      * to process or not, validate it and see if we are
      * listening for it or not based on the mapping.
      *
-     * @param \Aws\Result $response
+     * @param  \Aws\Result  $response
      * @return string|null
      */
     private function resolveListener(\Aws\Result $response)
