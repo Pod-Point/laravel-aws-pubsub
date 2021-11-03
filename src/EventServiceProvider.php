@@ -72,6 +72,7 @@ class EventServiceProvider extends ServiceProvider
      * Register everything relevant to the Event Bridge broadcaster.
      *
      * @return void
+     * @throws BindingResolutionException
      */
     protected function registerSnsBroadcaster(): void
     {
@@ -107,12 +108,13 @@ class EventServiceProvider extends ServiceProvider
      * Register everything relevant to the Event Bridge broadcaster.
      *
      * @return void
+     * @throws BindingResolutionException
      */
     protected function registerEventBridgeBroadcaster(): void
     {
         $this->app->singleton(EventBridgeClient::class, function () {
             $config = [
-                'region' => config('broadcasting.connections.sns.region'),
+                'region' => config('broadcasting.connections.eventbridge.region'),
                 'version' => 'latest',
             ];
 
@@ -123,7 +125,7 @@ class EventServiceProvider extends ServiceProvider
                 $config['credentials'] = [
                     'key' => $key,
                     'secret' => $secret,
-                    'token' => config('broadcasting.connections.sns.token'),
+                    'token' => config('broadcasting.connections.eventbridge.token'),
                 ];
             }
 
@@ -132,8 +134,8 @@ class EventServiceProvider extends ServiceProvider
 
         $this->app->make(BroadcastManager::class)->extend('eventbridge', function (Container $app, array $config) {
             return new EventBridgeBroadcaster(
-                $config['source'] ?? '',
-                $config['event'] ?? ''
+                $this->app->make(EventBridgeClient::class),
+                $config['source'] ?? ''
             );
         });
     }
