@@ -7,11 +7,11 @@
 
 **The Pub**
 
-Similar to [Pusher](https://laravel.com/docs/8.x/broadcasting#pusher-channels), this package provides a [Laravel Broadcasting](https://laravel.com/docs/8.x/broadcasting) driver for [AWS SNS](https://aws.amazon.com/sns/) (Simple Notification Service) in order to publish server-side events.
+Similar to [Pusher](https://laravel.com/docs/8.x/broadcasting#pusher-channels), this package provides [Laravel Broadcasting](https://laravel.com/docs/8.x/broadcasting) drivers for [AWS SNS](https://aws.amazon.com/sns/) (Simple Notification Service) and [AWS EventBridge](https://aws.amazon.com/eventbridge/) in order to publish server-side events.
 
 We understand [Broadcasting](https://laravel.com/docs/8.x/broadcasting) is usually used to "broadcast" your server-side Laravel [Events](https://laravel.com/docs/8.x/events) over a WebSocket connection to your client-side JavaScript application. However, we believe this approach of leveraging broadcasting makes sense for a Pub/Sub architecture where an application would like to broadcast a server-side event to the outside world about something that just happened.
 
-In this context, "channels" can be assimilated to "topics" on SNS.
+In this context, "channels" can be assimilated to "topics" when using the SNS driver and "event buses" when using the EventBridge driver.
 
 **The Sub**
 
@@ -50,6 +50,14 @@ You will need to add the following connection and configure your SNS credentials
         'arn-prefix' => env('BROADCAST_TOPIC_ARN_PREFIX'),
         'arn-suffix' => env('BROADCAST_TOPIC_ARN_SUFFIX'),
     ],
+    
+    'eventbridge' => [
+        'driver' => 'eventbridge',
+        'region' => env('AWS_DEFAULT_REGION'),
+        'key' => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'source' => env('AWS_EVENTBRIDGE_SOURCE'),
+    ],
     // ...
 ],
 ```
@@ -57,11 +65,17 @@ You will need to add the following connection and configure your SNS credentials
 Make sure to define your [environment variables](https://laravel.com/docs/8.x/configuration#environment-configuration) accordingly:
 
 ```dotenv
+# both drivers require:
 AWS_DEFAULT_REGION=you-region
 AWS_ACCESS_KEY_ID=your-aws-key
 AWS_SECRET_ACCESS_KEY=your-aws-secret
+
+# SNS driver only:
 BROADCAST_TOPIC_ARN_PREFIX=arn:aws:sns:us-east-1:123456789: # up until your Topic name
 BROADCAST_TOPIC_ARN_SUFFIX=-local # optional
+
+# EventBridge driver only:
+AWS_EVENTBRIDGE_SOURCE=com.your-app-name
 ```
 
 The `arn-suffix` can be used to help manage SNS topics for different environments. It will be added to the end when constructing the full SNS Topic ARN.
@@ -70,6 +84,10 @@ Next, you will need to make sure you're using the `sns` broadcast driver as your
 
 ```php
 BROADCAST_DRIVER=sns
+```
+or
+```php
+BROADCAST_DRIVER=eventbridge
 ```
 
 **Remember** that you can define the connection at the Event level if you ever need to be able to use [two drivers concurrently](https://github.com/laravel/framework/pull/38086).
