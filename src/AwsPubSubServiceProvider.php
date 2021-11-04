@@ -13,14 +13,13 @@ class AwsPubSubServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // ...
+        //
     }
 
     /**
      * Bootstrap any application services.
      *
      * @return void
-     * @throws BindingResolutionException
      */
     public function boot(): void
     {

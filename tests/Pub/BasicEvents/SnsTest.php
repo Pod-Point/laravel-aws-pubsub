@@ -2,9 +2,9 @@
 
 namespace PodPoint\AwsPubSub\Tests\Pub\BasicEvents;
 
-use Aws\Sns\SnsClient;
-use Mockery;
+use Mockery as m;
 use Mockery\MockInterface;
+use PodPoint\AwsPubSub\Tests\Pub\Concerns\InteractsWithSns;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrieved;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithCustomName;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithCustomPayload;
@@ -15,13 +15,15 @@ use PodPoint\AwsPubSub\Tests\TestCase;
 
 class SnsTest extends TestCase
 {
+    use InteractsWithSns;
+
     /** @test */
     public function it_broadcasts_basic_event()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->once()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     $message = json_decode($argument['Message'], true);
 
                     return $message['user']['email'] === 'john@doe.com'
@@ -39,10 +41,10 @@ class SnsTest extends TestCase
     /** @test */
     public function it_broadcasts_basic_event_with_action()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->once()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     $message = json_decode($argument['Message'], true);
 
                     return $message['user']['email'] === 'john@doe.com'
@@ -61,10 +63,10 @@ class SnsTest extends TestCase
     /** @test */
     public function it_broadcasts_basic_event_with_action_and_custom_payload()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->once()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     $message = json_decode($argument['Message'], true);
 
                     return $message['data']['user']['email'] === 'john@doe.com'
@@ -83,10 +85,10 @@ class SnsTest extends TestCase
     /** @test */
     public function it_broadcasts_basic_event_to_multiple_channels()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->twice()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     $message = json_decode($argument['Message'], true);
 
                     return $message['user']['email'] === 'john@doe.com'
@@ -104,10 +106,10 @@ class SnsTest extends TestCase
     /** @test */
     public function it_broadcasts_basic_event_name_as_subject()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->once()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     $message = json_decode($argument['Message'], true);
 
                     return $message['user']['email'] === 'john@doe.com'
@@ -125,10 +127,10 @@ class SnsTest extends TestCase
     /** @test */
     public function it_broadcasts_basic_event_name_as_subject_if_specified()
     {
-        $this->mock(SnsClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('publish')
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
                 ->once()
-                ->with(Mockery::on(function ($argument) {
+                ->with(m::on(function ($argument) {
                     $message = json_decode($argument['Message'], true);
 
                     return $message['user']['email'] === 'john@doe.com'

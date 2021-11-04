@@ -20,8 +20,8 @@ class EventBridgeBroadcaster extends Broadcaster
     /**
      * EventBridgeBroadcaster constructor.
      *
-     * @param EventBridgeClient $eventBridgeClient
-     * @param string $source
+     * @param  EventBridgeClient  $eventBridgeClient
+     * @param  string  $source
      */
     public function __construct(EventBridgeClient $eventBridgeClient, string $source = '')
     {
@@ -37,7 +37,7 @@ class EventBridgeBroadcaster extends Broadcaster
         $events = $this->mapToEventBridgeEntries($channels, $event, $payload);
 
         $this->eventBridgeClient->putEvents([
-            'Entries' => $events
+            'Entries' => $events,
         ]);
     }
 
@@ -58,9 +58,9 @@ class EventBridgeBroadcaster extends Broadcaster
     }
 
     /**
-     * @param array $channels
-     * @param string $event
-     * @param array $payload
+     * @param  array  $channels
+     * @param  string  $event
+     * @param  array  $payload
      * @return array
      */
     protected function mapToEventBridgeEntries(array $channels, string $event, array $payload): array

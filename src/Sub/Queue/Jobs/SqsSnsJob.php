@@ -35,7 +35,7 @@ class SqsSnsJob extends SqsJob
     /**
      * Resolves SNS queue messages.
      *
-     * @param array $job
+     * @param  array  $job
      * @return array
      */
     protected function resolveSnsSubscription(array $job): array
@@ -58,8 +58,8 @@ class SqsSnsJob extends SqsJob
     /**
      * Make the serialized command.
      *
-     * @param string $listenerName
-     * @param array  $body
+     * @param  string  $listenerName
+     * @param  array  $body
      * @return string
      */
     protected function makeCommand(string $listenerName, array $body): string
