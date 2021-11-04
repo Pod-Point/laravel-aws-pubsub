@@ -2,7 +2,6 @@
 
 namespace PodPoint\AwsPubSub\Tests;
 
-use Closure;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Orchestra\Testbench\TestCase as Orchestra;
