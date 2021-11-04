@@ -12,7 +12,7 @@ use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\EventBridgeBroadcaster;
 trait InteractsWithEventBridge
 {
     /**
-     * @param  Closure|null $mock
+     * @param  Closure|null  $mock
      * @return void
      */
     private function mockEventBridge(Closure $mock = null)
