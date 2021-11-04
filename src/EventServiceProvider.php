@@ -128,7 +128,7 @@ class EventServiceProvider extends ServiceProvider
                 'token' => $config['token'] ?? null,
             ];
         }
-        
+
         return $config;
     }
 }
