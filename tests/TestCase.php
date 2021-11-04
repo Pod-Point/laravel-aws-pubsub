@@ -17,8 +17,7 @@ abstract class TestCase extends Orchestra
     /**
      * Get package providers.
      *
-     * @param \Illuminate\Foundation\Application $app
-     *
+     * @param  \Illuminate\Foundation\Application  $app
      * @return array
      */
     protected function getPackageProviders($app)
@@ -29,6 +28,10 @@ abstract class TestCase extends Orchestra
         ];
     }
 
+    /**
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
     protected function setTestDatabase($app)
     {
         /** DATABASE */
@@ -43,10 +46,32 @@ abstract class TestCase extends Orchestra
     /**
      * Define environment setup.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
     protected function getEnvironmentSetUp($app)
+    {
+        $this->setSnsBroadcaster($app);
+
+        $this->setSubQueue($app);
+
+        $this->setTestDatabase($app);
+    }
+
+    /**
+     * Define database migrations.
+     *
+     * @return void
+     */
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadLaravelMigrations();
+    }
+
+    /**
+     * @param  \Illuminate\Foundation\Application  $app
+     */
+    protected function setSnsBroadcaster($app): void
     {
         /** PUB */
         $app['config']->set('broadcasting.default', 'sns');
@@ -58,7 +83,30 @@ abstract class TestCase extends Orchestra
             'arn-suffix' => '',
             'region' => 'eu-west-1',
         ]);
+    }
 
+    /**
+     * @param  \Illuminate\Foundation\Application  $app
+     */
+    protected function setEventBridgeBroadcaster($app)
+    {
+        /** PUB */
+        $app['config']->set('broadcasting.default', 'eventbridge');
+        $app['config']->set('broadcasting.connections.eventbridge', [
+            'driver' => 'eventbridge',
+            'key' => 'dummy-key',
+            'secret' => 'dummy-secret',
+            'region' => 'eu-west-1',
+            'event_bus' => 'default',
+            'source' => 'my-app',
+        ]);
+    }
+
+    /**
+     * @param  \Illuminate\Foundation\Application  $app
+     */
+    protected function setSubQueue($app): void
+    {
         /** SUB */
         $app['config']->set('queue.connections.pub-sub', [
             'driver' => 'sqs-sns',
@@ -69,18 +117,5 @@ abstract class TestCase extends Orchestra
             'suffix' => '',
             'region' => 'eu-west-1',
         ]);
-
-        $this->setTestDatabase($app);
-
-    }
-
-    /**
-     * Define database migrations.
-     *
-     * @return void
-     */
-    protected function defineDatabaseMigrations()
-    {
-        $this->loadLaravelMigrations();
     }
 }

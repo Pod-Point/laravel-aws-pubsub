@@ -25,18 +25,12 @@ class EventBridgeTest extends TestCase
         $this->mockClient = $this->mock(EventBridgeClient::class);
     }
 
+    /**
+     * @param  \Illuminate\Foundation\Application  $app
+     */
     protected function getEnvironmentSetUp($app)
     {
-        /** PUB */
-        $app['config']->set('broadcasting.default', 'eventbridge');
-        $app['config']->set('broadcasting.connections.eventbridge', [
-            'driver' => 'eventbridge',
-            'key' => 'dummy-key',
-            'secret' => 'dummy-secret',
-            'region' => 'eu-west-1',
-            'event_bus' => 'default',
-            'source' => 'my-app',
-        ]);
+        $this->setEventBridgeBroadcaster($app);
 
         $this->setTestDatabase($app);
     }
@@ -49,14 +43,14 @@ class EventBridgeTest extends TestCase
         $janeRetrieved = new UserRetrieved($jane);
 
         $expectedPayload = [
-            "Entries" => [
+            'Entries' => [
                 [
                     'Detail' => json_encode($janeRetrieved),
                     'DetailType' => UserRetrieved::class,
                     'EventBusName' => 'users',
                     'Source' => 'my-app',
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->mockClient
@@ -75,14 +69,14 @@ class EventBridgeTest extends TestCase
         $janeRetrieved = new UserRetrievedWithCustomName($jane);
 
         $expectedPayload = [
-            "Entries" => [
+            'Entries' => [
                 [
                     'Detail' => json_encode($janeRetrieved),
                     'DetailType' => 'user.retrieved',
                     'EventBusName' => 'users',
                     'Source' => 'my-app',
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->mockClient
@@ -101,7 +95,7 @@ class EventBridgeTest extends TestCase
         $janeRetrieved = new UserRetrievedWithCustomPayload($jane);
 
         $expectedPayload = [
-            "Entries" => [
+            'Entries' => [
                 [
                     'Detail' => json_encode([
                         'action' => 'retrieved',
@@ -114,8 +108,8 @@ class EventBridgeTest extends TestCase
                     'DetailType' => UserRetrievedWithCustomPayload::class,
                     'EventBusName' => 'users',
                     'Source' => 'my-app',
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->mockClient
@@ -134,7 +128,7 @@ class EventBridgeTest extends TestCase
         $janeRetrieved = new UserRetrievedWithMultipleChannels($jane);
 
         $expectedPayload = [
-            "Entries" => [
+            'Entries' => [
                 [
                     'Detail' => json_encode($janeRetrieved),
                     'DetailType' => UserRetrievedWithMultipleChannels::class,
