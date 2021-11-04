@@ -2,10 +2,8 @@
 
 namespace PodPoint\AwsPubSub\Tests\Pub\BasicEvents;
 
-use Aws\EventBridge\EventBridgeClient;
 use Illuminate\Foundation\Application;
 use Mockery;
-use Mockery\Mock;
 use Mockery\MockInterface;
 use PodPoint\AwsPubSub\Tests\Pub\Concerns\InteractsWithEventBridge;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrieved;
