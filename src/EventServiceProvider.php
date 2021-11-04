@@ -4,7 +4,7 @@ namespace PodPoint\AwsPubSub;
 
 use Aws\EventBridge\EventBridgeClient;
 use Aws\Sns\SnsClient;
-use Illuminate\Broadcasting\BroadcastManager;
+use Illuminate\Contracts\Broadcasting\Factory as BroadcastManager;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
@@ -29,7 +29,10 @@ class EventServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerSnsBroadcaster();
+
         $this->registerSqsSnsQueueConnector();
+
+        $this->registerEventBridgeBroadcaster();
     }
 
     /**
@@ -96,7 +99,11 @@ class EventServiceProvider extends ServiceProvider
     {
         $this->app->resolving(BroadcastManager::class, function (BroadcastManager $manager) {
             $manager->extend('eventbridge', function (Container $app, array $config) {
-                return $this->createEventBridgeDriver($config);
+                $lastCompatibleVersion = '2015-10-07';
+                
+                return $this->createEventBridgeDriver(array_merge($config, [
+                    'version' => $lastCompatibleVersion
+                ]));
             });
         });
     }

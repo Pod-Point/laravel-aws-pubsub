@@ -3,7 +3,11 @@
 namespace PodPoint\AwsPubSub\Tests\Pub\BasicEvents;
 
 use Aws\EventBridge\EventBridgeClient;
+use Illuminate\Foundation\Application;
+use Mockery;
+use Mockery\Mock;
 use Mockery\MockInterface;
+use PodPoint\AwsPubSub\Tests\Pub\Concerns\InteractsWithEventBridge;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrieved;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithCustomName;
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithCustomPayload;
@@ -13,20 +17,10 @@ use PodPoint\AwsPubSub\Tests\TestCase;
 
 class EventBridgeTest extends TestCase
 {
-    /**
-     * @var MockInterface
-     */
-    private $mockClient;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->mockClient = $this->mock(EventBridgeClient::class);
-    }
+    use InteractsWithEventBridge;
 
     /**
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  Application  $app
      */
     protected function getEnvironmentSetUp($app)
     {
@@ -42,21 +36,17 @@ class EventBridgeTest extends TestCase
 
         $janeRetrieved = new UserRetrieved($jane);
 
-        $expectedPayload = [
-            'Entries' => [
-                [
-                    'Detail' => json_encode($janeRetrieved),
-                    'DetailType' => UserRetrieved::class,
-                    'EventBusName' => 'users',
-                    'Source' => 'my-app',
-                ],
-            ],
-        ];
-
-        $this->mockClient
-            ->shouldReceive('putEvents')
-            ->once()
-            ->with($expectedPayload);
+        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved) {
+            $eventBridge
+                ->shouldReceive('putEvents')
+                ->once()
+                ->with(Mockery::on(function ($arg) use ($janeRetrieved) {
+                    return $arg['Entries'][0]['Detail'] === json_encode($janeRetrieved)
+                        && $arg['Entries'][0]['DetailType'] === UserRetrieved::class
+                        && $arg['Entries'][0]['EventBusName'] === 'users'
+                        && $arg['Entries'][0]['Source'] === 'my-app';
+                }));
+        });
 
         event($janeRetrieved);
     }
@@ -68,21 +58,17 @@ class EventBridgeTest extends TestCase
 
         $janeRetrieved = new UserRetrievedWithCustomName($jane);
 
-        $expectedPayload = [
-            'Entries' => [
-                [
-                    'Detail' => json_encode($janeRetrieved),
-                    'DetailType' => 'user.retrieved',
-                    'EventBusName' => 'users',
-                    'Source' => 'my-app',
-                ],
-            ],
-        ];
-
-        $this->mockClient
-            ->shouldReceive('putEvents')
-            ->once()
-            ->with($expectedPayload);
+        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved) {
+            $eventBridge
+                ->shouldReceive('putEvents')
+                ->once()
+                ->with(Mockery::on(function ($arg) use ($janeRetrieved) {
+                    return $arg['Entries'][0]['Detail'] === json_encode($janeRetrieved)
+                        && $arg['Entries'][0]['DetailType'] === 'user.retrieved'
+                        && $arg['Entries'][0]['EventBusName'] === 'users'
+                        && $arg['Entries'][0]['Source'] === 'my-app';
+                }));
+        });
 
         event($janeRetrieved);
     }
@@ -94,28 +80,19 @@ class EventBridgeTest extends TestCase
 
         $janeRetrieved = new UserRetrievedWithCustomPayload($jane);
 
-        $expectedPayload = [
-            'Entries' => [
-                [
-                    'Detail' => json_encode([
-                        'action' => 'retrieved',
-                        'data' => [
-                            'user' => $jane->toArray(),
-                            'foo' => 'baz',
-                        ],
-                        'socket' => null,
-                    ]),
-                    'DetailType' => UserRetrievedWithCustomPayload::class,
-                    'EventBusName' => 'users',
-                    'Source' => 'my-app',
-                ],
-            ],
-        ];
+        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved) {
+            $eventBridge
+                ->shouldReceive('putEvents')
+                ->once()
+                ->with(Mockery::on(function ($arg) use ($janeRetrieved) {
+                    $customPayload = array_merge($janeRetrieved->broadcastWith(), ['socket' => null]);
 
-        $this->mockClient
-            ->shouldReceive('putEvents')
-            ->once()
-            ->with($expectedPayload);
+                    return $arg['Entries'][0]['Detail'] === json_encode($customPayload)
+                        && $arg['Entries'][0]['DetailType'] === UserRetrievedWithCustomPayload::class
+                        && $arg['Entries'][0]['EventBusName'] === 'users'
+                        && $arg['Entries'][0]['Source'] === 'my-app';
+                }));
+        });
 
         event($janeRetrieved);
     }
@@ -127,26 +104,22 @@ class EventBridgeTest extends TestCase
 
         $janeRetrieved = new UserRetrievedWithMultipleChannels($jane);
 
-        $expectedPayload = [
-            'Entries' => [
-                [
-                    'Detail' => json_encode($janeRetrieved),
-                    'DetailType' => UserRetrievedWithMultipleChannels::class,
-                    'EventBusName' => 'users',
-                    'Source' => 'my-app',
-                ],
-                [
-                    'Detail' => json_encode($janeRetrieved),
-                    'DetailType' => UserRetrievedWithMultipleChannels::class,
-                    'EventBusName' => 'customers',
-                    'Source' => 'my-app',
-                ],
-            ],
-        ];
-
-        $this->mockClient
-            ->shouldReceive('putEvents')
-            ->with($expectedPayload);
+        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved) {
+            $eventBridge
+                ->shouldReceive('putEvents')
+                ->once()
+                ->with(Mockery::on(function ($arg) use ($janeRetrieved) {
+                    return collect($janeRetrieved->broadcastOn())
+                        ->map(function ($channel, $key) use ($arg, $janeRetrieved) {
+                            return $arg['Entries'][$key]['Detail'] === json_encode($janeRetrieved)
+                                && $arg['Entries'][$key]['DetailType'] === UserRetrievedWithMultipleChannels::class
+                                && $arg['Entries'][$key]['EventBusName'] === $channel
+                                && $arg['Entries'][$key]['Source'] === 'my-app';
+                        })
+                        ->filter()
+                        ->count() > 0;
+                }));
+        });
 
         event($janeRetrieved);
     }
