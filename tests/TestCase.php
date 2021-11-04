@@ -4,13 +4,11 @@ namespace PodPoint\AwsPubSub\Tests;
 
 use Closure;
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Mockery;
 use Mockery\MockInterface;
 use Orchestra\Testbench\TestCase as Orchestra;
 use PHPUnit\Framework\Constraint\FileExists;
 use PHPUnit\Framework\Constraint\LogicalNot;
-use PodPoint\AwsPubSub\ArtisanCommandsServiceProvider;
 use PodPoint\AwsPubSub\AwsPubSubServiceProvider;
 use PodPoint\AwsPubSub\EventServiceProvider;
 
@@ -35,7 +33,6 @@ abstract class TestCase extends Orchestra
         return [
             AwsPubSubServiceProvider::class,
             EventServiceProvider::class,
-            ArtisanCommandsServiceProvider::class,
         ];
     }
 
