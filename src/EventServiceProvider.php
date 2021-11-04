@@ -5,8 +5,6 @@ namespace PodPoint\AwsPubSub;
 use Aws\EventBridge\EventBridgeClient;
 use Aws\Sns\SnsClient;
 use Illuminate\Broadcasting\BroadcastManager;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
@@ -78,7 +76,7 @@ class EventServiceProvider extends ServiceProvider
     /**
      * Register the SQS SNS connector for the Queue components.
      *
-     * @return  void
+     * @return void
      */
     protected function registerSqsSnsQueueConnector()
     {
@@ -119,7 +117,7 @@ class EventServiceProvider extends ServiceProvider
 
     /**
      * @param  array  $config
-     * @return  array
+     * @return array
      */
     protected function prepareConfig(array $config): array
     {
