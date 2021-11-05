@@ -142,6 +142,8 @@ abstract class TestCase extends Orchestra
     }
 
     /**
+     * Added for backwards compatability with PHPUnit 6.
+     *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      * @throws ExpectationFailedException
      */
@@ -151,6 +153,19 @@ abstract class TestCase extends Orchestra
 
         static::assertThat($haystack, $constraint, $message);
     }
+
+    /**
+     * Added for backwards compatability with PHPUnit 6.
+     *
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
+    public function assertStringContainsString(string $needle, string $haystack, string $message = ''): void
+    {
+        static::assertThat($haystack, new StringContains($needle), $message);
+    }
+
+
     /**
      * Added for backwards compatability with Laravel 5.4 as it otherwise doesn't exist.
      *
