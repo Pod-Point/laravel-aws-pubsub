@@ -8,6 +8,8 @@ use Mockery\MockInterface;
 use Orchestra\Testbench\TestCase as Orchestra;
 use PHPUnit\Framework\Constraint\FileExists;
 use PHPUnit\Framework\Constraint\LogicalNot;
+use PHPUnit\Framework\Constraint\StringContains;
+use PHPUnit\Framework\ExpectationFailedException;
 use PodPoint\AwsPubSub\AwsPubSubServiceProvider;
 use PodPoint\AwsPubSub\EventServiceProvider;
 
@@ -139,6 +141,16 @@ abstract class TestCase extends Orchestra
         static::assertThat($filename, new LogicalNot(new FileExists), $message);
     }
 
+    /**
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
+    public function assertStringNotContainsString(string $needle, string $haystack, string $message = ''): void
+    {
+        $constraint = new LogicalNot(new StringContains($needle));
+
+        static::assertThat($haystack, $constraint, $message);
+    }
     /**
      * Added for backwards compatability with Laravel 5.4 as it otherwise doesn't exist.
      *
