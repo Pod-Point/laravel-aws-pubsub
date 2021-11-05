@@ -69,6 +69,6 @@ class InstallCommand extends Command
     {
         $appConfigArray = include config_path('app.php');
 
-        return array_last($appConfigArray['providers']);
+        return Arr::last($appConfigArray['providers']);
     }
 }
