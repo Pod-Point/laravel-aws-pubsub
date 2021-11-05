@@ -3,6 +3,7 @@
 namespace PodPoint\AwsPubSub\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class InstallCommand extends Command
