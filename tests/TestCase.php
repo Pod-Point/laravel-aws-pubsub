@@ -151,6 +151,7 @@ abstract class TestCase extends Orchestra
 
         static::assertThat($haystack, $constraint, $message);
     }
+
     /**
      * Added for backwards compatability with Laravel 5.4 as it otherwise doesn't exist.
      *
