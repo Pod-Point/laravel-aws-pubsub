@@ -165,7 +165,6 @@ abstract class TestCase extends Orchestra
         static::assertThat($haystack, new StringContains($needle), $message);
     }
 
-
     /**
      * Added for backwards compatability with Laravel 5.4 as it otherwise doesn't exist.
      *
@@ -175,7 +174,7 @@ abstract class TestCase extends Orchestra
      * @param  Closure|null  $mock
      * @return MockInterface
      */
-    protected function mock(string $abstract, Closure $mock = null): MockInterface
+    protected function mock(string $abstract, Closure $mock = null)
     {
         $mock = Mockery::mock(...array_filter(func_get_args()));
 
