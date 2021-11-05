@@ -2,7 +2,6 @@
 
 namespace PodPoint\AwsPubSub\Tests\Console;
 
-use Illuminate\Support\Facades\File;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
 class ListenerMakeCommandTest extends TestCase

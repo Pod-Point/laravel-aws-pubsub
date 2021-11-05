@@ -124,7 +124,6 @@ abstract class TestCase extends Orchestra
         ]);
 
         $this->setTestDatabase($app);
-
     }
 
     /**
@@ -132,8 +131,8 @@ abstract class TestCase extends Orchestra
      *
      * Check that the given filename doesn't exist in the filesystem.
      *
-     * @param string $filename
-     * @param string $message
+     * @param  string  $filename
+     * @param  string  $message
      */
     public function assertFileDoesNotExist(string $filename, string $message = '')
     {
@@ -147,7 +146,7 @@ abstract class TestCase extends Orchestra
      *
      * @param  string  $abstract
      * @param  Closure|null  $mock
-     * @return  MockInterface
+     * @return MockInterface
      */
     protected function mock(string $abstract, Closure $mock = null): MockInterface
     {

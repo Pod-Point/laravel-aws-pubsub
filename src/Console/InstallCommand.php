@@ -49,14 +49,14 @@ class InstallCommand extends Command
      */
     protected function installServiceProvider(string $name): void
     {
-        $providerFqn = 'App\\Providers\\' . $name . '::class';
+        $providerFqn = 'App\\Providers\\'.$name.'::class';
 
         if (! Str::contains($appConfigString = file_get_contents(config_path('app.php')), $providerFqn)) {
-            $lastProvider = $this->getLastRegisteredProvider() . '::class,';
+            $lastProvider = $this->getLastRegisteredProvider().'::class,';
 
             file_put_contents(config_path('app.php'), str_replace(
                 $lastProvider,
-                $lastProvider . PHP_EOL . '        ' . $providerFqn . ',',
+                $lastProvider.PHP_EOL.'        '.$providerFqn.',',
                 $appConfigString
             ));
         }
