@@ -6,7 +6,7 @@ use PodPoint\AwsPubSub\Tests\TestCase;
 
 class ListenerMakeCommandTest extends TestCase
 {
-    protected function tearDown()
+    protected function tearDown(): void
     {
         // Must be before parent::tearDown() as it flushes the container,
         // which is required to be populated for the `app_path` helper.
