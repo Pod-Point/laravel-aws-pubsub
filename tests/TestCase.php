@@ -136,7 +136,7 @@ abstract class TestCase extends Orchestra
      * @param  string  $filename
      * @param  string  $message
      */
-    public function assertFileDoesNotExist(string $filename, string $message = '')
+    public function assertFileNotExists(string $filename, string $message = '')
     {
         static::assertThat($filename, new LogicalNot(new FileExists), $message);
     }
@@ -147,7 +147,7 @@ abstract class TestCase extends Orchestra
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function assertStringNotContainsString(string $needle, string $haystack, string $message = ''): void
+    public function assertStringNotContains(string $needle, string $haystack, string $message = ''): void
     {
         $constraint = new LogicalNot(new StringContains($needle));
 
@@ -160,7 +160,7 @@ abstract class TestCase extends Orchestra
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function assertStringContainsString(string $needle, string $haystack, string $message = ''): void
+    public function assertStringContains(string $needle, string $haystack, string $message = ''): void
     {
         static::assertThat($haystack, new StringContains($needle), $message);
     }
