@@ -28,7 +28,7 @@ class InstallCommandTest extends TestCase
     /** @test */
     public function it_can_install_the_service_provider()
     {
-        $this->assertFileNotExists(app_path('Providers').'/PubSubEventServiceProvider.php');
+        $this->assertFileMissing(app_path('Providers').'/PubSubEventServiceProvider.php');
         $this->assertStringNotContains('PubSubEventServiceProvider', file_get_contents(config_path('app.php')));
 
         $this->artisan('pubsub:install');

@@ -136,7 +136,7 @@ abstract class TestCase extends Orchestra
      * @param  string  $filename
      * @param  string  $message
      */
-    public function assertFileNotExists(string $filename, string $message = '')
+    public function assertFileMissing(string $filename, string $message = '')
     {
         static::assertThat($filename, new LogicalNot(new FileExists), $message);
     }

@@ -20,7 +20,7 @@ class ListenerMakeCommandTest extends TestCase
     /** @test */
     public function it_can_generate_pubsub_event_listeners()
     {
-        $this->assertFileNotExists(app_path('Listeners/PubSub/SomeListener.php'));
+        $this->assertFileMissing(app_path('Listeners/PubSub/SomeListener.php'));
 
         $this->artisan('pubsub:make:listener', ['name' => 'SomeListener']);
 
