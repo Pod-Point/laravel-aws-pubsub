@@ -2,9 +2,6 @@
 
 namespace PodPoint\AwsPubSub\Tests;
 
-use Closure;
-use Mockery;
-use Mockery\MockInterface;
 use Orchestra\Testbench\TestCase as Orchestra;
 use PHPUnit\Framework\Constraint\FileExists;
 use PHPUnit\Framework\Constraint\LogicalNot;
