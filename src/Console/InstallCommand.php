@@ -3,6 +3,7 @@
 namespace PodPoint\AwsPubSub\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class InstallCommand extends Command
@@ -36,7 +37,7 @@ class InstallCommand extends Command
 
         copy(__DIR__.'/../Sub/stubs/app/Providers/PubSubEventServiceProvider.php', app_path('Providers/PubSubEventServiceProvider.php'));
 
-        $this->installServiceProviderAfter('EventServiceProvider', 'PubSubEventServiceProvider');
+        $this->installServiceProvider('PubSubEventServiceProvider');
 
         $this->info('PubSubEventServiceProvider created successfully.');
     }
@@ -44,18 +45,31 @@ class InstallCommand extends Command
     /**
      * Install the service provider in the application configuration file.
      *
-     * @param  string  $after
      * @param  string  $name
      * @return void
      */
-    protected function installServiceProviderAfter(string $after, string $name): void
+    protected function installServiceProvider(string $name): void
     {
-        if (! Str::contains($appConfig = file_get_contents(config_path('app.php')), 'App\\Providers\\'.$name.'::class')) {
+        $providerFqn = 'App\\Providers\\'.$name.'::class';
+
+        if (! Str::contains($appConfigString = file_get_contents(config_path('app.php')), $providerFqn)) {
+            $lastProvider = $this->getLastRegisteredProvider().'::class,';
+
             file_put_contents(config_path('app.php'), str_replace(
-                'App\\Providers\\'.$after.'::class,',
-                'App\\Providers\\'.$after.'::class,'.PHP_EOL.'        App\\Providers\\'.$name.'::class,',
-                $appConfig
+                $lastProvider,
+                $lastProvider.PHP_EOL.'        '.$providerFqn.',',
+                $appConfigString
             ));
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLastRegisteredProvider(): string
+    {
+        $appConfigArray = include config_path('app.php');
+
+        return Arr::last($appConfigArray['providers']);
     }
 }

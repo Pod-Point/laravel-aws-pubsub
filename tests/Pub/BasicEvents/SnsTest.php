@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\AwsPubSub\Tests\Pub;
+namespace PodPoint\AwsPubSub\Tests\Pub\BasicEvents;
 
 use Mockery as m;
 use Mockery\MockInterface;
@@ -13,7 +13,7 @@ use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithPublicPrope
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
-class BasicEventsTest extends TestCase
+class SnsTest extends TestCase
 {
     use InteractsWithSns;
 
@@ -32,9 +32,9 @@ class BasicEventsTest extends TestCase
         });
 
         event(new UserRetrieved(User::create([
-            'name' => $this->faker->name(),
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
-            'password' => $this->faker->password(),
+            'password' => 'pas$word',
         ])));
     }
 
@@ -54,9 +54,9 @@ class BasicEventsTest extends TestCase
         });
 
         event(new UserRetrievedWithPublicProperties(User::create([
-            'name' => $this->faker->name(),
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
-            'password' => $this->faker->password(),
+            'password' => 'pas$word',
         ])));
     }
 
@@ -76,9 +76,9 @@ class BasicEventsTest extends TestCase
         });
 
         event(new UserRetrievedWithCustomPayload(User::create([
-            'name' => $this->faker->name(),
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
-            'password' => $this->faker->password(),
+            'password' => 'pas$word',
         ])));
     }
 
@@ -97,9 +97,9 @@ class BasicEventsTest extends TestCase
         });
 
         event(new UserRetrievedWithMultipleChannels(User::create([
-            'name' => $this->faker->name(),
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
-            'password' => $this->faker->password(),
+            'password' => 'pas$word',
         ])));
     }
 
@@ -118,9 +118,9 @@ class BasicEventsTest extends TestCase
         });
 
         event(new UserRetrieved(User::create([
-            'name' => $this->faker->name(),
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
-            'password' => $this->faker->password(),
+            'password' => 'pas$word',
         ])));
     }
 
@@ -139,9 +139,9 @@ class BasicEventsTest extends TestCase
         });
 
         event(new UserRetrievedWithCustomName(User::create([
-            'name' => $this->faker->name(),
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
-            'password' => $this->faker->password(),
+            'password' => 'pas$word',
         ])));
     }
 }

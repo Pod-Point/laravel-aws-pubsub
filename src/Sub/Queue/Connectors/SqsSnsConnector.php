@@ -38,7 +38,7 @@ class SqsSnsConnector extends SqsConnector
             $config['queue'],
             Arr::get($config, 'prefix', ''),
             Arr::get($config, 'suffix', ''),
-            $this->events,
+            $this->events
         );
     }
 }

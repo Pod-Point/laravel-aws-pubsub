@@ -23,14 +23,4 @@ class SqsSnsConnectorTest extends TestCase
 
         $this->assertEquals('https://sqs.eu-west-1.amazonaws.com/13245/default', $queue->getQueue(null));
     }
-
-    /** @test */
-    public function it_can_use_a_queue_suffix()
-    {
-        config(['queue.connections.pub-sub.suffix' => '-testing']);
-
-        $queue = (new SqsSnsConnector)->connect(config('queue.connections.pub-sub'));
-
-        $this->assertEquals('https://sqs.eu-west-1.amazonaws.com/13245/default-testing', $queue->getQueue(null));
-    }
 }

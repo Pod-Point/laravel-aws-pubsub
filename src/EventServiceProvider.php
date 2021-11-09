@@ -2,11 +2,13 @@
 
 namespace PodPoint\AwsPubSub;
 
+use Aws\EventBridge\EventBridgeClient;
 use Aws\Sns\SnsClient;
-use Illuminate\Broadcasting\BroadcastManager;
+use Illuminate\Contracts\Broadcasting\Factory as BroadcastManager;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
+use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\EventBridgeBroadcaster;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
 use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
 
@@ -27,7 +29,10 @@ class EventServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerSnsBroadcaster();
+
         $this->registerSqsSnsQueueConnector();
+
+        $this->registerEventBridgeBroadcaster();
     }
 
     /**
@@ -62,13 +67,7 @@ class EventServiceProvider extends ServiceProvider
      */
     protected function createSnsDriver(array $config)
     {
-        if ($config['key'] && $config['secret']) {
-            $config['credentials'] = [
-                'key' => $config['key'],
-                'secret' => $config['secret'],
-                'token' => $config['token'] ?? null,
-            ];
-        }
+        $config = $this->prepareConfig($config);
 
         return new SnsBroadcaster(
             new SnsClient(array_merge($config, ['version' => 'latest'])),
@@ -89,5 +88,54 @@ class EventServiceProvider extends ServiceProvider
                 return new SqsSnsConnector($this->listen);
             });
         });
+    }
+
+    /**
+     * Register the EventBridge broadcaster for the Broadcast components.
+     *
+     * @return void
+     */
+    protected function registerEventBridgeBroadcaster()
+    {
+        $this->app->resolving(BroadcastManager::class, function (BroadcastManager $manager) {
+            $manager->extend('eventbridge', function (Container $app, array $config) {
+                $lastCompatibleVersion = '2015-10-07';
+
+                return $this->createEventBridgeDriver(array_merge($config, [
+                    'version' => $lastCompatibleVersion,
+                ]));
+            });
+        });
+    }
+
+    /**
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     */
+    protected function createEventBridgeDriver(array $config)
+    {
+        $config = $this->prepareConfig($config);
+
+        return new EventBridgeBroadcaster(
+            new EventBridgeClient($config),
+            $config['source'] ?? ''
+        );
+    }
+
+    /**
+     * @param  array  $config
+     * @return array
+     */
+    protected function prepareConfig(array $config): array
+    {
+        if ($config['key'] && $config['secret']) {
+            $config['credentials'] = [
+                'key' => $config['key'],
+                'secret' => $config['secret'],
+                'token' => $config['token'] ?? null,
+            ];
+        }
+
+        return $config;
     }
 }
