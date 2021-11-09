@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\AwsPubSub\Tests\Pub;
+namespace PodPoint\AwsPubSub\Tests\Pub\BasicEvents;
 
 use Mockery as m;
 use Mockery\MockInterface;
@@ -13,7 +13,7 @@ use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrievedWithPublicPrope
 use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
-class BasicEventsTest extends TestCase
+class SnsTest extends TestCase
 {
     use InteractsWithSns;
 
