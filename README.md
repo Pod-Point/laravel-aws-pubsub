@@ -255,6 +255,8 @@ You can use `broadcastOn()`, `broadcastWith()` and `broadcastAs()` methods on yo
 
 Once the package is installed and similar to what you would do for a standard Laravel SQS queue, you will need to add the following connection and configure your credentials in the `config/queue.php` configuration file:
 
+>Note: If you've been looking at the main branch README, you may notice that we don't have "suffix" in the config here, this is because our SQS-SNS driver extends the Laravel SQS driver. In Laravel 5.4 suffixes aren't supported here.
+
 ```php
 'connections' => [
     // ...
@@ -264,7 +266,6 @@ Once the package is installed and similar to what you would do for a standard La
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'prefix' => env('SQS_SNS_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),
         'queue' => env('SQS_SNS_QUEUE', 'pub-sub'),
-        'suffix' => env('SQS_SNS_SUFFIX'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
     // ...
