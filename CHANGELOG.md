@@ -2,6 +2,41 @@
 
 All notable changes to `laravel-aws-pubsub` will be documented in this file.
 
+## 0.3.0 - 2021-11-09
+
+Adds support for publishing pub/sub events to AWS EventBridge instead of AWS SNS [#11](https://github.com/Pod-Point/laravel-aws-pubsub/pull/11)
+
+- Add EventBridge driver
+- Cover it with some tests
+- Update the `README.md`
+
+## 0.0.1 - 2021-11-09
+
+Backward compatibility with Laravel 5, 6 and 7
+
+Adds backward compatibility with Laravel 5.x, 6.x and 7.x by removing the following functionalities:
+
+- [Model Broadcasting](https://github.com/Pod-Point/laravel-aws-pubsub#model-broadcasting) unsupported
+- Queue suffix unsupported
+
+All the functionalities to add EventBridge support from the [release 0.3.0](https://github.com/Pod-Point/laravel-aws-pubsub/releases/tag/0.3.0) have also been back ported here.
+
+See PR [#10](https://github.com/Pod-Point/laravel-aws-pubsub/pull/10).
+
+## 0.2.2 - 2021-11-03
+
+Bug fixing
+
+- Fix registration lifecycle within the IoC container [#9](https://github.com/Pod-Point/laravel-aws-pubsub/pull/9)
+
+## 0.2.1 - 2021-07-30
+
+Bug fixing + update README.md
+
+- Hotfix: fallback to Topic ARN listener when subject is not found
+- Add output to `pubsub:install` command
+- Update `README.md`
+
 ## 0.2.0 - 2021-07-29
 
 Refactored the package into a PubSub package offering a complete solution for both the publication (via Laravel [Broadcasting](https://laravel.com/docs/master/broadcasting)) and the subscription (using Laravel queue [Listeners](https://laravel.com/docs/master/queues)) of server-side events.

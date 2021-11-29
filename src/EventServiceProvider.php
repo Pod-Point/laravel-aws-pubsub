@@ -99,10 +99,8 @@ class EventServiceProvider extends ServiceProvider
     {
         $this->app->resolving(BroadcastManager::class, function (BroadcastManager $manager) {
             $manager->extend('eventbridge', function (Container $app, array $config) {
-                $lastCompatibleVersion = '2015-10-07';
-
                 return $this->createEventBridgeDriver(array_merge($config, [
-                    'version' => $lastCompatibleVersion,
+                    'version' => '2015-10-07',
                 ]));
             });
         });
