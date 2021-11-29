@@ -33,6 +33,8 @@ You can install the package on a Laravel 8+ application via composer:
 composer require pod-point/laravel-aws-pubsub
 ```
 
+For Laravel 5.4 you can use `pod-point/laravel-aws-pubsub:^0.0.1`.
+
 ## Publishing / Broadcasting
 
 ### Configuration
