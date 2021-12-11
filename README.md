@@ -293,7 +293,9 @@ use App\Listeners\PubSub\SendShipmentNotification;
  * @var array
  */
 protected $listen = [
-    'orders.shipped' => SendShipmentNotification::class,
+    'orders.shipped' => [
+        SendShipmentNotification::class,
+    ],
 ];
 ```
 
@@ -312,8 +314,13 @@ use App\Listeners\PubSub\OrdersListener;
  * @var array
  */
 protected $listen = [
-    'orders.shipped' => SendShipmentNotification::class,
-    'arn:aws:sns:us-east-1:123456789:orders' => OrdersListener::class,
+    'orders.shipped' => [
+        UpdateTrackingNumber::class,
+        SendShipmentNotification::class,
+    ],
+    'arn:aws:sns:us-east-1:123456789:orders' => [
+        OrdersListener::class,
+    ],
 ];
 ```
 

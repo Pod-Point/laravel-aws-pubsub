@@ -39,7 +39,7 @@ class SnsBroadcaster extends Broadcaster
     /**
      * @inheritDoc
      */
-    public function broadcast(array $channels, $event, array $payload = []): void
+    public function broadcast(array $channels, $event, array $payload = [])
     {
         foreach ($channels as $channel) {
             $this->snsClient->publish([
@@ -53,16 +53,16 @@ class SnsBroadcaster extends Broadcaster
     /**
      * @inheritDoc
      */
-    public function auth($request)
+    public function auth($request): bool
     {
-        //
+        return true;
     }
 
     /**
      * @inheritDoc
      */
-    public function validAuthenticationResponse($request, $result)
+    public function validAuthenticationResponse($request, $result): bool
     {
-        //
+        return true;
     }
 }
