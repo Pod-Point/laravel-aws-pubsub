@@ -3,7 +3,6 @@
 namespace PodPoint\AwsPubSub\Tests\Sub;
 
 use Aws\Sqs\SqsClient;
-use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Mockery as m;
@@ -12,11 +11,6 @@ use PodPoint\AwsPubSub\Tests\TestCase;
 
 class SqsSnsQueueTest extends TestCase
 {
-    /**
-     * @var SqsClient|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $mockedSqsClient;
-
     /**
      * @var array
      */
@@ -35,11 +29,6 @@ class SqsSnsQueueTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->mockedSqsClient = $this->getMockBuilder(SqsClient::class)
-            ->addMethods(['receiveMessage', 'deleteMessage'])
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $this->mockedMessageDataWithTopicOnly = [
             'Body' => json_encode([
@@ -70,7 +59,7 @@ class SqsSnsQueueTest extends TestCase
     /** @test */
     public function it_can_instantiate_the_queue()
     {
-        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default');
+        $queue = new SqsSnsQueue(m::mock(SqsClient::class), 'default');
 
         $this->assertInstanceOf(SqsSnsQueue::class, $queue);
     }
@@ -79,11 +68,12 @@ class SqsSnsQueueTest extends TestCase
     public function it_can_receive_a_message_and_pop_it_off_the_queue_which_should_dispatch_an_internal_event()
     {
         Event::fake();
-        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+        $sqs = m::mock(SqsClient::class);
+        $sqs->shouldReceive('receiveMessage')->once()->andReturn(new \Aws\Result([
             'Messages' => [$this->mockedMessageDataWithTopicOnly],
         ]));
 
-        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default');
+        $queue = new SqsSnsQueue($sqs, 'default');
         $queue->setContainer($this->app);
         $queue->pop();
 
@@ -94,11 +84,12 @@ class SqsSnsQueueTest extends TestCase
     public function it_can_dispatch_an_internal_event_for_topic_based_events()
     {
         Event::fake();
-        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+        $sqs = m::mock(SqsClient::class);
+        $sqs->shouldReceive('receiveMessage')->once()->andReturn(new \Aws\Result([
             'Messages' => [$this->mockedMessageDataWithTopicOnly],
         ]));
 
-        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default');
+        $queue = new SqsSnsQueue($sqs, 'default');
         $queue->setContainer($this->app);
         $queue->pop();
 
@@ -114,11 +105,12 @@ class SqsSnsQueueTest extends TestCase
     public function it_can_dispatch_an_internal_event_for_subject_based_events()
     {
         Event::fake();
-        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+        $sqs = m::mock(SqsClient::class);
+        $sqs->shouldReceive('receiveMessage')->once()->andReturn(new \Aws\Result([
             'Messages' => [$this->mockedMessageDataWithTopicAndSubject],
         ]));
 
-        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default');
+        $queue = new SqsSnsQueue($sqs, 'default');
         $queue->setContainer($this->app);
         $queue->pop();
 
@@ -134,11 +126,12 @@ class SqsSnsQueueTest extends TestCase
     public function it_dispatches_a_subject_based_events_over_topic_based()
     {
         Event::fake();
-        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+        $sqs = m::mock(SqsClient::class);
+        $sqs->shouldReceive('receiveMessage')->once()->andReturn(new \Aws\Result([
             'Messages' => [$this->mockedMessageDataWithTopicAndSubject],
         ]));
 
-        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default');
+        $queue = new SqsSnsQueue($sqs, 'default');
         $queue->setContainer($this->app);
         $queue->pop();
 
@@ -150,11 +143,12 @@ class SqsSnsQueueTest extends TestCase
     public function it_dispatches_a_topic_based_event_if_no_subject_can_be_found()
     {
         Event::fake();
-        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+        $sqs = m::mock(SqsClient::class);
+        $sqs->shouldReceive('receiveMessage')->once()->andReturn(new \Aws\Result([
             'Messages' => [$this->mockedMessageDataWithTopicOnly],
         ]));
 
-        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default');
+        $queue = new SqsSnsQueue($sqs, 'default');
         $queue->setContainer($this->app);
         $queue->pop();
 
@@ -170,11 +164,12 @@ class SqsSnsQueueTest extends TestCase
             m::type('array')
         );
 
-        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+        $sqs = m::mock(SqsClient::class);
+        $sqs->shouldReceive('receiveMessage')->once()->andReturn(new \Aws\Result([
             'Messages' => [$this->mockedRawMessageData],
         ]));
 
-        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default');
+        $queue = new SqsSnsQueue($sqs, 'default');
         $queue->setContainer($this->app);
         $queue->pop();
     }
@@ -182,11 +177,12 @@ class SqsSnsQueueTest extends TestCase
     /** @test */
     public function it_will_never_return_a_job_when_popping_messages_out_from_the_queue()
     {
-        $this->mockedSqsClient->method('receiveMessage')->willReturn(new \Aws\Result([
+        $sqs = m::mock(SqsClient::class);
+        $sqs->shouldReceive('receiveMessage')->once()->andReturn(new \Aws\Result([
             'Messages' => [$this->mockedMessageDataWithTopicOnly],
         ]));
 
-        $queue = new SqsSnsQueue($this->mockedSqsClient, 'default');
+        $queue = new SqsSnsQueue($sqs, 'default');
         $queue->setContainer($this->app);
 
         $this->assertNull($queue->pop());
@@ -206,10 +202,10 @@ class SqsSnsQueueTest extends TestCase
     {
         Log::shouldReceive('error')->once()->with('Unsupported: sqs-sns queue driver is read-only');
 
-        $mockedSqsClient = m::mock(SqsClient::class);
-        $mockedSqsClient->shouldNotReceive('sendMessage');
+        $sqs = m::mock(SqsClient::class);
+        $sqs->shouldNotReceive('sendMessage');
 
-        $queue = new SqsSnsQueue($mockedSqsClient, 'default');
+        $queue = new SqsSnsQueue($sqs, 'default');
         $queue->setContainer($this->app);
         $queue->$method(...$args);
     }
