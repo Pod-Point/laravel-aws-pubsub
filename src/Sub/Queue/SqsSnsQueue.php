@@ -2,74 +2,73 @@
 
 namespace PodPoint\AwsPubSub\Sub\Queue;
 
-use Aws\Sqs\SqsClient;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
-use PodPoint\AwsPubSub\Sub\Queue\Jobs\SqsSnsJob;
 
 class SqsSnsQueue extends SqsQueue
 {
     /**
-     * @var array
+     * @inheritDoc
      */
-    protected $events;
+    public function pushRaw($payload, $queue = null, array $options = [])
+    {
+        if ($this->container->bound('log')) {
+            $this->container['log']->error('Unsupported: sqs-sns queue driver is read-only');
+        }
+
+        return null;
+    }
 
     /**
-     * Create a new Amazon SQS SNS subscription queue instance.
-     *
-     * @param  \Aws\Sqs\SqsClient  $sqs
-     * @param  string  $default
-     * @param  string  $prefix
-     * @param  string  $suffix
-     * @param  array  $events
+     * @inheritDoc
      */
-    public function __construct(SqsClient $sqs, $default, $prefix = '', $suffix = '', $events = [])
+    public function later($delay, $job, $data = '', $queue = null)
     {
-        parent::__construct($sqs, $default, $prefix, $suffix);
+        if ($this->container->bound('log')) {
+            $this->container['log']->error('Unsupported: sqs-sns queue driver is read-only');
+        }
 
-        $this->events = $events;
+        return null;
     }
 
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string  $queue
-     * @return \PodPoint\AwsPubSub\Sub\Queue\Jobs\SqsSnsJob|null
+     * @param string $queue
+     * @return null
      */
     public function pop($queue = null)
     {
-        $queue = $this->getQueue($queue);
-
         $response = $this->sqs->receiveMessage([
-            'QueueUrl' => $queue,
+            'QueueUrl' => $this->getQueue($queue),
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
-        if ($listenerName = $this->resolveListener($response)) {
-            $response['Messages'][0]['ListenerName'] = $listenerName;
+        $hasMessage = ! is_null($response['Messages']) && count($response['Messages']) > 0;
 
-            return new SqsSnsJob(
-                $this->container, $this->sqs, $response['Messages'][0],
-                $this->connectionName, $queue
-            );
+        if ($hasMessage && $event = $this->resolveEventToTrigger($response)) {
+            if ($this->container->bound('events')) {
+                $this->container['events']->dispatch($event, $this->resolveEventPayload($response));
+            }
         }
+
+        return null;
     }
 
     /**
-     * Check whether there is a message pushed from SNS to SQS
-     * to process or not, validate it and see if we are
-     * listening for it or not based on the mapping.
+     * Check whether there is a message pushed from SNS to SQS to process or not, validate
+     * it and finally see if we are listening for it or not based on the mapping.
      *
      * @param  \Aws\Result  $response
      * @return string|null
      */
-    private function resolveListener(\Aws\Result $response)
+    private function resolveEventToTrigger(\Aws\Result $response): ?string
     {
         $messages = $response['Messages'];
 
         if (is_null($messages) || empty($messages)) {
-            return false;
+            return null;
         }
 
         $body = json_decode($messages[0]['Body'], true);
@@ -79,13 +78,19 @@ class SqsSnsQueue extends SqsQueue
                 'Make sure your JSON is a valid JSON object and raw '.
                 'message delivery is disabled for your SQS subscription.', $response->toArray());
 
-            return false;
+            return null;
         }
 
-        $default = Arr::get($this->events, Arr::get($body, 'TopicArn'));
+        return Arr::get($body, 'Subject', Arr::get($body, 'TopicArn'));
+    }
 
-        $event = Arr::get($body, 'Subject', Arr::get($body, 'TopicArn'));
+    private function resolveEventPayload(\Aws\Result $response): array
+    {
+        $body = json_decode($response['Messages'][0]['Body'], true);
 
-        return Arr::get($this->events, $event, $default);
+        return [
+            'subject' => Arr::get($body, 'Subject', ''),
+            'payload' => json_decode($body['Message'], true),
+        ];
     }
 }
