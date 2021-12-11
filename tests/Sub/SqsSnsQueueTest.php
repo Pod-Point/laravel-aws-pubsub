@@ -3,7 +3,6 @@
 namespace PodPoint\AwsPubSub\Tests\Sub;
 
 use Aws\Sqs\SqsClient;
-use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Mockery as m;
@@ -104,9 +103,9 @@ class SqsSnsQueueTest extends TestCase
 
         Event::assertDispatched('TopicArn:123456', function ($event, $payload) {
             return $payload === [
-                    'subject' => '',
-                    'payload' => ['foo' => 'bar'],
-                ];
+                'subject' => '',
+                'payload' => ['foo' => 'bar'],
+            ];
         });
     }
 
@@ -124,9 +123,9 @@ class SqsSnsQueueTest extends TestCase
 
         Event::assertDispatched('Subject#action', function ($event, $payload) {
             return $payload === [
-                    'subject' => 'Subject#action',
-                    'payload' => ['foo' => 'bar'],
-                ];
+                'subject' => 'Subject#action',
+                'payload' => ['foo' => 'bar'],
+            ];
         });
     }
 
