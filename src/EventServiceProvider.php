@@ -89,7 +89,7 @@ class EventServiceProvider extends ServiceProvider
     {
         $this->app->resolving('queue', function (QueueManager $manager) {
             $manager->extend('sqs-sns', function () {
-                return (new SqsSnsConnector);
+                return new SqsSnsConnector;
             });
         });
     }

@@ -35,7 +35,7 @@ class SqsSnsQueue extends SqsQueue
     /**
      * Pop the next job off of the queue.
      *
-     * @param string $queue
+     * @param  string  $queue
      * @return null
      */
     public function pop($queue = null)
