@@ -14,7 +14,7 @@ class SqsSnsQueue extends SqsQueue
     public function pushRaw($payload, $queue = null, array $options = [])
     {
         if ($this->container->bound('log')) {
-            $this->container['log']->error('Unsupported: sqs-sns queue driver is read-only');
+            Log::error('Unsupported: sqs-sns queue driver is read-only');
         }
 
         return null;
@@ -26,7 +26,7 @@ class SqsSnsQueue extends SqsQueue
     public function later($delay, $job, $data = '', $queue = null)
     {
         if ($this->container->bound('log')) {
-            $this->container['log']->error('Unsupported: sqs-sns queue driver is read-only');
+            Log::error('Unsupported: sqs-sns queue driver is read-only');
         }
 
         return null;
