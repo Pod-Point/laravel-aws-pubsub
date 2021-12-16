@@ -116,9 +116,9 @@ class SqsSnsQueueTest extends TestCase
 
         Event::assertDispatched('Subject#action', function ($event, $payload) {
             return $payload === [
-                    'subject' => 'Subject#action',
-                    'payload' => ['foo' => 'bar'],
-                ];
+                'subject' => 'Subject#action',
+                'payload' => ['foo' => 'bar'],
+            ];
         });
     }
 
