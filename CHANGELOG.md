@@ -4,7 +4,7 @@ All notable changes to `laravel-aws-pubsub` will be documented in this file.
 
 ## 0.3.0 - 2021-11-09
 
-Adds support for publishing pub/sub events to AWS EventBridge instead of AWS SNS [#11](https://github.com/Pod-Point/laravel-aws-pubsub/pull/11)
+Adds support for publishing pub/sub events to AWS EventBridge in addition to AWS SNS [#11](https://github.com/Pod-Point/laravel-aws-pubsub/pull/11)
 
 - Add EventBridge driver
 - Cover it with some tests
