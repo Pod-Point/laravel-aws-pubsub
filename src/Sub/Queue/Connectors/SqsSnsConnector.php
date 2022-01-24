@@ -16,7 +16,7 @@ class SqsSnsConnector extends SqsConnector
      * @param  array  $config
      * @return \Illuminate\Contracts\Queue\Queue
      */
-    public function connect(array $config): \Illuminate\Contracts\Queue\Queue
+    public function connect(array $config)
     {
         $config = $this->getDefaultConfiguration($config);
 

@@ -4,6 +4,7 @@ namespace PodPoint\AwsPubSub\Sub\Queue;
 
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 
 class SqsSnsQueue extends SqsQueue
@@ -14,7 +15,7 @@ class SqsSnsQueue extends SqsQueue
     public function pushRaw($payload, $queue = null, array $options = [])
     {
         if ($this->container->bound('log')) {
-            $this->container['log']->error('Unsupported: sqs-sns queue driver is read-only');
+            Log::error('Unsupported: sqs-sns queue driver is read-only');
         }
 
         return null;
@@ -26,14 +27,15 @@ class SqsSnsQueue extends SqsQueue
     public function later($delay, $job, $data = '', $queue = null)
     {
         if ($this->container->bound('log')) {
-            $this->container['log']->error('Unsupported: sqs-sns queue driver is read-only');
+            Log::error('Unsupported: sqs-sns queue driver is read-only');
         }
 
         return null;
     }
 
     /**
-     * Pop the next job off of the queue.
+     * Pop the next message off of the queue and try to resolve an Event
+     * and forward it to the standard Laravel Event Dispatcher.
      *
      * @param  string  $queue
      * @return null
@@ -49,7 +51,7 @@ class SqsSnsQueue extends SqsQueue
 
         if ($hasMessage && $event = $this->resolveEventToTrigger($response)) {
             if ($this->container->bound('events')) {
-                $this->container['events']->dispatch($event, $this->resolveEventPayload($response));
+                Event::dispatch($event, $this->resolveEventPayload($response));
             }
         }
 
@@ -63,7 +65,7 @@ class SqsSnsQueue extends SqsQueue
      * @param  \Aws\Result  $response
      * @return string|null
      */
-    private function resolveEventToTrigger(\Aws\Result $response): ?string
+    private function resolveEventToTrigger(\Aws\Result $response)
     {
         $messages = $response['Messages'];
 
@@ -74,9 +76,11 @@ class SqsSnsQueue extends SqsQueue
         $body = json_decode($messages[0]['Body'], true);
 
         if (is_null($body) || is_null(Arr::get($body, 'Type'))) {
-            Log::error('SqsSnsQueue: Invalid SNS payload. '.
-                'Make sure your JSON is a valid JSON object and raw '.
-                'message delivery is disabled for your SQS subscription.', $response->toArray());
+            if ($this->container->bound('log')) {
+                Log::error('SqsSnsQueue: Invalid SNS payload. '.
+                    'Make sure your JSON is a valid JSON object and raw '.
+                    'message delivery is disabled for your SQS subscription.', $response->toArray());
+            }
 
             return null;
         }
@@ -84,7 +88,12 @@ class SqsSnsQueue extends SqsQueue
         return Arr::get($body, 'Subject', Arr::get($body, 'TopicArn'));
     }
 
-    private function resolveEventPayload(\Aws\Result $response): array
+    /**
+     * Transforms a message body into attributes Events which will be dispatched with.
+     *
+     * @return array
+     */
+    private function resolveEventPayload(\Aws\Result $response)
     {
         $body = json_decode($response['Messages'][0]['Body'], true);
 

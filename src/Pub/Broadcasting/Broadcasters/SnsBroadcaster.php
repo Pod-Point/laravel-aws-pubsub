@@ -39,30 +39,30 @@ class SnsBroadcaster extends Broadcaster
     /**
      * @inheritDoc
      */
+    public function auth($request)
+    {
+        //
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function validAuthenticationResponse($request, $result)
+    {
+        //
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function broadcast(array $channels, $event, array $payload = [])
     {
-        foreach ($channels as $channel) {
+        collect($channels)->each(function ($channel) use ($event, $payload) {
             $this->snsClient->publish([
                 'TopicArn' => "{$this->arnPrefix}{$channel}{$this->arnSuffix}",
                 'Message' => json_encode($payload),
                 'Subject' => $event,
             ]);
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function auth($request): bool
-    {
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function validAuthenticationResponse($request, $result): bool
-    {
-        return true;
+        });
     }
 }

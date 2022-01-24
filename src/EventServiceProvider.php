@@ -69,7 +69,7 @@ class EventServiceProvider extends ServiceProvider
      * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
-    protected function createSnsDriver(array $config): \Illuminate\Contracts\Broadcasting\Broadcaster
+    protected function createSnsDriver(array $config)
     {
         $config = self::prepareConfigurationCredentials($config);
 
@@ -111,10 +111,12 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
+     * Create an instance of the EventBridge driver for broadcasting.
+     *
      * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
-    protected function createEventBridgeDriver(array $config): \Illuminate\Contracts\Broadcasting\Broadcaster
+    protected function createEventBridgeDriver(array $config)
     {
         $config = self::prepareConfigurationCredentials($config);
 
@@ -125,10 +127,12 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
+     * Parse and prepare the AWS credentials needed by the AWS SDK library from the config.
+     *
      * @param  array  $config
      * @return array
      */
-    public static function prepareConfigurationCredentials(array $config): array
+    public static function prepareConfigurationCredentials(array $config)
     {
         if (Arr::has($config, ['key', 'secret'])) {
             $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
@@ -137,8 +141,19 @@ class EventServiceProvider extends ServiceProvider
         return $config;
     }
 
+    /**
+     * Register the event handlers subscribed to PubSub events against Laravel event bus.
+     *
+     * @return void
+     */
     private function registerListeners()
     {
+        collect($this->listen)->each(function ($listeners, $event) {
+            collect($listeners)->unique()->each(function ($listener) use ($event) {
+                Event::listen($event, $listener);
+            });
+        });
+
         foreach ($this->listen as $event => $listeners) {
             foreach (array_unique($listeners) as $listener) {
                 Event::listen($event, $listener);
