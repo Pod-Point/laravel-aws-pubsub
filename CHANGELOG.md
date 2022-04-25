@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-aws-pubsub` will be documented in this file.
 
+## 0.3.1 - 2022-04-25
+
+Adds support for Laravel 9 thanks to [cappuc](https://github.com/cappuc), see [#40](https://github.com/Pod-Point/laravel-aws-pubsub/pull/40).
+
 ## 0.3.0 - 2021-11-09
 
 Adds support for publishing pub/sub events to AWS EventBridge in addition to AWS SNS [#11](https://github.com/Pod-Point/laravel-aws-pubsub/pull/11)
