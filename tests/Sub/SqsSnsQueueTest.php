@@ -95,8 +95,8 @@ class SqsSnsQueueTest extends TestCase
 
         Event::assertDispatched('TopicArn:123456', function ($event, $payload) {
             return $payload === [
-                'subject' => '',
                 'payload' => ['foo' => 'bar'],
+                'subject' => '',
             ];
         });
     }
@@ -116,8 +116,8 @@ class SqsSnsQueueTest extends TestCase
 
         Event::assertDispatched('Subject#action', function ($event, $payload) {
             return $payload === [
-                'subject' => 'Subject#action',
                 'payload' => ['foo' => 'bar'],
+                'subject' => 'Subject#action',
             ];
         });
     }
