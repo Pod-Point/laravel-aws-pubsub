@@ -148,12 +148,6 @@ class EventServiceProvider extends ServiceProvider
      */
     private function registerListeners()
     {
-        collect($this->listen)->each(function ($listeners, $event) {
-            collect($listeners)->unique()->each(function ($listener) use ($event) {
-                Event::listen($event, $listener);
-            });
-        });
-
         foreach ($this->listen as $event => $listeners) {
             foreach (array_unique($listeners) as $listener) {
                 Event::listen($event, $listener);
