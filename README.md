@@ -345,7 +345,7 @@ public function handle(array $payload, string $subject = '')
 }
 ```
 
-Feel free to queue these listeners, just like you would with an Laravel Listeners.
+Feel free to queue these listeners, just like you would with a standard Laravel Listeners.
 
 #### Generating Listeners
 
