@@ -98,8 +98,8 @@ class SqsSnsQueue extends SqsQueue
         $body = json_decode($response['Messages'][0]['Body'], true);
 
         return [
-            'subject' => Arr::get($body, 'Subject', ''),
             'payload' => json_decode($body['Message'], true),
+            'subject' => Arr::get($body, 'Subject', ''),
         ];
     }
 }
