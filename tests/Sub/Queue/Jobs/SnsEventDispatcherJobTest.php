@@ -38,9 +38,9 @@ class SnsEventDispatcherJobTest extends TestCase
 
         Event::assertDispatched('TopicArn:123456', function ($event, $args) {
             return $args === [
-                    'payload' => ['foo' => 'bar'],
-                    'subject' => '',
-                ];
+                'payload' => ['foo' => 'bar'],
+                'subject' => '',
+            ];
         });
     }
 
@@ -57,9 +57,9 @@ class SnsEventDispatcherJobTest extends TestCase
 
         Event::assertDispatched('Subject#action', function ($event, $payload) {
             return $payload === [
-                    'payload' => ['foo' => 'bar'],
-                    'subject' => 'Subject#action',
-                ];
+                'payload' => ['foo' => 'bar'],
+                'subject' => 'Subject#action',
+            ];
         });
         Event::assertNotDispatched('TopicArn:123456');
     }
@@ -88,9 +88,9 @@ class SnsEventDispatcherJobTest extends TestCase
 
         Event::assertDispatched('TopicArn:123456', function ($event, $payload) {
             return $payload === [
-                    'payload' => [],
-                    'subject' => '',
-                ];
+                'payload' => [],
+                'subject' => '',
+            ];
         });
     }
 
