@@ -27,34 +27,6 @@ class SnsEventDispatcherJobTest extends TestCase
     }
 
     /** @test */
-    public function it_will_not_handle_raw_notification_messages()
-    {
-        Log::shouldReceive('error')->once()->with(
-            m::pattern('/^SqsSnsQueue: Invalid SNS payload/'),
-            m::type('array')
-        );
-
-        $this->mockedJobData = $this->mockedRawNotificationMessage()['Messages'][0];
-
-        $this->getJob()->fire();
-
-        Event::assertNothingDispatched();
-    }
-
-    /** @test */
-    public function it_will_not_handle_messages_where_the_event_name_to_trigger_cannot_be_resolved()
-    {
-        $this->mockedJobData = $this->mockedRichNotificationMessage([
-            'TopicArn' => '',
-            'Subject' => '',
-        ])['Messages'][0];
-
-        $this->getJob()->fire();
-
-        Event::assertNothingDispatched();
-    }
-
-    /** @test */
     public function it_can_dispatch_an_event_using_the_topic_and_forward_the_message_payload()
     {
         $this->mockedJobData = $this->mockedRichNotificationMessage([
@@ -102,6 +74,52 @@ class SnsEventDispatcherJobTest extends TestCase
         $this->getJob()->fire();
 
         Event::assertDispatched('TopicArn:123456');
+    }
+
+    /** @test */
+    public function it_will_handle_empty_messages()
+    {
+        $this->mockedJobData = $this->mockedRichNotificationMessage([
+            'TopicArn' => 'TopicArn:123456',
+            'Message' => null,
+        ])['Messages'][0];
+
+        $this->getJob()->fire();
+
+        Event::assertDispatched('TopicArn:123456', function ($event, $payload) {
+            return $payload === [
+                    'payload' => [],
+                    'subject' => '',
+                ];
+        });
+    }
+
+    /** @test */
+    public function it_will_not_handle_raw_notification_messages()
+    {
+        Log::shouldReceive('error')->once()->with(
+            m::pattern('/^SqsSnsQueue: Invalid SNS payload/'),
+            m::type('array')
+        );
+
+        $this->mockedJobData = $this->mockedRawNotificationMessage()['Messages'][0];
+
+        $this->getJob()->fire();
+
+        Event::assertNothingDispatched();
+    }
+
+    /** @test */
+    public function it_will_not_handle_messages_where_the_event_name_to_trigger_cannot_be_resolved()
+    {
+        $this->mockedJobData = $this->mockedRichNotificationMessage([
+            'TopicArn' => '',
+            'Subject' => '',
+        ])['Messages'][0];
+
+        $this->getJob()->fire();
+
+        Event::assertNothingDispatched();
     }
 
     protected function getJob()

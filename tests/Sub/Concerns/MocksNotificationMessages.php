@@ -33,9 +33,4 @@ trait MocksNotificationMessages
     {
         return new \Aws\Result(['Messages' => null]);
     }
-
-    private function mockedEmptyRichNotificationMessage(): \Aws\Result
-    {
-        return $this->mockedRichNotificationMessage(['Message' => null]);
-    }
 }
