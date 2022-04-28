@@ -39,11 +39,7 @@ class SnsEventDispatcherJob extends SqsJob implements JobContract
      */
     public function getName()
     {
-        if (empty($this->snsSubject())) {
-            return $this->snsTopicArn();
-        }
-
-        return $this->snsSubject();
+        return $this->snsSubject() ?: $this->snsTopicArn();
     }
 
     /**
