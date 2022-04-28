@@ -95,6 +95,24 @@ class SnsEventDispatcherJobTest extends TestCase
     }
 
     /** @test */
+    public function it_will_handle_empty_messages_with_a_subject()
+    {
+        $this->mockedJobData = $this->mockedRichNotificationMessage([
+            'Subject' => 'Subject#action',
+            'Message' => null,
+        ])['Messages'][0];
+
+        $this->getJob()->fire();
+
+        Event::assertDispatched('Subject#action', function ($event, $payload) {
+            return $payload === [
+                    'payload' => [],
+                    'subject' => 'Subject#action',
+                ];
+        });
+    }
+
+    /** @test */
     public function it_will_not_handle_raw_notification_messages()
     {
         Log::shouldReceive('error')->once()->with(
