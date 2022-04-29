@@ -2,6 +2,32 @@
 
 All notable changes to `laravel-aws-pubsub` will be documented in this file.
 
+## 0.4.0 - 2022-04-29
+
+**Breaking Change** - Adding the ability to support multiple event handlers defined in your `PubSubEventServiceProvider`.
+
+```php
+protected $listen = [
+    // from
+    'orders.shipped' => SendShipmentNotification::class,
+    'arn:aws:sns:us-east-1:123456789:orders' => OrdersListener::class,
+    // to
+    'orders.shipped' => [
+        UpdateTrackingNumber::class,
+        SendShipmentNotification::class,
+    ],
+    'arn:aws:sns:us-east-1:123456789:orders' => [
+        OrdersListener::class,
+    ],
+];
+```
+### What's Changed
+
+* Add support to multiple event handlers in `PubSubEventServiceProvider` by @clemblanco in https://github.com/Pod-Point/laravel-aws-pubsub/pull/38
+* Refactor event processing mechanism to piggy-back on the default Laravel Event Dispatcher by @clemblanco in https://github.com/Pod-Point/laravel-aws-pubsub/pull/38
+
+**Full Changelog**: https://github.com/Pod-Point/laravel-aws-pubsub/compare/0.3.1...0.4.0
+
 ## 0.3.1 - 2022-04-25
 
 Adds support for Laravel 9 thanks to [cappuc](https://github.com/cappuc), see [#40](https://github.com/Pod-Point/laravel-aws-pubsub/pull/40).

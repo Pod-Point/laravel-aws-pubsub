@@ -11,7 +11,7 @@ class AwsPubSubServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register(): void
+    public function register()
     {
         //
     }
@@ -21,7 +21,7 @@ class AwsPubSubServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot(): void
+    public function boot()
     {
         $this->configureCommands();
     }

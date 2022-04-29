@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\AwsPubSub\Tests\Sub;
+namespace PodPoint\AwsPubSub\Tests\Sub\Queue\Connectors;
 
 use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
 use PodPoint\AwsPubSub\Sub\Queue\SqsSnsQueue;
