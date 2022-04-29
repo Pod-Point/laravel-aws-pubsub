@@ -27,6 +27,7 @@ class EventDispatcherJob extends SqsJob implements JobContract
 
         if (! $eventResolver->validate($this)) {
             $eventResolver->failedValidation($this);
+
             return;
         }
 
