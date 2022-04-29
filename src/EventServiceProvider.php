@@ -9,7 +9,6 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Event;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\EventBridgeBroadcaster;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
 use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
@@ -118,14 +117,5 @@ class EventServiceProvider extends ServiceProvider
         }
 
         return $config;
-    }
-
-    private function registerListeners()
-    {
-        foreach ($this->listen as $event => $listeners) {
-            foreach (array_unique($listeners) as $listener) {
-                Event::listen($event, $listener);
-            }
-        }
     }
 }

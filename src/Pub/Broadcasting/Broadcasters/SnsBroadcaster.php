@@ -39,6 +39,22 @@ class SnsBroadcaster extends Broadcaster
     /**
      * @inheritDoc
      */
+    public function auth($request)
+    {
+        //
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function validAuthenticationResponse($request, $result)
+    {
+        //
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function broadcast(array $channels, $event, array $payload = [])
     {
         foreach ($channels as $channel) {
@@ -48,21 +64,5 @@ class SnsBroadcaster extends Broadcaster
                 'Subject' => $event,
             ]);
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function auth($request): bool
-    {
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function validAuthenticationResponse($request, $result): bool
-    {
-        return true;
     }
 }

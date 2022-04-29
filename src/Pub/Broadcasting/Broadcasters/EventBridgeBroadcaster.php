@@ -32,6 +32,22 @@ class EventBridgeBroadcaster extends Broadcaster
     /**
      * @inheritDoc
      */
+    public function auth($request)
+    {
+        //
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function validAuthenticationResponse($request, $result)
+    {
+        //
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function broadcast(array $channels, $event, array $payload = [])
     {
         $events = $this->mapToEventBridgeEntries($channels, $event, $payload);
@@ -39,22 +55,6 @@ class EventBridgeBroadcaster extends Broadcaster
         $this->eventBridgeClient->putEvents([
             'Entries' => $events,
         ]);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function auth($request): bool
-    {
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function validAuthenticationResponse($request, $result): bool
-    {
-        return true;
     }
 
     /**

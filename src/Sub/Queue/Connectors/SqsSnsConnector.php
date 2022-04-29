@@ -16,7 +16,7 @@ class SqsSnsConnector extends SqsConnector
      * @param  array  $config
      * @return \Illuminate\Contracts\Queue\Queue
      */
-    public function connect(array $config): \Illuminate\Contracts\Queue\Queue
+    public function connect(array $config)
     {
         $config = $this->getDefaultConfiguration($config);
 
@@ -24,7 +24,7 @@ class SqsSnsConnector extends SqsConnector
             new SqsClient(EventServiceProvider::prepareConfigurationCredentials($config)),
             $config['queue'],
             Arr::get($config, 'prefix', ''),
-            Arr::get($config, 'suffix', '')
+            Arr::get($config, 'suffix', '') // only supported with L7+
         );
     }
 }
