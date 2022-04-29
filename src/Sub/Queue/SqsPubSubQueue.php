@@ -5,6 +5,7 @@ namespace PodPoint\AwsPubSub\Sub\Queue;
 use Aws\Sqs\SqsClient;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Facades\Log;
+use PodPoint\AwsPubSub\Sub\Queue\EventResolvers\EventResolver;
 use PodPoint\AwsPubSub\Sub\Queue\Jobs\EventDispatcherJob;
 
 class SqsPubSubQueue extends SqsQueue
@@ -18,7 +19,7 @@ class SqsPubSubQueue extends SqsQueue
         $prefix,
         $suffix,
         $dispatchAfterCommit,
-        string $eventResolver
+        EventResolver $eventResolver
     ) {
         parent::__construct($sqs, $default, $prefix, $suffix, $dispatchAfterCommit);
 

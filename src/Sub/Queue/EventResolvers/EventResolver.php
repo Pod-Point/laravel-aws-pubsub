@@ -3,24 +3,17 @@
 namespace PodPoint\AwsPubSub\Sub\Queue\EventResolvers;
 
 use Illuminate\Queue\Jobs\SqsJob;
-use PodPoint\AwsPubSub\Sub\Queue\ValidationResult;
 
 abstract class EventResolver
 {
-    /** @var SqsJob */
-    protected $job;
-
-    public function __construct(SqsJob $job)
+    public function validate(SqsJob $job): bool
     {
-        $this->job = $job;
+        return true;
     }
 
-    public function validate(): ValidationResult
+    public function failedValidation(SqsJob $job): void
     {
-        return new ValidationResult(true);
     }
 
-    abstract public function resolveName(): string;
-
-    abstract public function resolvePayload();
+    abstract public function resolve(SqsJob $job): Event;
 }
