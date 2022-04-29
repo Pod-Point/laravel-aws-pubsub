@@ -16,8 +16,8 @@ class SnsEventDispatcherJob extends SqsJob implements JobContract
     {
         if ($this->isRawPayload()) {
             if ($this->container->bound('log')) {
-                Log::error('SqsSnsQueue: Invalid SNS payload. ' .
-                    'Make sure your JSON is a valid JSON object and raw ' .
+                Log::error('SqsSnsQueue: Invalid SNS payload. '.
+                    'Make sure your JSON is a valid JSON object and raw '.
                     'message delivery is disabled for your SQS subscription.', $this->job);
             }
 
