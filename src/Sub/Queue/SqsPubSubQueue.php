@@ -5,8 +5,8 @@ namespace PodPoint\AwsPubSub\Sub\Queue;
 use Aws\Sqs\SqsClient;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Facades\Log;
-use PodPoint\AwsPubSub\Sub\Queue\Jobs\EventDispatcherJob;
 use PodPoint\AwsPubSub\Sub\Queue\EventResolvers\EventResolver;
+use PodPoint\AwsPubSub\Sub\Queue\Jobs\EventDispatcherJob;
 
 class SqsPubSubQueue extends SqsQueue
 {
