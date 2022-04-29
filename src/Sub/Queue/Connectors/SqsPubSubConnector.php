@@ -28,7 +28,7 @@ class SqsPubSubConnector extends SqsConnector
             Arr::get($config, 'suffix', ''),
             Arr::get($config, 'dispatchAfterCommit', false),
             new (Arr::get($config, 'event_resolver.class', SnsEventResolver::class))(
-                ...Arr::get($config, 'event_resolver.config', [])
+                ...Arr::get($config, 'event_resolver.parameters', [])
             )
         );
     }
