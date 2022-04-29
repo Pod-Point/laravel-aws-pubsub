@@ -3,7 +3,6 @@
 namespace PodPoint\AwsPubSub\Sub\Queue;
 
 use Illuminate\Queue\SqsQueue;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use PodPoint\AwsPubSub\Sub\Queue\Jobs\SnsEventDispatcherJob;
 
