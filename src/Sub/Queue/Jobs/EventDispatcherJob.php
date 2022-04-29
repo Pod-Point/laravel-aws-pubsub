@@ -8,18 +8,13 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Support\Facades\Log;
-use PodPoint\AwsPubSub\Sub\Queue\EventResolvers\EventResolver;
 
 class EventDispatcherJob extends SqsJob implements JobContract
 {
     /** @var string */
     private $eventName;
 
-    /** @var array */
     private $eventPayload;
-
-    /** @var string */
-    private $eventSubject;
 
     public function __construct(
         Container $container,
@@ -27,11 +22,13 @@ class EventDispatcherJob extends SqsJob implements JobContract
         array $job,
         $connectionName,
         $queue,
-        EventResolver $eventResolver
+        string $eventResolver
     ) {
         parent::__construct($container, $sqs, $job, $connectionName, $queue);
 
-        $validationResult = $eventResolver->validate($this);
+        $eventResolver = new $eventResolver($this);
+
+        $validationResult = $eventResolver->validate();
 
         if (! $validationResult->result()) {
             if ($this->container->bound('log')) {
@@ -41,9 +38,8 @@ class EventDispatcherJob extends SqsJob implements JobContract
             return;
         }
 
-        $this->eventName = $eventResolver->resolveName($this);
-        $this->eventPayload = $eventResolver->resolvePayload($this);
-        $this->eventSubject = $eventResolver->resolveSubject($this);
+        $this->eventName = $eventResolver->resolveName();
+        $this->eventPayload = $eventResolver->resolvePayload();
     }
 
     /**
@@ -54,7 +50,7 @@ class EventDispatcherJob extends SqsJob implements JobContract
         if ($this->eventName) {
             $this->resolve(Dispatcher::class)->dispatch($this->eventName, [
                 'payload' => $this->eventPayload,
-                'subject' => $this->eventSubject,
+                'name' => $this->eventName,
             ]);
         }
     }

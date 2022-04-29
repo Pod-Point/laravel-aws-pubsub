@@ -2,14 +2,13 @@
 
 namespace PodPoint\AwsPubSub\Sub\Queue\EventResolvers;
 
-use Illuminate\Queue\Jobs\SqsJob;
 use PodPoint\AwsPubSub\Sub\Queue\ValidationResult;
 
-class SnsEventResolver implements EventResolver
+class SnsEventResolver extends EventResolver
 {
-    public function validate(SqsJob $job): ValidationResult
+    public function validate(): ValidationResult
     {
-        if ($this->isRawPayload($job->payload())) {
+        if ($this->isRawPayload()) {
             return new ValidationResult(
                 false,
                 'Invalid SNS payload. '.
@@ -21,28 +20,17 @@ class SnsEventResolver implements EventResolver
         return new ValidationResult(true);
     }
 
-    public function resolveName(SqsJob $job): string
+    public function resolveName(): string
     {
-        $jobPayload = $job->payload();
-
-        return $this->snsSubject($jobPayload) ?: $this->snsTopicArn($jobPayload);
+        return $this->snsSubject() ?: $this->snsTopicArn();
     }
 
-    public function resolvePayload(SqsJob $job): array
+    public function resolvePayload(): array
     {
-        $jobPayload = $job->payload();
-
         return [
-            'payload' => json_decode($this->snsMessage($jobPayload), true),
-            'subject' => $this->snsSubject($jobPayload),
+            'payload' => json_decode($this->snsMessage(), true),
+            'subject' => $this->snsSubject(),
         ];
-    }
-
-    public function resolveSubject(SqsJob $job): string
-    {
-        $jobPayload = $job->payload();
-
-        return $this->snsSubject($jobPayload);
     }
 
     /**
@@ -50,9 +38,9 @@ class SnsEventResolver implements EventResolver
      *
      * @return bool
      */
-    private function isRawPayload($jobPayload): bool
+    private function isRawPayload(): bool
     {
-        return is_null($jobPayload['Type'] ?? null);
+        return is_null($this->job->payload()['Type'] ?? null);
     }
 
     /**
@@ -60,9 +48,9 @@ class SnsEventResolver implements EventResolver
      *
      * @return string
      */
-    private function snsTopicArn(array $jobPayload): array
+    private function snsTopicArn(): string
     {
-        return $jobPayload['TopicArn'] ?? '';
+        return $this->job->payload()['TopicArn'] ?? '';
     }
 
     /**
@@ -70,9 +58,9 @@ class SnsEventResolver implements EventResolver
      *
      * @return string
      */
-    private function snsSubject(array $jobPayload): array
+    private function snsSubject(): string
     {
-        return $jobPayload['Subject'] ?? '';
+        return $this->job->payload()['Subject'] ?? '';
     }
 
     /**
@@ -80,8 +68,8 @@ class SnsEventResolver implements EventResolver
      *
      * @return string
      */
-    private function snsMessage(array $jobPayload): array
+    private function snsMessage(): string
     {
-        return $jobPayload['Message'] ?? '[]';
+        return $this->job->payload()['Message'] ?? '[]';
     }
 }

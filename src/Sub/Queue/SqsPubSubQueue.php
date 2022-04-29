@@ -6,11 +6,10 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Facades\Log;
 use PodPoint\AwsPubSub\Sub\Queue\Jobs\EventDispatcherJob;
-use PodPoint\AwsPubSub\Sub\Queue\EventResolvers\EventResolver;
 
 class SqsPubSubQueue extends SqsQueue
 {
-    /** @var EventResolver */
+    /** @var string */
     private $eventResolver;
 
     public function __construct(
@@ -19,7 +18,7 @@ class SqsPubSubQueue extends SqsQueue
         $prefix,
         $suffix,
         $dispatchAfterCommit,
-        EventResolver $eventResolver
+        string $eventResolver
     ) {
         parent::__construct($sqs, $default, $prefix, $suffix, $dispatchAfterCommit);
 
