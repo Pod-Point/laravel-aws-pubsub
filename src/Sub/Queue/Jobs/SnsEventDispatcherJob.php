@@ -15,6 +15,12 @@ class SnsEventDispatcherJob extends SqsJob implements JobContract
     public function fire()
     {
         if ($this->isRawPayload()) {
+            if ($this->container->bound('log')) {
+                Log::error('SqsSnsQueue: Invalid SNS payload. ' .
+                    'Make sure your JSON is a valid JSON object and raw ' .
+                    'message delivery is disabled for your SQS subscription.', $this->job);
+            }
+
             return;
         }
 
@@ -57,15 +63,7 @@ class SnsEventDispatcherJob extends SqsJob implements JobContract
      */
     private function isRawPayload()
     {
-        $isRaw = is_null($this->payload()['Type'] ?? null);
-
-        if ($isRaw && $this->container->bound('log')) {
-            Log::error('SqsSnsQueue: Invalid SNS payload. '.
-                'Make sure your JSON is a valid JSON object and raw '.
-                'message delivery is disabled for your SQS subscription.', $this->job);
-        }
-
-        return $isRaw;
+        return is_null($this->payload()['Type'] ?? null);
     }
 
     /**
