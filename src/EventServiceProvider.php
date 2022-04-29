@@ -8,8 +8,7 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastManager;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\EventBridgeBroadcaster;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
 use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
@@ -17,16 +16,7 @@ use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
 class EventServiceProvider extends ServiceProvider
 {
     /**
-     * The event handler mappings for subscribing to PubSub events.
-     *
-     * @var array
-     */
-    protected $listen = [];
-
-    /**
-     * Register any application services.
-     *
-     * @return void
+     * @inheritDoc
      */
     public function register()
     {
@@ -35,18 +25,6 @@ class EventServiceProvider extends ServiceProvider
         $this->registerSqsSnsQueueConnector();
 
         $this->registerEventBridgeBroadcaster();
-
-        $this->registerListeners();
-    }
-
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        //
     }
 
     /**
@@ -139,19 +117,5 @@ class EventServiceProvider extends ServiceProvider
         }
 
         return $config;
-    }
-
-    /**
-     * Register the event handlers subscribed to PubSub events against Laravel event bus.
-     *
-     * @return void
-     */
-    private function registerListeners()
-    {
-        foreach ($this->listen as $event => $listeners) {
-            foreach (array_unique($listeners) as $listener) {
-                Event::listen($event, $listener);
-            }
-        }
     }
 }
