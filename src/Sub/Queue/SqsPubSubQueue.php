@@ -2,19 +2,37 @@
 
 namespace PodPoint\AwsPubSub\Sub\Queue;
 
+use Aws\Sqs\SqsClient;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Facades\Log;
-use PodPoint\AwsPubSub\Sub\Queue\Jobs\SnsEventDispatcherJob;
+use PodPoint\AwsPubSub\Sub\Queue\Jobs\EventDispatcherJob;
+use PodPoint\AwsPubSub\Sub\Queue\EventResolvers\EventResolver;
 
-class SqsSnsQueue extends SqsQueue
+class SqsPubSubQueue extends SqsQueue
 {
+    /** @var EventResolver */
+    private $eventResolver;
+
+    public function __construct(
+        SqsClient $sqs,
+        $default,
+        $prefix,
+        $suffix,
+        $dispatchAfterCommit,
+        EventResolver $eventResolver
+    ) {
+        parent::__construct($sqs, $default, $prefix, $suffix, $dispatchAfterCommit);
+
+        $this->eventResolver = $eventResolver;
+    }
+
     /**
      * @inheritDoc
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
         if ($this->container->bound('log')) {
-            Log::error('Unsupported: sqs-sns queue driver is read-only');
+            Log::error('Unsupported: sqs-pubsub queue driver is read-only');
         }
 
         return null;
@@ -26,7 +44,7 @@ class SqsSnsQueue extends SqsQueue
     public function later($delay, $job, $data = '', $queue = null)
     {
         if ($this->container->bound('log')) {
-            Log::error('Unsupported: sqs-sns queue driver is read-only');
+            Log::error('Unsupported: sqs-pubsub queue driver is read-only');
         }
 
         return null;
@@ -46,10 +64,16 @@ class SqsSnsQueue extends SqsQueue
         ]);
 
         if (! is_null($response['Messages']) && count($response['Messages']) > 0) {
-            return new SnsEventDispatcherJob(
-                $this->container, $this->sqs, $response['Messages'][0],
-                $this->connectionName, $queue
+            return new EventDispatcherJob(
+                $this->container,
+                $this->sqs,
+                $response['Messages'][0],
+                $this->connectionName,
+                $queue,
+                $this->eventResolver,
             );
         }
+
+        return null;
     }
 }

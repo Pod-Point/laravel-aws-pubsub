@@ -260,7 +260,7 @@ Once the package is installed and similar to what you would do for a standard La
 ```php
 'connections' => [
     // ...
-    'sqs-sns' => [
+    'sqs-pubsub' => [
         'driver' => 'sqs-sns',
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
