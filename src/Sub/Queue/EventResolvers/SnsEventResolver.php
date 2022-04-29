@@ -2,74 +2,63 @@
 
 namespace PodPoint\AwsPubSub\Sub\Queue\EventResolvers;
 
-use PodPoint\AwsPubSub\Sub\Queue\ValidationResult;
+use Illuminate\Queue\Jobs\SqsJob;
+use Illuminate\Support\Facades\Log;
 
 class SnsEventResolver extends EventResolver
 {
-    public function validate(): ValidationResult
+    public function validate(SqsJob $job): bool
     {
-        if ($this->isRawPayload()) {
-            return new ValidationResult(
-                false,
+        return ! $this->isRawPayload($job);
+    }
+
+    public function failedValidation(SqsJob $job): void
+    {
+        if ($job->getContainer()->bound('log')) {
+            Log::error(
                 'Invalid SNS payload. '.
                 'Make sure your JSON is a valid JSON object and raw '.
-                'message delivery is disabled for your SQS subscription.'
+                'message delivery is disabled for your SQS subscription.',
+                $job->getSqsJob()
             );
         }
-
-        return new ValidationResult(true);
     }
 
-    public function resolveName(): string
+    public function resolve(SqsJob $job): Event
     {
-        return $this->snsSubject() ?: $this->snsTopicArn();
+        return new Event(
+            $this->resolveName($job),
+            $this->resolvePayload($job),
+        );
     }
 
-    public function resolvePayload(): array
+    private function resolveName(SqsJob $job)
     {
-        return [
-            'payload' => json_decode($this->snsMessage(), true),
-            'subject' => $this->snsSubject(),
-        ];
+        return $this->snsSubject($job) ?: $this->snsTopicArn($job);
     }
 
-    /**
-     * Verifies that the SNS message sent to the queue can be processed.
-     *
-     * @return bool
-     */
-    private function isRawPayload(): bool
+    public function resolvePayload(SqsJob $job): array
     {
-        return is_null($this->job->payload()['Type'] ?? null);
+        return json_decode($this->snsMessage($job), true);
     }
 
-    /**
-     * Get the job SNS Topic identifier it was sent from.
-     *
-     * @return string
-     */
-    private function snsTopicArn(): string
+    private function isRawPayload(SqsJob $job): bool
     {
-        return $this->job->payload()['TopicArn'] ?? '';
+        return is_null($job->payload()['Type'] ?? null);
     }
 
-    /**
-     * Get the job SNS subject.
-     *
-     * @return string
-     */
-    private function snsSubject(): string
+    private function snsTopicArn(SqsJob $job): string
     {
-        return $this->job->payload()['Subject'] ?? '';
+        return $job->payload()['TopicArn'] ?? '';
     }
 
-    /**
-     * Get the job SNS message.
-     *
-     * @return string
-     */
-    private function snsMessage(): string
+    private function snsSubject(SqsJob $job): string
     {
-        return $this->job->payload()['Message'] ?? '[]';
+        return $job->payload()['Subject'] ?? '';
+    }
+
+    private function snsMessage(SqsJob $job): string
+    {
+        return $job->payload()['Message'] ?? '[]';
     }
 }

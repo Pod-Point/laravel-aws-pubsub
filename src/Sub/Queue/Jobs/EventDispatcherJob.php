@@ -7,14 +7,13 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Queue\Jobs\SqsJob;
-use Illuminate\Support\Facades\Log;
+use PodPoint\AwsPubSub\Sub\Queue\EventResolvers\Event;
+use PodPoint\AwsPubSub\Sub\Queue\EventResolvers\EventResolver;
 
 class EventDispatcherJob extends SqsJob implements JobContract
 {
-    /** @var string */
-    private $eventName;
-
-    private $eventPayload;
+    /** @var Event */
+    private $event;
 
     public function __construct(
         Container $container,
@@ -22,24 +21,16 @@ class EventDispatcherJob extends SqsJob implements JobContract
         array $job,
         $connectionName,
         $queue,
-        string $eventResolver
+        EventResolver $eventResolver
     ) {
         parent::__construct($container, $sqs, $job, $connectionName, $queue);
 
-        $eventResolver = new $eventResolver($this);
-
-        $validationResult = $eventResolver->validate();
-
-        if (! $validationResult->result()) {
-            if ($this->container->bound('log')) {
-                Log::error($validationResult->message(), $this->job);
-            }
-
+        if (! $eventResolver->validate($this)) {
+            $eventResolver->failedValidation($this);
             return;
         }
 
-        $this->eventName = $eventResolver->resolveName();
-        $this->eventPayload = $eventResolver->resolvePayload();
+        $this->event = $eventResolver->resolve($this);
     }
 
     /**
@@ -47,10 +38,10 @@ class EventDispatcherJob extends SqsJob implements JobContract
      */
     public function fire()
     {
-        if ($this->eventName) {
-            $this->resolve(Dispatcher::class)->dispatch($this->eventName, [
-                'payload' => $this->eventPayload,
-                'name' => $this->eventName,
+        if ($this->event->name()) {
+            $this->resolve(Dispatcher::class)->dispatch($this->event->name(), [
+                'payload' => $this->event->payload(),
+                'name' => $this->event->name(),
             ]);
         }
     }
@@ -68,7 +59,7 @@ class EventDispatcherJob extends SqsJob implements JobContract
      */
     public function getName()
     {
-        return $this->eventName;
+        return $this->event->name();
     }
 
     /**
