@@ -35,7 +35,7 @@ class SnsEventDispatcherJob extends SqsJob implements JobContract
     /**
      * @inheritDoc
      */
-    protected function failed($e)
+    public function failed($e)
     {
         // ...
     }

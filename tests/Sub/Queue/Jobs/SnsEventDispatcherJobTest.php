@@ -124,7 +124,7 @@ class SnsEventDispatcherJobTest extends TestCase
 
         $this->getJob()->fire();
 
-        Event::assertNothingDispatched();
+        Event::assertNotDispatched('foo');
     }
 
     /** @test */
@@ -137,7 +137,7 @@ class SnsEventDispatcherJobTest extends TestCase
 
         $this->getJob()->fire();
 
-        Event::assertNothingDispatched();
+        Event::assertNotDispatched('');
     }
 
     protected function getJob()
