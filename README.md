@@ -50,7 +50,7 @@ You will need to add the following connection and configure your SNS credentials
         'arn-prefix' => env('BROADCAST_TOPIC_ARN_PREFIX'),
         'arn-suffix' => env('BROADCAST_TOPIC_ARN_SUFFIX'),
     ],
-    
+
     'eventbridge' => [
         'driver' => 'eventbridge',
         'region' => env('AWS_DEFAULT_REGION'),
@@ -344,7 +344,7 @@ public function handle(array $payload, string $subject = '')
 }
 ```
 
-Feel free to queue these listeners, just like you would with an Laravel Listeners.
+Feel free to queue these listeners, just like you would with a standard Laravel Listeners.
 
 #### Generating Listeners
 

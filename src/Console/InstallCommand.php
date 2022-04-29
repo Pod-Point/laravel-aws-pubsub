@@ -48,7 +48,7 @@ class InstallCommand extends Command
      * @param  string  $name
      * @return void
      */
-    protected function installServiceProvider(string $name): void
+    protected function installServiceProvider(string $name)
     {
         $providerFqn = 'App\\Providers\\'.$name.'::class';
 
