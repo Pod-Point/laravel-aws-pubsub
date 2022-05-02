@@ -22,9 +22,9 @@ class EventServiceProvider extends ServiceProvider
     {
         $this->registerSnsBroadcaster();
 
-        $this->registerSqsSnsQueueConnector();
-
         $this->registerEventBridgeBroadcaster();
+
+        $this->registerSqsSnsQueueConnector();
     }
 
     /**
@@ -66,8 +66,8 @@ class EventServiceProvider extends ServiceProvider
     protected function registerSqsSnsQueueConnector()
     {
         $this->app->resolving('queue', function (QueueManager $manager) {
-            $manager->extend('sqs-pubsub', function () {
-                return new SqsPubSubConnector;
+            $manager->extend('sqs-pubsub', function ($app) {
+                return $app->make(SqsPubSubConnector::class);
             });
         });
     }

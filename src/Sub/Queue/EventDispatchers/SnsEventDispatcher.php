@@ -1,12 +1,27 @@
 <?php
 
-namespace PodPoint\AwsPubSub\Sub\Queue\EventResolvers;
+namespace PodPoint\AwsPubSub\Sub\Queue\EventDispatchers;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Support\Facades\Log;
 
-class SnsEventResolver extends EventResolver
+class SnsEventDispatcher implements EventDispatcher
 {
+    public function dispatch(SqsJob $job, Dispatcher $dispatcher): void
+    {
+        if (! $this->validate($job)) {
+            $this->failedValidation($job);
+        }
+
+        $dispatcher->dispatch($this->resolveName($job), $this->resolvePayload($job));
+    }
+
+    public function getName(SqsJob $job): string
+    {
+        return $this->resolveName($job);
+    }
+
     public function validate(SqsJob $job): bool
     {
         return ! $this->isRawPayload($job);
@@ -22,14 +37,6 @@ class SnsEventResolver extends EventResolver
                 $job->getSqsJob()
             );
         }
-    }
-
-    public function resolve(SqsJob $job): Event
-    {
-        return new Event(
-            $this->resolveName($job),
-            $this->resolvePayload($job),
-        );
     }
 
     private function resolveName(SqsJob $job)

@@ -6,11 +6,19 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Support\Arr;
 use PodPoint\AwsPubSub\EventServiceProvider;
-use PodPoint\AwsPubSub\Sub\Queue\EventResolvers\SnsEventResolver;
+use PodPoint\AwsPubSub\Sub\Queue\EventDispatcherManager;
 use PodPoint\AwsPubSub\Sub\Queue\SqsPubSubQueue;
 
 class SqsPubSubConnector extends SqsConnector
 {
+    /** @var EventDispatcherManager */
+    private $eventDispatcherManager;
+
+    public function __construct(EventDispatcherManager $eventDispatcherManager)
+    {
+        $this->eventDispatcherManager = $eventDispatcherManager;
+    }
+
     /**
      * Establish a queue connection.
      *
@@ -27,9 +35,7 @@ class SqsPubSubConnector extends SqsConnector
             Arr::get($config, 'prefix', ''),
             Arr::get($config, 'suffix', ''),
             Arr::get($config, 'dispatchAfterCommit', false),
-            new (Arr::get($config, 'event_resolver.class', SnsEventResolver::class))(
-                ...Arr::get($config, 'event_resolver.parameters', [])
-            )
+            $this->eventDispatcherManager->driver(Arr::get($config, 'dispatcher'))
         );
     }
 }

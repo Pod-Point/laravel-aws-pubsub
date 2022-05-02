@@ -92,7 +92,7 @@ or
 BROADCAST_DRIVER=eventbridge
 ```
 
-**Remember** that you can define the connection at the Event level if you ever need to be able to use [two drivers concurrently](https://github.com/laravel/framework/pull/38086).
+**Remember** that you can define the connection at the EventDispatcher level if you ever need to be able to use [two drivers concurrently](https://github.com/laravel/framework/pull/38086).
 
 Finally, don't forget to enable the [Broadcast Service Provider](https://laravel.com/docs/8.x/broadcasting#broadcast-service-provider).
 
@@ -143,7 +143,7 @@ class OrderShipped implements ShouldBroadcast
 
 #### Broadcast Data
 
-By default, the package will publish the default Laravel payload which is already used when broadcasting an Event. Once published, its JSON representation could look like this:
+By default, the package will publish the default Laravel payload which is already used when broadcasting an EventDispatcher. Once published, its JSON representation could look like this:
 
 ```json
 {
@@ -302,7 +302,7 @@ protected $listen = [
 
 #### Using the SNS Topic Name
 
-As a fallback, you can also use the ARN of an SNS Topic itself and have a more generic Listener for any event coming from that Topic **which haven't been already mapped** to an existing subject-based Event/Listeners couple.
+As a fallback, you can also use the ARN of an SNS Topic itself and have a more generic Listener for any event coming from that Topic **which haven't been already mapped** to an existing subject-based EventDispatcher/Listeners couple.
 
 For example, let's add a generic Listener for any event pushed to a given SNS Topic as a fallback:
 
@@ -327,11 +327,11 @@ protected $listen = [
 
 It's up to you do do whatever you want from that generic `OrdersListener`, you could even [dispatch more events](https://laravel.com/docs/8.x/events) internally within your application.
 
-**Note:** Topic-based Event/Listeners couples should be registered last so the Subject-based ones take priority.
+**Note:** Topic-based EventDispatcher/Listeners couples should be registered last so the Subject-based ones take priority.
 
 ### Defining Listeners
 
-Here we are simply re-using standard Laravel event listeners. The only difference being the function definition of the main `handle()` method which differs slightly. Instead of expecting an instance of an Event class passed, we simply receive the `payload` and the `subject`, if it's found.
+Here we are simply re-using standard Laravel event listeners. The only difference being the function definition of the main `handle()` method which differs slightly. Instead of expecting an instance of an EventDispatcher class passed, we simply receive the `payload` and the `subject`, if it's found.
 
 ```php
 /**
