@@ -40,8 +40,10 @@ class SqsSnsQueue extends SqsQueue
      */
     public function pop($queue = null)
     {
+        $queue = $this->getQueue($queue);
+
         $response = $this->sqs->receiveMessage([
-            'QueueUrl' => $this->getQueue($queue),
+            'QueueUrl' => $queue,
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
