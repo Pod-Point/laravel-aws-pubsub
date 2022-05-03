@@ -369,10 +369,6 @@ composer test
 
 Please see our [releases](https://github.com/Pod-Point/laravel-aws-pubsub/releases) for more information on what has changed recently.
 
-## Todo
-
-- [ ] Work on the compatibility with earlier versions of Laravel.
-
 ## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
