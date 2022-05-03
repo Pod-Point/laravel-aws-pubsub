@@ -263,7 +263,7 @@ Once the package is installed and similar to what you would do for a standard La
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'prefix' => env('SQS_SNS_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),
-        'suffix' => env('SQS_SNS_SUFFIX'), // only supported with L7+ 
+        'suffix' => env('SQS_SNS_SUFFIX'), // only supported with L7+
         'queue' => env('SQS_SNS_QUEUE', 'pub-sub'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
@@ -365,7 +365,7 @@ composer test
 
 ## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+Please see our [releases](https://github.com/Pod-Point/laravel-aws-pubsub/releases) for more information on what has changed recently.
 
 ## Todo
 
