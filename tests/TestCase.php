@@ -2,6 +2,7 @@
 
 namespace PodPoint\AwsPubSub\Tests;
 
+use Faker\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
 use PHPUnit\Framework\Constraint\FileExists;
 use PHPUnit\Framework\Constraint\LogicalNot;
@@ -12,9 +13,18 @@ use PodPoint\AwsPubSub\EventServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
+    /**
+     * The Faker instance.
+     *
+     * @var \Faker\Generator
+     */
+    protected $faker;
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->faker = Factory::create(config('app.faker_locale', Factory::DEFAULT_LOCALE));
 
         $this->loadLaravelMigrations();
     }

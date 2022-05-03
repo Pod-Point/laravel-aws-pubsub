@@ -50,7 +50,7 @@ You will need to add the following connection and configure your SNS credentials
         'arn-prefix' => env('BROADCAST_TOPIC_ARN_PREFIX'),
         'arn-suffix' => env('BROADCAST_TOPIC_ARN_SUFFIX'),
     ],
-    
+
     'eventbridge' => [
         'driver' => 'eventbridge',
         'region' => env('AWS_DEFAULT_REGION'),
@@ -255,8 +255,6 @@ You can use `broadcastOn()`, `broadcastWith()` and `broadcastAs()` methods on yo
 
 Once the package is installed and similar to what you would do for a standard Laravel SQS queue, you will need to add the following connection and configure your credentials in the `config/queue.php` configuration file:
 
->Note: If you've been looking at the main branch README, you may notice that we don't have "suffix" in the config here, this is because our SQS-SNS driver extends the Laravel SQS driver. In Laravel 5.4 suffixes aren't supported here.
-
 ```php
 'connections' => [
     // ...
@@ -265,6 +263,7 @@ Once the package is installed and similar to what you would do for a standard La
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'prefix' => env('SQS_SNS_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),
+        'suffix' => env('SQS_SNS_SUFFIX'), // only supported with L7+ 
         'queue' => env('SQS_SNS_QUEUE', 'pub-sub'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
@@ -293,7 +292,9 @@ use App\Listeners\PubSub\SendShipmentNotification;
  * @var array
  */
 protected $listen = [
-    'orders.shipped' => SendShipmentNotification::class,
+    'orders.shipped' => [
+        SendShipmentNotification::class,
+    ],
 ];
 ```
 
@@ -312,8 +313,13 @@ use App\Listeners\PubSub\OrdersListener;
  * @var array
  */
 protected $listen = [
-    'orders.shipped' => SendShipmentNotification::class,
-    'arn:aws:sns:us-east-1:123456789:orders' => OrdersListener::class,
+    'orders.shipped' => [
+        UpdateTrackingNumber::class,
+        SendShipmentNotification::class,
+    ],
+    'arn:aws:sns:us-east-1:123456789:orders' => [
+        OrdersListener::class,
+    ],
 ];
 ```
 
@@ -337,7 +343,7 @@ public function handle(array $payload, string $subject = '')
 }
 ```
 
-Feel free to queue these listeners, just like you would with an Laravel Listeners.
+Feel free to queue these listeners, just like you would with a standard Laravel Listeners.
 
 #### Generating Listeners
 

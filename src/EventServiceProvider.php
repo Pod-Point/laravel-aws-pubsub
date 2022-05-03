@@ -6,8 +6,9 @@ use Aws\EventBridge\EventBridgeClient;
 use Aws\Sns\SnsClient;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastManager;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Queue\QueueManager;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Arr;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\EventBridgeBroadcaster;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
 use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
@@ -15,16 +16,7 @@ use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
 class EventServiceProvider extends ServiceProvider
 {
     /**
-     * The event handler mappings for subscribing to PubSub events.
-     *
-     * @var array
-     */
-    protected $listen = [];
-
-    /**
-     * Register any application services.
-     *
-     * @return void
+     * @inheritDoc
      */
     public function register()
     {
@@ -33,16 +25,6 @@ class EventServiceProvider extends ServiceProvider
         $this->registerSqsSnsQueueConnector();
 
         $this->registerEventBridgeBroadcaster();
-    }
-
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        //
     }
 
     /**
@@ -65,9 +47,9 @@ class EventServiceProvider extends ServiceProvider
      * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
-    protected function createSnsDriver(array $config)
+    protected function createSnsDriver(array $config): \Illuminate\Contracts\Broadcasting\Broadcaster
     {
-        $config = $this->prepareConfig($config);
+        $config = self::prepareConfigurationCredentials($config);
 
         return new SnsBroadcaster(
             new SnsClient(array_merge($config, ['version' => 'latest'])),
@@ -85,7 +67,7 @@ class EventServiceProvider extends ServiceProvider
     {
         $this->app->resolving('queue', function (QueueManager $manager) {
             $manager->extend('sqs-sns', function () {
-                return new SqsSnsConnector($this->listen);
+                return new SqsSnsConnector;
             });
         });
     }
@@ -107,12 +89,14 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
+     * Create an instance of the EventBridge driver for broadcasting.
+     *
      * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
-    protected function createEventBridgeDriver(array $config)
+    protected function createEventBridgeDriver(array $config): \Illuminate\Contracts\Broadcasting\Broadcaster
     {
-        $config = $this->prepareConfig($config);
+        $config = self::prepareConfigurationCredentials($config);
 
         return new EventBridgeBroadcaster(
             new EventBridgeClient($config),
@@ -121,17 +105,15 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
+     * Parse and prepare the AWS credentials needed by the AWS SDK library from the config.
+     *
      * @param  array  $config
      * @return array
      */
-    protected function prepareConfig(array $config): array
+    public static function prepareConfigurationCredentials(array $config): array
     {
-        if ($config['key'] && $config['secret']) {
-            $config['credentials'] = [
-                'key' => $config['key'],
-                'secret' => $config['secret'],
-                'token' => $config['token'] ?? null,
-            ];
+        if (Arr::has($config, ['key', 'secret'])) {
+            $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
         }
 
         return $config;
