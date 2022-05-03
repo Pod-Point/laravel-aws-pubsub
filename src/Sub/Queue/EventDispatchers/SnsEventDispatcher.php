@@ -17,11 +17,6 @@ class SnsEventDispatcher implements EventDispatcher
         $dispatcher->dispatch($this->resolveName($job), $this->resolvePayload($job));
     }
 
-    public function getName(SqsJob $job): string
-    {
-        return $this->resolveName($job);
-    }
-
     public function validate(SqsJob $job): bool
     {
         return ! $this->isRawPayload($job);

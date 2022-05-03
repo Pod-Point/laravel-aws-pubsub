@@ -20,13 +20,8 @@ class PayloadPathEventDispatcher implements EventDispatcher
     public function dispatch(SqsJob $job, Dispatcher $dispatcher): void
     {
         $dispatcher->dispatch(
-            $this->getName($job),
+            Arr::get($job->payload(), $this->namePath, ''),
             Arr::get($job->payload(), $this->payloadPath, ''),
         );
-    }
-
-    public function getName(SqsJob $job): string
-    {
-        return Arr::get($job->payload(), $this->namePath, '');
     }
 }

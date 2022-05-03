@@ -35,6 +35,11 @@ class EventDispatcherJob extends SqsJob implements JobContract
         $this->eventDispatcher->dispatch($this, $this->resolve(Dispatcher::class));
     }
 
+    public function uuid()
+    {
+        return $this->getJobId();
+    }
+
     /**
      * @inheritDoc
      */
@@ -48,6 +53,6 @@ class EventDispatcherJob extends SqsJob implements JobContract
      */
     public function getName()
     {
-        return $this->eventDispatcher->getName($this);
+        return self::class;
     }
 }
