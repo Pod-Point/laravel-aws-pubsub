@@ -367,7 +367,7 @@ composer test
 
 ## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+Please see our [releases](https://github.com/Pod-Point/laravel-aws-pubsub/releases) for more information on what has changed recently.
 
 ## Todo
 
