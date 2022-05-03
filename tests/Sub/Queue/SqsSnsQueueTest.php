@@ -42,12 +42,31 @@ class SqsSnsQueueTest extends TestCase
     {
         $this->sqs->shouldReceive('receiveMessage')
             ->once()
+            ->with(['QueueUrl' => '/default', 'AttributeNames' => ['ApproximateReceiveCount']])
             ->andReturn($this->mockedRichNotificationMessage());
 
         $queue = new SqsSnsQueue($this->sqs, 'default');
         $queue->setContainer($this->app);
         $result = $queue->pop();
+
         $this->assertInstanceOf(SnsEventDispatcherJob::class, $result);
+        $this->assertEquals('/default', $result->getQueue());
+    }
+
+    /** @test */
+    public function it_should_use_the_queue_name_including_prefix_and_suffix()
+    {
+        $this->sqs->shouldReceive('receiveMessage')
+            ->once()
+            ->with(['QueueUrl' => 'prefix/default-suffix', 'AttributeNames' => ['ApproximateReceiveCount']])
+            ->andReturn($this->mockedRichNotificationMessage());
+
+        $queue = new SqsSnsQueue($this->sqs, 'default', 'prefix', '-suffix');
+        $queue->setContainer($this->app);
+        $result = $queue->pop();
+
+        $this->assertInstanceOf(SnsEventDispatcherJob::class, $result);
+        $this->assertEquals('prefix/default-suffix', $result->getQueue());
     }
 
     /** @test */
