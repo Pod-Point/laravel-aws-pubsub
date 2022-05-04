@@ -4,7 +4,7 @@ namespace PodPoint\AwsPubSub\Sub\Queue;
 
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Facades\Log;
-use PodPoint\AwsPubSub\Sub\Queue\Jobs\SnsEventDispatcherJob;
+use PodPoint\AwsPubSub\Sub\Queue\Jobs\EventDispatcherJob;
 
 class SqsSnsQueue extends SqsQueue
 {
@@ -48,7 +48,7 @@ class SqsSnsQueue extends SqsQueue
         ]);
 
         if (! is_null($response['Messages']) && count($response['Messages']) > 0) {
-            return new SnsEventDispatcherJob(
+            return new EventDispatcherJob(
                 $this->container, $this->sqs, $response['Messages'][0],
                 $this->connectionName, $queue
             );

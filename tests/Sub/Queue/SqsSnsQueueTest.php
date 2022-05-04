@@ -6,7 +6,7 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Mockery as m;
-use PodPoint\AwsPubSub\Sub\Queue\Jobs\SnsEventDispatcherJob;
+use PodPoint\AwsPubSub\Sub\Queue\Jobs\EventDispatcherJob;
 use PodPoint\AwsPubSub\Sub\Queue\SqsSnsQueue;
 use PodPoint\AwsPubSub\Tests\Sub\Concerns\MocksNotificationMessages;
 use PodPoint\AwsPubSub\Tests\TestCase;
@@ -49,7 +49,7 @@ class SqsSnsQueueTest extends TestCase
         $queue->setContainer($this->app);
         $result = $queue->pop();
 
-        $this->assertInstanceOf(SnsEventDispatcherJob::class, $result);
+        $this->assertInstanceOf(EventDispatcherJob::class, $result);
         $this->assertEquals('/default', $result->getQueue());
     }
 
@@ -65,7 +65,7 @@ class SqsSnsQueueTest extends TestCase
         $queue->setContainer($this->app);
         $result = $queue->pop();
 
-        $this->assertInstanceOf(SnsEventDispatcherJob::class, $result);
+        $this->assertInstanceOf(EventDispatcherJob::class, $result);
         $this->assertEquals('prefix/default-suffix', $result->getQueue());
     }
 

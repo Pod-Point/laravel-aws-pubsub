@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Support\Facades\Log;
 
-class SnsEventDispatcherJob extends SqsJob implements JobContract
+class EventDispatcherJob extends SqsJob implements JobContract
 {
     /**
      * @inheritDoc
