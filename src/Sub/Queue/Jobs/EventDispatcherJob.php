@@ -2,34 +2,37 @@
 
 namespace PodPoint\AwsPubSub\Sub\Queue\Jobs;
 
+use Aws\Sqs\SqsClient;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Queue\Jobs\SqsJob;
-use Illuminate\Support\Facades\Log;
+use PodPoint\AwsPubSub\Sub\EventDispatchers\EventDispatcher;
 
 class EventDispatcherJob extends SqsJob implements JobContract
 {
+    /** @var EventDispatcher */
+    private $eventDispatcher;
+
+    public function __construct(
+        Container $container,
+        SqsClient $sqs,
+        array $job,
+        $connectionName,
+        $queue,
+        EventDispatcher $eventDispatcher
+    ) {
+        parent::__construct($container, $sqs, $job, $connectionName, $queue);
+
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
     /**
      * @inheritDoc
      */
     public function fire()
     {
-        if ($this->isRawPayload()) {
-            if ($this->container->bound('log')) {
-                Log::error('SqsSnsQueue: Invalid SNS payload. '.
-                    'Make sure your JSON is a valid JSON object and raw '.
-                    'message delivery is disabled for your SQS subscription.', $this->job);
-            }
-
-            return;
-        }
-
-        if ($eventName = $this->resolveName()) {
-            $this->resolve(Dispatcher::class)->dispatch($eventName, [
-                'payload' => json_decode($this->snsMessage(), true),
-                'subject' => $this->snsSubject(),
-            ]);
-        }
+        $this->eventDispatcher->dispatch($this, $this->container->make(Dispatcher::class));
     }
 
     /**
@@ -54,16 +57,6 @@ class EventDispatcherJob extends SqsJob implements JobContract
     public function resolveName()
     {
         return $this->getName();
-    }
-
-    /**
-     * Verifies that the SNS message sent to the queue can be processed.
-     *
-     * @return bool
-     */
-    private function isRawPayload()
-    {
-        return is_null($this->payload()['Type'] ?? null);
     }
 
     /**
