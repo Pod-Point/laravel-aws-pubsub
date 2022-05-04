@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use PodPoint\AwsPubSub\EventServiceProvider;
 use PodPoint\AwsPubSub\Sub\Queue\SqsSnsQueue;
 
-class SqsSnsConnector extends SqsConnector
+class PubSubSqsConnector extends SqsConnector
 {
     /**
      * Establish a queue connection.

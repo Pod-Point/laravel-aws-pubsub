@@ -11,7 +11,7 @@ use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Arr;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\EventBridgeBroadcaster;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
-use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
+use PodPoint\AwsPubSub\Sub\Queue\Connectors\PubSubSqsConnector;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -67,7 +67,7 @@ class EventServiceProvider extends ServiceProvider
     {
         $this->app->resolving('queue', function (QueueManager $manager) {
             $manager->extend('sqs-sns', function () {
-                return new SqsSnsConnector;
+                return new PubSubSqsConnector;
             });
         });
     }
