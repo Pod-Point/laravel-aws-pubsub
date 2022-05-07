@@ -68,8 +68,13 @@ class PubSubSqsQueue extends SqsQueue
         if (! is_null($response['Messages']) && count($response['Messages']) > 0) {
             return new EventDispatcherJob(
                 $this->container, $this->sqs, $response['Messages'][0],
-                $this->connectionName, $queue, $this->eventDispatcher
+                $this->connectionName, $queue, $this->getEventDispatcher()
             );
         }
+    }
+
+    public function getEventDispatcher(): EventDispatcher
+    {
+        return $this->eventDispatcher;
     }
 }
