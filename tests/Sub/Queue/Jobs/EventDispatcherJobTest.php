@@ -6,6 +6,7 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Events\Dispatcher;
 use Mockery as m;
 use PodPoint\AwsPubSub\Sub\EventDispatchers\EventDispatcher;
+use PodPoint\AwsPubSub\Sub\EventDispatchers\SnsEventDispatcher;
 use PodPoint\AwsPubSub\Sub\Queue\Jobs\EventDispatcherJob;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
@@ -25,7 +26,13 @@ class EventDispatcherJobTest extends TestCase
             ->with($job, $this->app->make(Dispatcher::class));
     }
 
-    protected function getJob(EventDispatcher $eventDispatcher)
+    /** @test */
+    public function it_has_a_name()
+    {
+        $this->assertEquals(EventDispatcherJob::class, $this->getJob()->getName());
+    }
+
+    protected function getJob(?EventDispatcher $eventDispatcher = null)
     {
         return new EventDispatcherJob(
             $this->app,
@@ -33,7 +40,7 @@ class EventDispatcherJobTest extends TestCase
             [],
             'connection-name',
             'https://sqs.someregion.amazonaws.com/1234567891011/pubsub-events',
-            $eventDispatcher,
+            $eventDispatcher ?? new SnsEventDispatcher(),
         );
     }
 }

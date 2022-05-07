@@ -48,54 +48,6 @@ class EventDispatcherJob extends SqsJob implements JobContract
      */
     public function getName()
     {
-        return $this->snsSubject() ?: $this->snsTopicArn();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function resolveName()
-    {
-        return $this->getName();
-    }
-
-    /**
-     * Get the job SNS Topic identifier it was sent from.
-     *
-     * @return string
-     */
-    public function snsTopicArn()
-    {
-        return $this->payload()['TopicArn'] ?? '';
-    }
-
-    /**
-     * Get the job SNS subject.
-     *
-     * @return string
-     */
-    public function snsSubject()
-    {
-        return $this->payload()['Subject'] ?? '';
-    }
-
-    /**
-     * Get the job SNS message.
-     *
-     * @return string
-     */
-    public function snsMessage()
-    {
-        return $this->payload()['Message'] ?? '[]';
-    }
-
-    /**
-     * Get the job message type. If a raw SNS message was used, this will be missing.
-     *
-     * @return string|null
-     */
-    public function snsMessageType()
-    {
-        return $this->payload()['Type'] ?? null;
+        return self::class;
     }
 }
