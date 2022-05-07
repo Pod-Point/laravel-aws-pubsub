@@ -116,12 +116,10 @@ class PubSubSqsQueueTest extends TestCase
 
     public function getQueue($parameterOverrides = []): PubSubSqsQueue
     {
-        $sqs = tap(m::mock(SqsClient::class), function ($sqs) {
-            return $sqs->shouldReceive('receiveMessage')->andReturn($this->mockedRichNotificationMessage());
-        });
-
         $parameters = array_merge([
-            'sqs' => $sqs,
+            'sqs' => m::mock(SqsClient::class, [
+                'receiveMessage' => $this->mockedRichNotificationMessage(),
+            ]),
             'default' => '',
             'prefix' => '',
             'suffix' => '',
