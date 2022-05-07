@@ -6,6 +6,7 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Support\Arr;
 use PodPoint\AwsPubSub\EventServiceProvider;
+use PodPoint\AwsPubSub\Sub\EventDispatchers\SnsEventDispatcher;
 use PodPoint\AwsPubSub\Sub\Queue\PubSubSqsQueue;
 
 class PubSubSqsConnector extends SqsConnector
@@ -25,6 +26,8 @@ class PubSubSqsConnector extends SqsConnector
             $config['queue'],
             Arr::get($config, 'prefix', ''),
             Arr::get($config, 'suffix', ''),
+            false,
+            new SnsEventDispatcher()
         );
     }
 }

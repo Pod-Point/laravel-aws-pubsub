@@ -32,7 +32,7 @@ class EventDispatcherJob extends SqsJob implements JobContract
      */
     public function fire()
     {
-        $this->eventDispatcher->dispatch($this, $this->container->make(Dispatcher::class));
+        $this->getEventDispatcher()->dispatch($this, $this->container->make(Dispatcher::class));
     }
 
     /**
@@ -49,5 +49,10 @@ class EventDispatcherJob extends SqsJob implements JobContract
     public function getName()
     {
         return self::class;
+    }
+
+    public function getEventDispatcher(): EventDispatcher
+    {
+        return $this->eventDispatcher;
     }
 }

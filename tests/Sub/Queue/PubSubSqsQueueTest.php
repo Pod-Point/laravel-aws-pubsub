@@ -6,6 +6,7 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Mockery as m;
+use PodPoint\AwsPubSub\Sub\EventDispatchers\EventDispatcher;
 use PodPoint\AwsPubSub\Sub\Queue\Jobs\EventDispatcherJob;
 use PodPoint\AwsPubSub\Sub\Queue\PubSubSqsQueue;
 use PodPoint\AwsPubSub\Tests\Sub\Concerns\MocksNotificationMessages;
@@ -32,7 +33,7 @@ class PubSubSqsQueueTest extends TestCase
     /** @test */
     public function it_can_instantiate_the_queue()
     {
-        $queue = new PubSubSqsQueue($this->sqs, 'default');
+        $queue = $this->getQueue();
 
         $this->assertInstanceOf(PubSubSqsQueue::class, $queue);
     }
@@ -45,8 +46,8 @@ class PubSubSqsQueueTest extends TestCase
             ->with(['QueueUrl' => '/default', 'AttributeNames' => ['ApproximateReceiveCount']])
             ->andReturn($this->mockedRichNotificationMessage());
 
-        $queue = new PubSubSqsQueue($this->sqs, 'default');
-        $queue->setContainer($this->app);
+        $queue = $this->getQueue(['sqs' => $this->sqs, 'default' => 'default']);
+
         $result = $queue->pop();
 
         $this->assertInstanceOf(EventDispatcherJob::class, $result);
@@ -61,8 +62,10 @@ class PubSubSqsQueueTest extends TestCase
             ->with(['QueueUrl' => 'prefix/default-suffix', 'AttributeNames' => ['ApproximateReceiveCount']])
             ->andReturn($this->mockedRichNotificationMessage());
 
-        $queue = new PubSubSqsQueue($this->sqs, 'default', 'prefix', '-suffix');
-        $queue->setContainer($this->app);
+        $queue = $this->getQueue([
+            'sqs' => $this->sqs, 'default' => 'default', 'prefix' => 'prefix', 'suffix' => '-suffix',
+        ]);
+
         $result = $queue->pop();
 
         $this->assertInstanceOf(EventDispatcherJob::class, $result);
@@ -76,10 +79,19 @@ class PubSubSqsQueueTest extends TestCase
             ->once()
             ->andReturn($this->mockedEmptyNotificationMessage());
 
-        $queue = new PubSubSqsQueue($this->sqs, 'default');
-        $queue->setContainer($this->app);
+        $queue = $this->getQueue(['sqs' => $this->sqs, 'default' => 'default']);
 
         $this->assertNull($queue->pop());
+    }
+
+    /** @test */
+    public function it_provides_the_job_with_its_event_dispatcher()
+    {
+        $eventDispatcher = m::mock(EventDispatcher::class);
+
+        $queue = $this->getQueue(['eventDispatcher' => $eventDispatcher]);
+
+        $this->assertEquals($eventDispatcher, $queue->pop()->getEventDispatcher());
     }
 
     public function readOnlyDataProvider(): array
@@ -97,8 +109,35 @@ class PubSubSqsQueueTest extends TestCase
         Log::shouldReceive('error')->once()->with('Unsupported: sqs-sns queue driver is read-only');
         $this->sqs->shouldNotReceive('sendMessage');
 
-        $queue = new PubSubSqsQueue($this->sqs, 'default');
-        $queue->setContainer($this->app);
+        $queue = $this->getQueue(['sqs' => $this->sqs, 'default' => 'default']);
+
         $queue->$method(...$args);
+    }
+
+    public function getQueue($parameterOverrides = []): PubSubSqsQueue
+    {
+        $sqs = tap(m::mock(SqsClient::class), function ($sqs) {
+            return $sqs->shouldReceive('receiveMessage')->andReturn($this->mockedRichNotificationMessage());
+        });
+
+        $parameters = array_merge([
+            'sqs' => $sqs,
+            'default' => '',
+            'prefix' => '',
+            'suffix' => '',
+            'dispatchAfterCommit' => false,
+            'eventDispatcher' => m::mock(EventDispatcher::class),
+        ], $parameterOverrides);
+
+        return tap(new PubSubSqsQueue(
+            $parameters['sqs'],
+            $parameters['default'],
+            $parameters['prefix'],
+            $parameters['suffix'],
+            $parameters['dispatchAfterCommit'],
+            $parameters['eventDispatcher'],
+        ), function ($queue) {
+            $queue->setContainer($this->app);
+        });
     }
 }
