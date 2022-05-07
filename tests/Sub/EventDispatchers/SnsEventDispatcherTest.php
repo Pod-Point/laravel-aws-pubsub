@@ -118,7 +118,7 @@ class SnsEventDispatcherTest extends TestCase
     public function it_will_not_handle_raw_notification_messages()
     {
         Log::shouldReceive('error')->once()->with(
-            m::pattern('/^SqsSnsQueue: Invalid SNS payload/'),
+            m::pattern('/^PubSubSqsQueue: Invalid SNS payload/'),
             m::type('array')
         );
 

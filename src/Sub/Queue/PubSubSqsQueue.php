@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 use PodPoint\AwsPubSub\Sub\EventDispatchers\SnsEventDispatcher;
 use PodPoint\AwsPubSub\Sub\Queue\Jobs\EventDispatcherJob;
 
-class SqsSnsQueue extends SqsQueue
+class PubSubSqsQueue extends SqsQueue
 {
     /**
      * @inheritDoc

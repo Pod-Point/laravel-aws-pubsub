@@ -12,7 +12,7 @@ class SnsEventDispatcher implements EventDispatcher
     {
         if ($this->isRawPayload($job)) {
             if ($job->getContainer()->bound('log')) {
-                Log::error('SqsSnsQueue: Invalid SNS payload. '.
+                Log::error('PubSubSqsQueue: Invalid SNS payload. '.
                     'Make sure your JSON is a valid JSON object and raw '.
                     'message delivery is disabled for your SQS subscription.', $job->getSqsJob());
             }

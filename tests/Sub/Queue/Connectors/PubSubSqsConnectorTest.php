@@ -3,7 +3,7 @@
 namespace PodPoint\AwsPubSub\Tests\Sub\Queue\Connectors;
 
 use PodPoint\AwsPubSub\Sub\Queue\Connectors\PubSubSqsConnector;
-use PodPoint\AwsPubSub\Sub\Queue\SqsSnsQueue;
+use PodPoint\AwsPubSub\Sub\Queue\PubSubSqsQueue;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
 class PubSubSqsConnectorTest extends TestCase
@@ -13,7 +13,7 @@ class PubSubSqsConnectorTest extends TestCase
     {
         $queue = (new PubSubSqsConnector)->connect(config('queue.connections.pub-sub'));
 
-        $this->assertInstanceOf(SqsSnsQueue::class, $queue);
+        $this->assertInstanceOf(PubSubSqsQueue::class, $queue);
     }
 
     /** @test */

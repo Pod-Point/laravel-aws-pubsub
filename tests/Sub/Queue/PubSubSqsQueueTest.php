@@ -7,11 +7,11 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Mockery as m;
 use PodPoint\AwsPubSub\Sub\Queue\Jobs\EventDispatcherJob;
-use PodPoint\AwsPubSub\Sub\Queue\SqsSnsQueue;
+use PodPoint\AwsPubSub\Sub\Queue\PubSubSqsQueue;
 use PodPoint\AwsPubSub\Tests\Sub\Concerns\MocksNotificationMessages;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
-class SqsSnsQueueTest extends TestCase
+class PubSubSqsQueueTest extends TestCase
 {
     use MocksNotificationMessages;
 
@@ -32,9 +32,9 @@ class SqsSnsQueueTest extends TestCase
     /** @test */
     public function it_can_instantiate_the_queue()
     {
-        $queue = new SqsSnsQueue($this->sqs, 'default');
+        $queue = new PubSubSqsQueue($this->sqs, 'default');
 
-        $this->assertInstanceOf(SqsSnsQueue::class, $queue);
+        $this->assertInstanceOf(PubSubSqsQueue::class, $queue);
     }
 
     /** @test */
@@ -45,7 +45,7 @@ class SqsSnsQueueTest extends TestCase
             ->with(['QueueUrl' => '/default', 'AttributeNames' => ['ApproximateReceiveCount']])
             ->andReturn($this->mockedRichNotificationMessage());
 
-        $queue = new SqsSnsQueue($this->sqs, 'default');
+        $queue = new PubSubSqsQueue($this->sqs, 'default');
         $queue->setContainer($this->app);
         $result = $queue->pop();
 
@@ -61,7 +61,7 @@ class SqsSnsQueueTest extends TestCase
             ->with(['QueueUrl' => 'prefix/default-suffix', 'AttributeNames' => ['ApproximateReceiveCount']])
             ->andReturn($this->mockedRichNotificationMessage());
 
-        $queue = new SqsSnsQueue($this->sqs, 'default', 'prefix', '-suffix');
+        $queue = new PubSubSqsQueue($this->sqs, 'default', 'prefix', '-suffix');
         $queue->setContainer($this->app);
         $result = $queue->pop();
 
@@ -76,7 +76,7 @@ class SqsSnsQueueTest extends TestCase
             ->once()
             ->andReturn($this->mockedEmptyNotificationMessage());
 
-        $queue = new SqsSnsQueue($this->sqs, 'default');
+        $queue = new PubSubSqsQueue($this->sqs, 'default');
         $queue->setContainer($this->app);
 
         $this->assertNull($queue->pop());
@@ -97,7 +97,7 @@ class SqsSnsQueueTest extends TestCase
         Log::shouldReceive('error')->once()->with('Unsupported: sqs-sns queue driver is read-only');
         $this->sqs->shouldNotReceive('sendMessage');
 
-        $queue = new SqsSnsQueue($this->sqs, 'default');
+        $queue = new PubSubSqsQueue($this->sqs, 'default');
         $queue->setContainer($this->app);
         $queue->$method(...$args);
     }

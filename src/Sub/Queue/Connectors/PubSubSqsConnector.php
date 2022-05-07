@@ -6,7 +6,7 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Support\Arr;
 use PodPoint\AwsPubSub\EventServiceProvider;
-use PodPoint\AwsPubSub\Sub\Queue\SqsSnsQueue;
+use PodPoint\AwsPubSub\Sub\Queue\PubSubSqsQueue;
 
 class PubSubSqsConnector extends SqsConnector
 {
@@ -20,7 +20,7 @@ class PubSubSqsConnector extends SqsConnector
     {
         $config = $this->getDefaultConfiguration($config);
 
-        return new SqsSnsQueue(
+        return new PubSubSqsQueue(
             new SqsClient(EventServiceProvider::prepareConfigurationCredentials($config)),
             $config['queue'],
             Arr::get($config, 'prefix', ''),
