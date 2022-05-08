@@ -44,7 +44,7 @@ class PubSubSqsConnectorTest extends TestCase
     {
         $testDispatcher = $this->getEventDispatcher();
 
-        $manager = tap($this->app->make(EventDispatcherManager::class), function($manager) use ($testDispatcher) {
+        $manager = tap($this->app->make(EventDispatcherManager::class), function ($manager) use ($testDispatcher) {
             $manager->extend('test_dispatcher', function () use ($testDispatcher) {
                 return $testDispatcher;
             });
@@ -72,10 +72,10 @@ class PubSubSqsConnectorTest extends TestCase
 
     private function getEventDispatcher()
     {
-        return new class implements EventDispatcher {
+        return new class implements EventDispatcher
+        {
             public function dispatch(SqsJob $job, Dispatcher $dispatcher): void
             {
-
             }
         };
     }
