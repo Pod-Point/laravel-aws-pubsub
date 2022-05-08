@@ -5,15 +5,16 @@ namespace PodPoint\AwsPubSub\Sub\EventDispatchers;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Jobs\SqsJob;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 class SnsEventDispatcher implements EventDispatcher
 {
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(?LoggerInterface $logger = null)
     {
-        $this->logger = $logger;
+        $this->logger = $logger ?? new NullLogger();
     }
 
     public function dispatch(SqsJob $job, Dispatcher $dispatcher): void

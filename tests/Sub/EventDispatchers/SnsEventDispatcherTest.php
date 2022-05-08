@@ -11,6 +11,7 @@ use Mockery as m;
 use PodPoint\AwsPubSub\Sub\EventDispatchers\SnsEventDispatcher;
 use PodPoint\AwsPubSub\Tests\Sub\Concerns\MocksNotificationMessages;
 use PodPoint\AwsPubSub\Tests\TestCase;
+use Psr\Log\LoggerInterface;
 
 class SnsEventDispatcherTest extends TestCase
 {
@@ -124,9 +125,20 @@ class SnsEventDispatcherTest extends TestCase
 
         $this->mockedJobData = $this->mockedRawNotificationMessage()['Messages'][0];
 
-        $this->getDispatcher()->dispatch($this->getJob(), $this->app->make(Dispatcher::class));
+        $this->getDispatcher($this->app->make('log'))
+            ->dispatch($this->getJob(), $this->app->make(Dispatcher::class));
 
         Event::assertNothingDispatched();
+    }
+
+    /** @test */
+    public function it_can_handle_errors_when_no_logger_provided()
+    {
+        $this->mockedJobData = $this->mockedRawNotificationMessage()['Messages'][0];
+
+        $this->assertNull(
+            $this->getDispatcher()->dispatch($this->getJob(), $this->app->make(Dispatcher::class))
+        );
     }
 
     /** @test */
@@ -142,9 +154,9 @@ class SnsEventDispatcherTest extends TestCase
         Event::assertNothingDispatched();
     }
 
-    protected function getDispatcher()
+    protected function getDispatcher(?LoggerInterface $logger = null)
     {
-        return $this->app->make(SnsEventDispatcher::class);
+        return new SnsEventDispatcher($logger);
     }
 
     protected function getJob()
