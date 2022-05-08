@@ -14,6 +14,6 @@ class EventDispatcherManager extends Manager
 
     public function createSnsDriver()
     {
-        return new SnsEventDispatcher();
+        return $this->container->make(SnsEventDispatcher::class);
     }
 }

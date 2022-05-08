@@ -4,18 +4,24 @@ namespace PodPoint\AwsPubSub\Sub\EventDispatchers;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Jobs\SqsJob;
-use Illuminate\Support\Facades\Log;
+use Psr\Log\LoggerInterface;
 
 class SnsEventDispatcher implements EventDispatcher
 {
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function dispatch(SqsJob $job, Dispatcher $dispatcher): void
     {
         if ($this->isRawPayload($job)) {
-            if ($job->getContainer()->bound('log')) {
-                Log::error('PubSubSqsQueue: Invalid SNS payload. '.
-                    'Make sure your JSON is a valid JSON object and raw '.
-                    'message delivery is disabled for your SQS subscription.', $job->getSqsJob());
-            }
+            $this->logger->error('PubSubSqsQueue: Invalid SNS payload. '.
+                'Make sure your JSON is a valid JSON object and raw '.
+                'message delivery is disabled for your SQS subscription.', $job->getSqsJob());
 
             return;
         }

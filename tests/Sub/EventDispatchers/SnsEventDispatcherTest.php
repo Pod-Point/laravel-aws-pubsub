@@ -144,7 +144,7 @@ class SnsEventDispatcherTest extends TestCase
 
     protected function getDispatcher()
     {
-        return new SnsEventDispatcher();
+        return $this->app->make(SnsEventDispatcher::class);
     }
 
     protected function getJob()

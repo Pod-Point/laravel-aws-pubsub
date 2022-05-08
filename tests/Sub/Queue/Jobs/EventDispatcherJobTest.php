@@ -40,7 +40,7 @@ class EventDispatcherJobTest extends TestCase
             [],
             'connection-name',
             'https://sqs.someregion.amazonaws.com/1234567891011/pubsub-events',
-            $eventDispatcher ?? new SnsEventDispatcher(),
+            $eventDispatcher ?? $this->app->make(SnsEventDispatcher::class),
         );
     }
 }
