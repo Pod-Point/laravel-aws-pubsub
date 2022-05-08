@@ -32,7 +32,7 @@ class PubSubSqsQueue extends SqsQueue
     public function pushRaw($payload, $queue = null, array $options = [])
     {
         if ($this->container->bound('log')) {
-            Log::error('Unsupported: sqs-sns queue driver is read-only');
+            Log::error('Unsupported: pub_sub queue driver is read-only');
         }
 
         return null;
@@ -44,7 +44,7 @@ class PubSubSqsQueue extends SqsQueue
     public function later($delay, $job, $data = '', $queue = null)
     {
         if ($this->container->bound('log')) {
-            Log::error('Unsupported: sqs-sns queue driver is read-only');
+            Log::error('Unsupported: pub_sub queue driver is read-only');
         }
 
         return null;

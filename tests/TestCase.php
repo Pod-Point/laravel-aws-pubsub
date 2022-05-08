@@ -107,8 +107,8 @@ abstract class TestCase extends Orchestra
     protected function setSubQueue($app): void
     {
         /** SUB */
-        $app['config']->set('queue.connections.pub-sub', [
-            'driver' => 'sqs-sns',
+        $app['config']->set('queue.connections.pub_sub', [
+            'driver' => 'pub_sub',
             'key' => 'dummy-key',
             'secret' => 'dummy-secret',
             'prefix' => 'https://sqs.eu-west-1.amazonaws.com/13245',

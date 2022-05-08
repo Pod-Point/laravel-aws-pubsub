@@ -106,7 +106,7 @@ class PubSubSqsQueueTest extends TestCase
     /** @test @dataProvider readOnlyDataProvider */
     public function it_is_a_read_only_queue_driver_and_will_not_push_messages_onto_a_queue(string $method, ...$args)
     {
-        Log::shouldReceive('error')->once()->with('Unsupported: sqs-sns queue driver is read-only');
+        Log::shouldReceive('error')->once()->with('Unsupported: pub_sub queue driver is read-only');
         $this->sqs->shouldNotReceive('sendMessage');
 
         $queue = $this->getQueue(['sqs' => $this->sqs, 'default' => 'default']);

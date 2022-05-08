@@ -16,7 +16,7 @@ class PubSubSqsConnectorTest extends TestCase
     /** @test */
     public function it_can_instantiate_the_connector_and_connect_to_the_queue()
     {
-        $queue = $this->getConnector()->connect(config('queue.connections.pub-sub'));
+        $queue = $this->getConnector()->connect(config('queue.connections.pub_sub'));
 
         $this->assertInstanceOf(PubSubSqsQueue::class, $queue);
     }
@@ -24,7 +24,7 @@ class PubSubSqsConnectorTest extends TestCase
     /** @test */
     public function it_can_use_a_queue_prefix()
     {
-        $queue = $this->getConnector()->connect(config('queue.connections.pub-sub'));
+        $queue = $this->getConnector()->connect(config('queue.connections.pub_sub'));
 
         $this->assertEquals('https://sqs.eu-west-1.amazonaws.com/13245/default', $queue->getQueue(null));
     }
@@ -32,9 +32,9 @@ class PubSubSqsConnectorTest extends TestCase
     /** @test */
     public function it_can_use_a_queue_suffix()
     {
-        config(['queue.connections.pub-sub.suffix' => '-testing']);
+        config(['queue.connections.pub_sub.suffix' => '-testing']);
 
-        $queue = $this->getConnector()->connect(config('queue.connections.pub-sub'));
+        $queue = $this->getConnector()->connect(config('queue.connections.pub_sub'));
 
         $this->assertEquals('https://sqs.eu-west-1.amazonaws.com/13245/default-testing', $queue->getQueue(null));
     }
@@ -50,9 +50,9 @@ class PubSubSqsConnectorTest extends TestCase
             });
         });
 
-        config(['queue.connections.pub-sub.dispatcher' => 'test_dispatcher']);
+        config(['queue.connections.pub_sub.dispatcher' => 'test_dispatcher']);
 
-        $queue = $this->getConnector($manager)->connect(config('queue.connections.pub-sub'));
+        $queue = $this->getConnector($manager)->connect(config('queue.connections.pub_sub'));
 
         $this->assertEquals($testDispatcher, $queue->getEventDispatcher());
     }
@@ -60,7 +60,7 @@ class PubSubSqsConnectorTest extends TestCase
     /** @test */
     public function it_uses_the_sns_event_dispatcher_by_default()
     {
-        $queue = $this->getConnector()->connect(config('queue.connections.pub-sub'));
+        $queue = $this->getConnector()->connect(config('queue.connections.pub_sub'));
 
         $this->assertInstanceOf(SnsEventDispatcher::class, $queue->getEventDispatcher());
     }
