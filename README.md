@@ -260,8 +260,8 @@ Once the package is installed and similar to what you would do for a standard La
 ```php
 'connections' => [
     // ...
-    'pub_sub' => [
-        'driver' => 'pub_sub',
+    'sqs_pub_sub' => [
+        'driver' => 'sqs_pub_sub',
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'prefix' => env('SQS_SNS_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),

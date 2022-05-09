@@ -98,7 +98,7 @@ class EventServiceProvider extends ServiceProvider
     protected function registerPubSubQueueConnector()
     {
         $this->app->resolving('queue', function (QueueManager $manager) {
-            $manager->extend('pub_sub', function () {
+            $manager->extend('sqs_pub_sub', function () {
                 return $this->app->make(PubSubSqsConnector::class);
             });
         });

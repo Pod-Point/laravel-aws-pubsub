@@ -21,6 +21,6 @@ class EventServiceProviderTest extends TestCase
             'connect' => $queue,
         ]));
 
-        $this->assertEquals($queue, $this->app->make('queue')->connection('pub_sub'));
+        $this->assertEquals($queue, $this->app->make('queue')->connection('sqs_pub_sub'));
     }
 }
