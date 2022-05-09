@@ -65,6 +65,16 @@ class PubSubSqsConnectorTest extends TestCase
         $this->assertInstanceOf(SnsEventDispatcher::class, $queue->getEventDispatcher());
     }
 
+    /** @test */
+    public function it_uses_the_sns_event_dispatcher_if_specified()
+    {
+        config(['queue.connections.pub_sub.dispatcher' => 'sns']);
+
+        $queue = $this->getConnector()->connect(config('queue.connections.pub_sub'));
+
+        $this->assertInstanceOf(SnsEventDispatcher::class, $queue->getEventDispatcher());
+    }
+
     private function getConnector(?EventDispatcherManager $manager = null): PubSubSqsConnector
     {
         return new PubSubSqsConnector($manager ?? $this->app->make(EventDispatcherManager::class));
