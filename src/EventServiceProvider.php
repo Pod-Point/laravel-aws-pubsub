@@ -11,7 +11,7 @@ use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Arr;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\EventBridgeBroadcaster;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
-use PodPoint\AwsPubSub\Sub\Queue\Connectors\SqsSnsConnector;
+use PodPoint\AwsPubSub\Sub\Queue\Connectors\PubSubSqsConnector;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -22,9 +22,9 @@ class EventServiceProvider extends ServiceProvider
     {
         $this->registerSnsBroadcaster();
 
-        $this->registerSqsSnsQueueConnector();
-
         $this->registerEventBridgeBroadcaster();
+
+        $this->registerPubSubQueueConnector();
     }
 
     /**
@@ -59,20 +59,6 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the SQS SNS connector for the Queue components.
-     *
-     * @return void
-     */
-    protected function registerSqsSnsQueueConnector()
-    {
-        $this->app->resolving('queue', function (QueueManager $manager) {
-            $manager->extend('sqs-sns', function () {
-                return new SqsSnsConnector;
-            });
-        });
-    }
-
-    /**
      * Register the EventBridge broadcaster for the Broadcast components.
      *
      * @return void
@@ -102,6 +88,20 @@ class EventServiceProvider extends ServiceProvider
             new EventBridgeClient($config),
             $config['source'] ?? ''
         );
+    }
+
+    /**
+     * Register the pub sub connector for the Queue components.
+     *
+     * @return void
+     */
+    protected function registerPubSubQueueConnector()
+    {
+        $this->app->resolving('queue', function (QueueManager $manager) {
+            $manager->extend('sqs_pub_sub', function () {
+                return $this->app->make(PubSubSqsConnector::class);
+            });
+        });
     }
 
     /**

@@ -1,16 +1,19 @@
 <?php
 
-namespace PodPoint\AwsPubSub\Tests\Sub\Queue\Jobs;
+namespace PodPoint\AwsPubSub\Tests\Sub\EventDispatchers;
 
 use Aws\Sqs\SqsClient;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Mockery as m;
-use PodPoint\AwsPubSub\Sub\Queue\Jobs\SnsEventDispatcherJob;
+use PodPoint\AwsPubSub\Sub\EventDispatchers\SnsEventDispatcher;
 use PodPoint\AwsPubSub\Tests\Sub\Concerns\MocksNotificationMessages;
 use PodPoint\AwsPubSub\Tests\TestCase;
+use Psr\Log\LoggerInterface;
 
-class SnsEventDispatcherJobTest extends TestCase
+class SnsEventDispatcherTest extends TestCase
 {
     use MocksNotificationMessages;
 
@@ -34,7 +37,7 @@ class SnsEventDispatcherJobTest extends TestCase
             'Message' => json_encode(['foo' => 'bar']),
         ])['Messages'][0];
 
-        $this->getJob()->fire();
+        $this->getDispatcher()->dispatch($this->getJob(), $this->app->make(Dispatcher::class));
 
         Event::assertDispatched('TopicArn:123456', function ($event, $args) {
             return $args === [
@@ -53,7 +56,7 @@ class SnsEventDispatcherJobTest extends TestCase
             'Message' => json_encode(['foo' => 'bar']),
         ])['Messages'][0];
 
-        $this->getJob()->fire();
+        $this->getDispatcher()->dispatch($this->getJob(), $this->app->make(Dispatcher::class));
 
         Event::assertDispatched('Subject#action', function ($event, $payload) {
             return $payload === [
@@ -71,7 +74,7 @@ class SnsEventDispatcherJobTest extends TestCase
             'TopicArn' => 'TopicArn:123456',
         ])['Messages'][0];
 
-        $this->getJob()->fire();
+        $this->getDispatcher()->dispatch($this->getJob(), $this->app->make(Dispatcher::class));
 
         Event::assertDispatched('TopicArn:123456');
     }
@@ -84,7 +87,7 @@ class SnsEventDispatcherJobTest extends TestCase
             'Message' => null,
         ])['Messages'][0];
 
-        $this->getJob()->fire();
+        $this->getDispatcher()->dispatch($this->getJob(), $this->app->make(Dispatcher::class));
 
         Event::assertDispatched('TopicArn:123456', function ($event, $payload) {
             return $payload === [
@@ -102,7 +105,7 @@ class SnsEventDispatcherJobTest extends TestCase
             'Message' => null,
         ])['Messages'][0];
 
-        $this->getJob()->fire();
+        $this->getDispatcher()->dispatch($this->getJob(), $this->app->make(Dispatcher::class));
 
         Event::assertDispatched('Subject#action', function ($event, $payload) {
             return $payload === [
@@ -116,15 +119,26 @@ class SnsEventDispatcherJobTest extends TestCase
     public function it_will_not_handle_raw_notification_messages()
     {
         Log::shouldReceive('error')->once()->with(
-            m::pattern('/^SqsSnsQueue: Invalid SNS payload/'),
+            m::pattern('/^PubSubSqsQueue: Invalid SNS payload/'),
             m::type('array')
         );
 
         $this->mockedJobData = $this->mockedRawNotificationMessage()['Messages'][0];
 
-        $this->getJob()->fire();
+        $this->getDispatcher($this->app->make('log'))
+            ->dispatch($this->getJob(), $this->app->make(Dispatcher::class));
 
         Event::assertNothingDispatched();
+    }
+
+    /** @test */
+    public function it_can_handle_errors_when_no_logger_provided()
+    {
+        $this->mockedJobData = $this->mockedRawNotificationMessage()['Messages'][0];
+
+        $this->assertNull(
+            $this->getDispatcher()->dispatch($this->getJob(), $this->app->make(Dispatcher::class))
+        );
     }
 
     /** @test */
@@ -135,14 +149,19 @@ class SnsEventDispatcherJobTest extends TestCase
             'Subject' => '',
         ])['Messages'][0];
 
-        $this->getJob()->fire();
+        $this->getDispatcher()->dispatch($this->getJob(), $this->app->make(Dispatcher::class));
 
         Event::assertNothingDispatched();
     }
 
+    protected function getDispatcher(?LoggerInterface $logger = null)
+    {
+        return new SnsEventDispatcher($logger);
+    }
+
     protected function getJob()
     {
-        return new SnsEventDispatcherJob(
+        return new SqsJob(
             $this->app,
             m::mock(SqsClient::class),
             $this->mockedJobData,
