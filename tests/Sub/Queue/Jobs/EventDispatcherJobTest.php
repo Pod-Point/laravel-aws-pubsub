@@ -13,6 +13,16 @@ use PodPoint\AwsPubSub\Tests\TestCase;
 class EventDispatcherJobTest extends TestCase
 {
     /** @test */
+    public function it_has_an_event_dispatcher()
+    {
+        $eventDispatcher = m::mock(EventDispatcher::class);
+
+        $job = $this->getJob($eventDispatcher);
+
+        $this->assertEquals($eventDispatcher, $job->getEventDispatcher());
+    }
+
+    /** @test */
     public function it_calls_the_provided_event_dispatcher()
     {
         $eventDispatcher = m::spy(EventDispatcher::class);

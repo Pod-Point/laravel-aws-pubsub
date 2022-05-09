@@ -85,13 +85,23 @@ class PubSubSqsQueueTest extends TestCase
     }
 
     /** @test */
+    public function it_has_an_event_dispatcher()
+    {
+        $eventDispatcher = m::mock(EventDispatcher::class);
+
+        $queue = $this->getQueue(['eventDispatcher' => $eventDispatcher]);
+
+        $this->assertEquals($eventDispatcher, $queue->getEventDispatcher());
+    }
+
+    /** @test */
     public function it_provides_the_job_with_its_event_dispatcher()
     {
         $eventDispatcher = m::mock(EventDispatcher::class);
 
         $queue = $this->getQueue(['eventDispatcher' => $eventDispatcher]);
 
-        $this->assertEquals($eventDispatcher, $queue->pop()->getEventDispatcher());
+        $this->assertEquals($queue->getEventDispatcher(), $queue->pop()->getEventDispatcher());
     }
 
     public function readOnlyDataProvider(): array
