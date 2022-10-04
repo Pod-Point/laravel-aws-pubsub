@@ -47,7 +47,7 @@ class EventServiceProvider extends ServiceProvider
      * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
-    protected function createSnsDriver(array $config)
+    public function createSnsDriver(array $config)
     {
         $config = self::prepareConfigurationCredentials($config);
 
@@ -81,9 +81,7 @@ class EventServiceProvider extends ServiceProvider
     {
         $this->app->resolving(BroadcastManager::class, function (BroadcastManager $manager) {
             $manager->extend('eventbridge', function (Container $app, array $config) {
-                return $this->createEventBridgeDriver(array_merge($config, [
-                    'version' => '2015-10-07',
-                ]));
+                return $this->createEventBridgeDriver($config);
             });
         });
     }
@@ -94,12 +92,12 @@ class EventServiceProvider extends ServiceProvider
      * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
-    protected function createEventBridgeDriver(array $config)
+    public function createEventBridgeDriver(array $config)
     {
         $config = self::prepareConfigurationCredentials($config);
 
         return new EventBridgeBroadcaster(
-            new EventBridgeClient($config),
+            new EventBridgeClient(array_merge($config, ['version' => '2015-10-07'])),
             $config['source'] ?? ''
         );
     }
@@ -110,12 +108,24 @@ class EventServiceProvider extends ServiceProvider
      * @param  array  $config
      * @return array
      */
-    public static function prepareConfigurationCredentials(array $config)
+    public static function prepareConfigurationCredentials(array $config): array
     {
-        if (Arr::has($config, ['key', 'secret'])) {
+        if (static::configHasCredentials($config)) {
             $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
         }
 
         return $config;
+    }
+
+    /**
+     * Make sure some AWS credentials were provided to the configuration array.
+     *
+     * @return bool
+     */
+    private static function configHasCredentials(array $config): bool
+    {
+        return Arr::has($config, ['key', 'secret'])
+            && is_string(Arr::get($config, 'key'))
+            && is_string(Arr::get($config, 'secret'));
     }
 }
