@@ -2,13 +2,9 @@
 
 namespace PodPoint\AwsPubSub\Tests\Pub\Broadcasting\Broadcasters;
 
-use Mockery as m;
-use Mockery\MockInterface;
 use PodPoint\AwsPubSub\EventServiceProvider;
 use PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters\SnsBroadcaster;
 use PodPoint\AwsPubSub\Tests\Pub\Concerns\InteractsWithSns;
-use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Events\UserRetrieved;
-use PodPoint\AwsPubSub\Tests\Pub\TestClasses\Models\User;
 use PodPoint\AwsPubSub\Tests\TestCase;
 
 class SnsBroadcasterTest extends TestCase
