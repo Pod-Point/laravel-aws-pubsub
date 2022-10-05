@@ -19,7 +19,7 @@ abstract class TestCase extends Orchestra
      * @param  \Illuminate\Foundation\Application  $app
      * @return array
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             AwsPubSubServiceProvider::class,
@@ -28,33 +28,14 @@ abstract class TestCase extends Orchestra
     }
 
     /**
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    protected function setTestDatabase($app)
-    {
-        /** DATABASE */
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
-            'prefix'   => '',
-        ]);
-    }
-
-    /**
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
-        $this->setSnsBroadcaster($app);
-
-        $this->setSubQueue($app);
-
-        $this->setTestDatabase($app);
+        $this->configureTestDatabase($app);
     }
 
     /**
@@ -69,52 +50,15 @@ abstract class TestCase extends Orchestra
 
     /**
      * @param  \Illuminate\Foundation\Application  $app
+     * @return void
      */
-    protected function setSnsBroadcaster($app): void
+    protected function configureTestDatabase($app)
     {
-        /** PUB */
-        $app['config']->set('broadcasting.default', 'sns');
-        $app['config']->set('broadcasting.connections.sns', [
-            'driver' => 'sns',
-            'key' => 'dummy-key',
-            'secret' => 'dummy-secret',
-            'arn-prefix' => 'aws:arn:12345:',
-            'arn-suffix' => '',
-            'region' => 'eu-west-1',
-        ]);
-    }
-
-    /**
-     * @param  \Illuminate\Foundation\Application  $app
-     */
-    protected function setEventBridgeBroadcaster($app)
-    {
-        /** PUB */
-        $app['config']->set('broadcasting.default', 'eventbridge');
-        $app['config']->set('broadcasting.connections.eventbridge', [
-            'driver' => 'eventbridge',
-            'key' => 'dummy-key',
-            'secret' => 'dummy-secret',
-            'region' => 'eu-west-1',
-            'event_bus' => 'default',
-            'source' => 'my-app',
-        ]);
-    }
-
-    /**
-     * @param  \Illuminate\Foundation\Application  $app
-     */
-    protected function setSubQueue($app): void
-    {
-        /** SUB */
-        $app['config']->set('queue.connections.pub-sub', [
-            'driver' => 'sqs-sns',
-            'key' => 'dummy-key',
-            'secret' => 'dummy-secret',
-            'prefix' => 'https://sqs.eu-west-1.amazonaws.com/13245',
-            'queue' => 'default',
-            'suffix' => '',
-            'region' => 'eu-west-1',
+        $app->config->set('database.default', 'testbench');
+        $app->config->set('database.connections.testbench', [
+            'driver'   => 'sqlite',
+            'database' => ':memory:',
+            'prefix'   => '',
         ]);
     }
 }

@@ -11,7 +11,14 @@ class SqsSnsConnectorTest extends TestCase
     /** @test */
     public function it_can_instantiate_the_connector_and_connect_to_the_queue()
     {
-        $queue = (new SqsSnsConnector)->connect(config('queue.connections.pub-sub'));
+        $queue = (new SqsSnsConnector)->connect([
+            'driver' => 'sqs-sns',
+            'key' => 'dummy-key',
+            'secret' => 'dummy-secret',
+            'prefix' => 'https://sqs.eu-west-1.amazonaws.com/13245',
+            'queue' => 'default',
+            'region' => 'eu-west-1',
+        ]);
 
         $this->assertInstanceOf(SqsSnsQueue::class, $queue);
     }
@@ -19,7 +26,14 @@ class SqsSnsConnectorTest extends TestCase
     /** @test */
     public function it_can_use_a_queue_prefix()
     {
-        $queue = (new SqsSnsConnector)->connect(config('queue.connections.pub-sub'));
+        $queue = (new SqsSnsConnector)->connect([
+            'driver' => 'sqs-sns',
+            'key' => 'dummy-key',
+            'secret' => 'dummy-secret',
+            'prefix' => 'https://sqs.eu-west-1.amazonaws.com/13245',
+            'queue' => 'default',
+            'region' => 'eu-west-1',
+        ]);
 
         $this->assertEquals('https://sqs.eu-west-1.amazonaws.com/13245/default', $queue->getQueue(null));
     }
@@ -27,10 +41,44 @@ class SqsSnsConnectorTest extends TestCase
     /** @test */
     public function it_can_use_a_queue_suffix()
     {
-        config(['queue.connections.pub-sub.suffix' => '-testing']);
-
-        $queue = (new SqsSnsConnector)->connect(config('queue.connections.pub-sub'));
+        $queue = (new SqsSnsConnector)->connect([
+            'driver' => 'sqs-sns',
+            'key' => null,
+            'secret' => null,
+            'prefix' => 'https://sqs.eu-west-1.amazonaws.com/13245',
+            'queue' => 'default',
+            'suffix' => '-testing',
+            'region' => 'eu-west-1',
+        ]);
 
         $this->assertEquals('https://sqs.eu-west-1.amazonaws.com/13245/default-testing', $queue->getQueue(null));
+    }
+
+    /** @test */
+    public function it_supports_optional_aws_credentials()
+    {
+        $queue = (new SqsSnsConnector)->connect([
+            'driver' => 'sqs-sns',
+            'prefix' => 'https://sqs.eu-west-1.amazonaws.com/13245',
+            'queue' => 'default',
+            'region' => 'eu-west-1',
+        ]);
+
+        $this->assertEquals('https://sqs.eu-west-1.amazonaws.com/13245/default', $queue->getQueue(null));
+    }
+
+    /** @test */
+    public function it_supports_null_aws_credentials()
+    {
+        $queue = (new SqsSnsConnector)->connect([
+            'driver' => 'sqs-sns',
+            'key' => null,
+            'secret' => null,
+            'prefix' => 'https://sqs.eu-west-1.amazonaws.com/13245',
+            'queue' => 'default',
+            'region' => 'eu-west-1',
+        ]);
+
+        $this->assertEquals('https://sqs.eu-west-1.amazonaws.com/13245/default', $queue->getQueue(null));
     }
 }

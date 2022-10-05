@@ -26,15 +26,17 @@ class SnsTest extends TestCase
                 ->with(m::on(function ($argument) {
                     $message = json_decode($argument['Message'], true);
 
-                    return $message['user']['email'] === 'john@doe.com'
+                    return $message['user']['name'] === 'John Doe'
+                        && $message['user']['email'] === 'john@doe.com'
+                        && $message['user']['password'] === 'secret'
                         && $message['foo'] = 'bar';
                 }));
         });
 
         event(new UserRetrieved(User::create([
-            'name' => $this->faker->name(),
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
-            'password' => $this->faker->password(),
+            'password' => 'secret',
         ])));
     }
 
@@ -141,6 +143,27 @@ class SnsTest extends TestCase
         event(new UserRetrievedWithCustomName(User::create([
             'name' => $this->faker->name(),
             'email' => 'john@doe.com',
+            'password' => $this->faker->password(),
+        ])));
+    }
+
+    /** @test */
+    public function it_can_use_an_arn_prefix_and_suffix()
+    {
+        config(['broadcasting.connections.sns.arn-prefix' => 'some-prefix:']);
+        config(['broadcasting.connections.sns.arn-suffix' => '-some-suffix']);
+
+        $this->mockSns(function (MockInterface $sns) {
+            $sns->shouldReceive('publish')
+                ->once()
+                ->with(m::on(function ($argument) {
+                    return $argument['TopicArn'] === 'some-prefix:users-some-suffix';
+                }));
+        });
+
+        event(new UserRetrieved(User::create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->email(),
             'password' => $this->faker->password(),
         ])));
     }
