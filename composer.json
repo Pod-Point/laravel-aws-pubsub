@@ -14,8 +14,7 @@
         "php": "^7.3|^8.0",
         "ext-json": "*",
         "aws/aws-sdk-php": "^3.155",
-        "illuminate/support": "^8.52 || ^9.0",
-        "laravel/framework": "8.*"
+        "illuminate/support": "^8.52 || ^9.0"
     },
     "require-dev": {
         "orchestra/testbench": "^6.0 || ^7.0"
