@@ -60,7 +60,7 @@ jobs:
           run: |
             composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
             composer require "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-            composer update --prefer-dist --no-interaction --no-progress
+            composer update --prefer-dist --no-interaction --no-progress --no-plugins
 
       -   name: Execute tests
           run: vendor/bin/phpunit
