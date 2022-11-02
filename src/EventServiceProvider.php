@@ -120,7 +120,7 @@ class EventServiceProvider extends ServiceProvider
     /**
      * Make sure some AWS credentials were provided to the configuration array.
      *
-     * @param array $config
+     * @param  array  $config
      * @return bool
      */
     private static function configHasCredentials(array $config): bool
