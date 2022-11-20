@@ -94,7 +94,15 @@ BROADCAST_DRIVER=eventbridge
 
 **Remember** that you can define the connection at the Event level if you ever need to be able to use [two drivers concurrently](https://github.com/laravel/framework/pull/38086).
 
-Finally, don't forget to enable the [Broadcast Service Provider](https://laravel.com/docs/8.x/broadcasting#broadcast-service-provider).
+Finally, don't forget to enable the [Broadcast Service Provider](https://laravel.com/docs/8.x/broadcasting#broadcast-service-provider) in the `app/config.php` configuration file:
+
+```php
+    'providers' => [
+        // ...
+        PodPoint\AwsPubSub\EventServiceProvider::class,
+        // ...
+    ],
+```
 
 ### Usage
 
