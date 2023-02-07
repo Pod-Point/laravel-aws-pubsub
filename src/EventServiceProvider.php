@@ -124,6 +124,8 @@ class EventServiceProvider extends ServiceProvider
      */
     private static function configHasCredentials(array $config): bool
     {
-        return ! empty($config['key']) && ! empty($config['secret']);
+        return Arr::has($config, ['key', 'secret'])
+            && Arr::get($config, 'key')
+            && Arr::get($config, 'secret');
     }
 }
