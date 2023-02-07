@@ -27,7 +27,7 @@ class EventServiceProviderTest extends TestCase
     }
 
     /** @test */
-    public function it_can_prepare_configuration_credentials_with_a_token_too()
+    public function it_can_prepare_configuration_credentials_with_a_token()
     {
         $config = EventServiceProvider::prepareConfigurationCredentials([
             'foo' => 'bar',
