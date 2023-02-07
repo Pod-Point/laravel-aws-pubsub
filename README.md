@@ -1,7 +1,7 @@
 # AWS PubSub for Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/pod-point/laravel-aws-pubsub.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-aws-pubsub)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/pod-point/laravel-aws-pubsub/run-tests?label=tests)
+[![main](https://github.com/Pod-Point/laravel-aws-pubsub/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/Pod-Point/laravel-aws-pubsub/actions/workflows/run-tests.yml)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Total Downloads](https://img.shields.io/packagist/dt/pod-point/laravel-aws-pubsub.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-aws-pubsub)
 
