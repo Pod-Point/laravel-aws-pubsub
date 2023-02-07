@@ -1,15 +1,15 @@
 # AWS PubSub for Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/pod-point/laravel-aws-pubsub.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-aws-pubsub)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/pod-point/laravel-aws-pubsub/run-tests?label=tests)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/pod-point/laravel-aws-pubsub/run-tests.yml?branch=main&label=0.4.x)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Total Downloads](https://img.shields.io/packagist/dt/pod-point/laravel-aws-pubsub.svg?style=flat-square)](https://packagist.org/packages/pod-point/laravel-aws-pubsub)
 
 **The Pub**
 
-Similar to [Pusher](https://laravel.com/docs/8.x/broadcasting#pusher-channels), this package provides [Laravel Broadcasting](https://laravel.com/docs/8.x/broadcasting) drivers for [AWS SNS](https://aws.amazon.com/sns/) (Simple Notification Service) and [AWS EventBridge](https://aws.amazon.com/eventbridge/) in order to publish server-side events.
+Similar to [Pusher](https://laravel.com/docs/broadcasting#pusher-channels), this package provides [Laravel Broadcasting](https://laravel.com/docs/broadcasting) drivers for [AWS SNS](https://aws.amazon.com/sns/) (Simple Notification Service) and [AWS EventBridge](https://aws.amazon.com/eventbridge/) in order to publish server-side events.
 
-We understand [Broadcasting](https://laravel.com/docs/8.x/broadcasting) is usually used to "broadcast" your server-side Laravel [Events](https://laravel.com/docs/8.x/events) over a WebSocket connection to your client-side JavaScript application. However, we believe this approach of leveraging broadcasting makes sense for a Pub/Sub architecture where an application would like to broadcast a server-side event to the outside world about something that just happened.
+We understand [Broadcasting](https://laravel.com/docs/broadcasting) is usually used to "broadcast" your server-side Laravel [Events](https://laravel.com/docs/events) over a WebSocket connection to your client-side JavaScript application. However, we believe this approach of leveraging broadcasting makes sense for a Pub/Sub architecture where an application would like to broadcast a server-side event to the outside world about something that just happened.
 
 In this context, "channels" can be assimilated to "topics" when using the SNS driver and "event buses" when using the EventBridge driver.
 
@@ -33,7 +33,15 @@ You can install the package on a Laravel 8+ application via composer:
 composer require pod-point/laravel-aws-pubsub
 ```
 
-For Laravel 5.x, 6.x or 7.x you can use `pod-point/laravel-aws-pubsub:^0.0.1`.
+**Note:** For Laravel 5.x, 6.x or 7.x you can use `pod-point/laravel-aws-pubsub:^0.0.1`.
+
+This package needs a separate Service Provider, please install it by running:
+
+```bash
+php artisan pubsub:install
+```
+
+This will create `App\Providers\PubSubEventServiceProvider` and load it within your `config/app.php` file automatically.
 
 ## Publishing / Broadcasting
 
@@ -64,7 +72,7 @@ You will need to add the following connection and configure your SNS credentials
 ],
 ```
 
-Make sure to define your [environment variables](https://laravel.com/docs/8.x/configuration#environment-configuration) accordingly:
+Make sure to define your [environment variables](https://laravel.com/docs/configuration#environment-configuration) accordingly:
 
 ```dotenv
 # both drivers require:
@@ -94,11 +102,9 @@ BROADCAST_DRIVER=eventbridge
 
 **Remember** that you can define the connection at the Event level if you ever need to be able to use [two drivers concurrently](https://github.com/laravel/framework/pull/38086).
 
-Finally, don't forget to enable the [Broadcast Service Provider](https://laravel.com/docs/8.x/broadcasting#broadcast-service-provider).
-
 ### Usage
 
-Simply follow the default way of broadcasting Laravel events, explained in the [official documentation](https://laravel.com/docs/8.x/broadcasting#defining-broadcast-events).
+Simply follow the default way of broadcasting Laravel events, explained in the [official documentation](https://laravel.com/docs/broadcasting#defining-broadcast-events).
 
 In a similar way, you will have to make sure you're implementing the `Illuminate\Contracts\Broadcasting\ShouldBroadcast` interface and define which channel / Topic you'd like to broadcast on.
 
@@ -218,7 +224,7 @@ Now, when the event is being triggered, it will behave like a standard Laravel e
 
 In a Pub/Sub context, it can be handy to specify a `Subject` on each notification which broadcast to SNS. This can be an easy way to configure a Listeners for each specific kind of subject you can receive and process later on within queues.
 
-By default, the package will use the standard [Laravel broadcast name](https://laravel.com/docs/8.x/broadcasting#broadcast-name) in order to define the `Subject` of the notification sent. Feel free to customize it as you wish.
+By default, the package will use the standard [Laravel broadcast name](https://laravel.com/docs/broadcasting#broadcast-name) in order to define the `Subject` of the notification sent. Feel free to customize it as you wish.
 
 ```php
 /**
@@ -234,7 +240,7 @@ public function broadcastAs()
 
 #### Model Broadcasting
 
-If you're familiar with [Model Broadcasting](https://laravel.com/docs/8.x/broadcasting#model-broadcasting), you already know that Eloquent models dispatch several events during their lifecycle and broadcast them accordingly.
+If you're familiar with [Model Broadcasting](https://laravel.com/docs/broadcasting#model-broadcasting), you already know that Eloquent models dispatch several events during their lifecycle and broadcast them accordingly.
 
 In the context of model broadcasting, only the following model events can be broadcasted:
 
@@ -244,12 +250,12 @@ In the context of model broadcasting, only the following model events can be bro
 - `trashed` _if soft delete is enabled_
 - `restored` _if soft delete is enabled_
 
-In order to broadcast the model events, you need to use the `Illuminate\Database\Eloquent\BroadcastsEvents` trait on your Model and follow the official [documentation]((https://laravel.com/docs/8.x/broadcasting#model-broadcasting)).
+In order to broadcast the model events, you need to use the `Illuminate\Database\Eloquent\BroadcastsEvents` trait on your Model and follow the official [documentation]((https://laravel.com/docs/broadcasting#model-broadcasting)).
 
 You can use `broadcastOn()`, `broadcastWith()` and `broadcastAs()` methods on your model in order to customize the Topic names, the payload and the Subject respectively.
 
 > **Note:** Model Broadcasting is **only available from Laravel 8.x**.
-> If you'd like to do something similar with an older version of Laravel, we recommend to manually dispatch some "broadcastable" Events you'd be creating yourself from the [Model Observer](https://laravel.com/docs/8.x/eloquent#observers) functions.
+> If you'd like to do something similar with an older version of Laravel, we recommend to manually dispatch some "broadcastable" Events you'd be creating yourself from the [Model Observer](https://laravel.com/docs/eloquent#observers) functions.
 
 ## Subscribing / Listening
 
@@ -277,7 +283,7 @@ Once your queue is configured properly, you will need to be able to define which
 
 ### Registering Events & Listeners
 
-You'll need a separate Service Provider in order to define the mapping for each PubSub event and its Listeners. We provide a Service Provider you can install and use by running `artisan pubsub:install`. This will create `App\Providers\PubSubEventServiceProvider` and load it within your `config/app.php` file automatically.
+You'll need a separate Service Provider in order to define the mapping for each PubSub event and its Listeners. We provide `App\Providers\PubSubEventServiceProvider` which you should have already installed by now when running `php artisan pubsub:install` upon package installation.
 
 The `listen` property contains an array of all events (keys) and their listeners (values). Unlike the standard Laravel `EventServiceProvider`, you can only define one Listeners per event, however you may add as many events to this array as your application requires.
 
@@ -325,7 +331,7 @@ protected $listen = [
 ];
 ```
 
-It's up to you do do whatever you want from that generic `OrdersListener`, you could even [dispatch more events](https://laravel.com/docs/8.x/events) internally within your application.
+You may do whatever you want from that generic `OrdersListener`, you could even [dispatch more events](https://laravel.com/docs/events) internally within your application.
 
 **Note:** Topic-based Event/Listeners couples should be registered last so the Subject-based ones take priority.
 
