@@ -8,9 +8,9 @@ trait MocksNotificationMessages
     {
         $attributes = array_merge([
             'Type' => 'Notification',
-            'TopicArn' => $this->faker->word,
+            'TopicArn' => $this->faker->word(),
             'Message' => json_encode(['foo' => 'bar']),
-            'MessageId' => $this->faker->uuid,
+            'MessageId' => $this->faker->uuid(),
         ], $attributes);
 
         return new \Aws\Result([
