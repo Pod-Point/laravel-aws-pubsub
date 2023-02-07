@@ -331,7 +331,7 @@ protected $listen = [
 ];
 ```
 
-It's up to you do do whatever you want from that generic `OrdersListener`, you could even [dispatch more events](https://laravel.com/docs/events) internally within your application.
+You may do whatever you want from that generic `OrdersListener`, you could even [dispatch more events](https://laravel.com/docs/events) internally within your application.
 
 **Note:** Topic-based Event/Listeners couples should be registered last so the Subject-based ones take priority.
 
