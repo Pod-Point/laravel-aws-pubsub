@@ -64,7 +64,7 @@ class EventBridgeBroadcaster extends Broadcaster
                     $errors->push([$entry['ErrorMessage'], $entry['ErrorCode']]);
                 }
             }
-            Log::error('Failed to send event to EventBridge', ['errors' => $errors->all()]);
+            Log::error('Failed to send events to EventBridge', ['errors' => $errors->all()]);
         }
     }
 
