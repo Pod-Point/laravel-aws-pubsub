@@ -2,6 +2,8 @@
 
 namespace PodPoint\AwsPubSub\Tests\Pub\BasicEvents;
 
+use Aws\Result;
+use Illuminate\Support\Facades\Log;
 use Mockery as m;
 use Mockery\MockInterface;
 use PodPoint\AwsPubSub\Tests\Pub\Concerns\InteractsWithEventBridge;
@@ -21,7 +23,9 @@ class EventBridgeTest extends TestCase
     {
         $janeRetrieved = new UserRetrieved($this->createJane());
 
-        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved) {
+        $awsResultMock = $this->createMock(Result::class);
+        $awsResultMock->method('get')->with('FailedEntryCount')->willReturn(0);
+        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved, $awsResultMock) {
             $eventBridge
                 ->shouldReceive('putEvents')
                 ->once()
@@ -30,7 +34,7 @@ class EventBridgeTest extends TestCase
                         && $arg['Entries'][0]['DetailType'] === UserRetrieved::class
                         && $arg['Entries'][0]['EventBusName'] === 'users'
                         && $arg['Entries'][0]['Source'] === 'my-app';
-                }));
+                }))->andReturn($awsResultMock);
         });
 
         event($janeRetrieved);
@@ -41,14 +45,16 @@ class EventBridgeTest extends TestCase
     {
         $janeRetrieved = new UserRetrievedWithCustomName($this->createJane());
 
-        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved) {
+        $awsResultMock = $this->createMock(Result::class);
+        $awsResultMock->method('get')->with('FailedEntryCount')->willReturn(0);
+        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved, $awsResultMock) {
             $eventBridge
                 ->shouldReceive('putEvents')
                 ->once()
                 ->with(m::on(function ($arg) use ($janeRetrieved) {
                     return $arg['Entries'][0]['Detail'] === json_encode($janeRetrieved)
                         && $arg['Entries'][0]['DetailType'] === 'user.retrieved';
-                }));
+                }))->andReturn($awsResultMock);
         });
 
         event($janeRetrieved);
@@ -59,7 +65,9 @@ class EventBridgeTest extends TestCase
     {
         $janeRetrieved = new UserRetrievedWithCustomPayload($this->createJane());
 
-        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved) {
+        $awsResultMock = $this->createMock(Result::class);
+        $awsResultMock->method('get')->with('FailedEntryCount')->willReturn(0);
+        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved, $awsResultMock) {
             $eventBridge
                 ->shouldReceive('putEvents')
                 ->once()
@@ -69,7 +77,7 @@ class EventBridgeTest extends TestCase
                     return $arg['Entries'][0]['Detail'] === json_encode($customPayload)
                         && $arg['Entries'][0]['DetailType'] === UserRetrievedWithCustomPayload::class
                         && $arg['Entries'][0]['EventBusName'] === 'users';
-                }));
+                }))->andReturn($awsResultMock);
         });
 
         event($janeRetrieved);
@@ -80,7 +88,9 @@ class EventBridgeTest extends TestCase
     {
         $janeRetrieved = new UserRetrievedWithMultipleChannels($this->createJane());
 
-        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved) {
+        $awsResultMock = $this->createMock(Result::class);
+        $awsResultMock->method('get')->with('FailedEntryCount')->willReturn(0);
+        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved, $awsResultMock) {
             $eventBridge
                 ->shouldReceive('putEvents')
                 ->once()
@@ -93,7 +103,7 @@ class EventBridgeTest extends TestCase
                         })
                         ->filter()
                         ->count() === 2;
-                }));
+                }))->andReturn($awsResultMock);
         });
 
         event($janeRetrieved);
@@ -106,7 +116,9 @@ class EventBridgeTest extends TestCase
 
         $janeRetrieved = new UserRetrievedWithMultipleChannels($this->createJane());
 
-        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved) {
+        $awsResultMock = $this->createMock(Result::class);
+        $awsResultMock->method('get')->with('FailedEntryCount')->willReturn(0);
+        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved, $awsResultMock) {
             $eventBridge
                 ->shouldReceive('putEvents')
                 ->once()
@@ -117,8 +129,46 @@ class EventBridgeTest extends TestCase
                             })
                             ->filter()
                             ->count() > 0;
-                }));
+                }))
+                ->andReturn($awsResultMock);
         });
+
+        event($janeRetrieved);
+    }
+
+    /** @test */
+    public function it_logs_errors_when_events_fail_to_send()
+    {
+        $janeRetrieved = new UserRetrieved($this->createJane());
+
+        Log::spy();
+        $awsResultMock = $this->createMock(Result::class);
+        $awsResultMock->method('get')->willReturnMap([
+            ['FailedEntryCount', 1],
+            ['Entries', [
+                [
+                    'ErrorCode' => 'SomeErrorCode',
+                    'ErrorMessage' => 'SomeErrorMessage',
+                ],
+            ]],
+        ]);
+        $this->mockEventBridge(function (MockInterface $eventBridge) use ($janeRetrieved, $awsResultMock) {
+            $eventBridge
+                ->shouldReceive('putEvents')
+                ->once()
+                ->with(m::on(function ($arg) use ($janeRetrieved) {
+                    return $arg['Entries'][0]['Detail'] === json_encode($janeRetrieved)
+                        && $arg['Entries'][0]['DetailType'] === UserRetrieved::class
+                        && $arg['Entries'][0]['EventBusName'] === 'users'
+                        && $arg['Entries'][0]['Source'] === 'my-app';
+                }))->andReturn($awsResultMock);
+        });
+
+        Log::shouldReceive('error')->once()->with('Failed to send events to EventBridge', [
+            'errors' => [
+                ['SomeErrorMessage', 'SomeErrorCode'],
+            ],
+        ]);
 
         event($janeRetrieved);
     }
