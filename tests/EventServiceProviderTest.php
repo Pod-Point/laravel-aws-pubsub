@@ -116,6 +116,7 @@ class EventServiceProviderTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider invalidCredentialsDataProvider
      */
     public function it_can_make_sure_some_aws_credentials_are_provided_and_valid(array $invalidCredentials)
