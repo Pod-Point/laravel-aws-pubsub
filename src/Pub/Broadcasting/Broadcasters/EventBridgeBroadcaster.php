@@ -4,6 +4,8 @@ namespace PodPoint\AwsPubSub\Pub\Broadcasting\Broadcasters;
 
 use Aws\EventBridge\EventBridgeClient;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 class EventBridgeBroadcaster extends Broadcaster
 {
@@ -52,9 +54,17 @@ class EventBridgeBroadcaster extends Broadcaster
     {
         $events = $this->mapToEventBridgeEntries($channels, $event, $payload);
 
-        $this->eventBridgeClient->putEvents([
+        $result = $this->eventBridgeClient->putEvents([
             'Entries' => $events,
         ]);
+
+        if ($this->failedToBroadcast($result)) {
+            Log::error('Failed to send events to EventBridge', [
+                'errors' => collect($result->get('Entries'))->filter(function (array $entry) {
+                    return Arr::hasAny($entry, ['ErrorCode', 'ErrorMessage']);
+                })->toArray(),
+            ]);
+        }
     }
 
     /**
@@ -75,5 +85,12 @@ class EventBridgeBroadcaster extends Broadcaster
                 ];
             })
             ->all();
+    }
+
+    protected function failedToBroadcast(?\Aws\Result $result): bool
+    {
+        return $result
+            && $result->hasKey('FailedEntryCount')
+            && $result->get('FailedEntryCount') > 0;
     }
 }
