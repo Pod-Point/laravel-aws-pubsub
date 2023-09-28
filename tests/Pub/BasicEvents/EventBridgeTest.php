@@ -136,7 +136,7 @@ class EventBridgeTest extends TestCase
             'EventId' => $this->faker->uuid,
         ];
 
-        $this->mockEventBridge(function (MockInterface $eventBridge) use ($event, $failedEntry) {
+        $this->mockEventBridge(function (MockInterface $eventBridge) use ($failedEntry) {
             $eventBridge
                 ->shouldReceive('putEvents')
                 ->once()
