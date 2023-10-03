@@ -22,6 +22,7 @@ class SnsEventDispatcherJob extends SqsJob implements JobContract
             }
 
             $this->release();
+
             return;
         }
 
