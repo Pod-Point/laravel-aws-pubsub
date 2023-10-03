@@ -113,7 +113,7 @@ class SnsEventDispatcherJobTest extends TestCase
     }
 
     /** @test */
-    public function it_will_not_handle_raw_notification_messages()
+    public function it_will_not_handle_raw_notification_messages_and_release_the_message_onto_the_queue()
     {
         Log::shouldReceive('error')->once()->with(
             m::pattern('/^SqsSnsQueue: Invalid SNS payload/'),
@@ -122,32 +122,60 @@ class SnsEventDispatcherJobTest extends TestCase
 
         $this->mockedJobData = $this->mockedRawNotificationMessage()['Messages'][0];
 
-        $this->getJob()->fire();
+        $job = $this->getJob();
+        $job->shouldNotReceive('delete');
+        $job->shouldReceive('release')->once();
+
+        $job->fire();
 
         Event::assertNothingDispatched();
     }
 
     /** @test */
-    public function it_will_not_handle_messages_where_the_event_name_to_trigger_cannot_be_resolved()
+    public function it_will_not_handle_messages_where_the_event_name_to_trigger_cannot_be_resolved_and_release_the_message_onto_the_queue()
     {
         $this->mockedJobData = $this->mockedRichNotificationMessage([
             'TopicArn' => '',
             'Subject' => '',
         ])['Messages'][0];
 
-        $this->getJob()->fire();
+        $job = $this->getJob();
+        $job->shouldNotReceive('delete');
+        $job->shouldReceive('release')->once();
+
+        $job->fire();
 
         Event::assertNothingDispatched();
     }
 
+    /** @test */
+    public function it_will_delete_the_message_from_the_queue_when_it_managed_to_dispatch_an_event()
+    {
+        $this->mockedJobData = $this->mockedRichNotificationMessage([
+            'TopicArn' => 'TopicArn:123456',
+        ])['Messages'][0];
+
+        $job = $this->getJob();
+        $job->shouldReceive('delete')->once();
+
+        $job->fire();
+
+        Event::assertDispatched('TopicArn:123456');
+    }
+
+    /** @return SnsEventDispatcherJob|\Mockery\LegacyMockInterface */
     protected function getJob()
     {
-        return new SnsEventDispatcherJob(
+        $mock = m::mock(SnsEventDispatcherJob::class, [
             $this->app,
             m::mock(SqsClient::class),
             $this->mockedJobData,
             'connection-name',
             'https://sqs.someregion.amazonaws.com/1234567891011/pubsub-events'
-        );
+        ])->makePartial();
+
+        $mock->shouldReceive('delete', 'release')->byDefault();
+
+        return $mock;
     }
 }
