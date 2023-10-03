@@ -171,7 +171,7 @@ class SnsEventDispatcherJobTest extends TestCase
             m::mock(SqsClient::class),
             $this->mockedJobData,
             'connection-name',
-            'https://sqs.someregion.amazonaws.com/1234567891011/pubsub-events'
+            'https://sqs.someregion.amazonaws.com/1234567891011/pubsub-events',
         ])->makePartial();
 
         $mock->shouldReceive('delete', 'release')->byDefault();
