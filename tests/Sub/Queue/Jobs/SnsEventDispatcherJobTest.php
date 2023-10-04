@@ -132,7 +132,7 @@ class SnsEventDispatcherJobTest extends TestCase
     }
 
     /** @test */
-    public function it_will_not_handle_messages_where_the_event_name_to_trigger_cannot_be_resolved_and_release_the_message_onto_the_queue()
+    public function it_will_not_handle_messages_where_the_event_name_to_trigger_cannot_be_resolved_and_delete_the_message_from_the_queue()
     {
         $this->mockedJobData = $this->mockedRichNotificationMessage([
             'TopicArn' => '',
@@ -140,8 +140,8 @@ class SnsEventDispatcherJobTest extends TestCase
         ])['Messages'][0];
 
         $job = $this->getJob();
-        $job->shouldNotReceive('delete');
-        $job->shouldReceive('release')->once();
+        $job->shouldReceive('delete')->once();
+        $job->shouldNotReceive('release');
 
         $job->fire();
 

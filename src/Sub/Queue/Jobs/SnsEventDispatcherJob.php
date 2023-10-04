@@ -31,13 +31,9 @@ class SnsEventDispatcherJob extends SqsJob implements JobContract
                 'payload' => json_decode($this->snsMessage(), true),
                 'subject' => $this->snsSubject(),
             ]);
-
-            $this->delete();
-
-            return;
         }
 
-        $this->release();
+        $this->delete();
     }
 
     /**
