@@ -21,6 +21,8 @@ class SnsEventDispatcherJob extends SqsJob implements JobContract
                     'message delivery is disabled for your SQS subscription.', $this->job);
             }
 
+            $this->release();
+
             return;
         }
 
@@ -30,6 +32,8 @@ class SnsEventDispatcherJob extends SqsJob implements JobContract
                 'subject' => $this->snsSubject(),
             ]);
         }
+
+        $this->delete();
     }
 
     /**
