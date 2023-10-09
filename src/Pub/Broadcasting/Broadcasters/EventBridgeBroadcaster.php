@@ -61,7 +61,7 @@ class EventBridgeBroadcaster extends Broadcaster
         if ($this->failedToBroadcast($result)) {
             Log::error('Failed to send events to EventBridge', [
                 'errors' => collect($result->get('Entries'))->filter(function (array $entry) {
-                    return Arr::hasAny($entry, ['ErrorCode', 'ErrorMessage']);
+                    return Arr::has($entry, 'ErrorCode') || Arr::has($entry, 'ErrorMessage');
                 })->toArray(),
             ]);
         }
