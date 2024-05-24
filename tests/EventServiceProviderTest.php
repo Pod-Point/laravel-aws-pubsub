@@ -128,4 +128,21 @@ class EventServiceProviderTest extends TestCase
         $this->assertArrayHasKey('foo', $config);
         $this->assertArrayNotHasKey('credentials', $config);
     }
+
+    /**
+     * @test
+     */
+    public function it_can_register_listeners_when_array_is_populated()
+    {
+        $this->app->register(TestPubSubEventServiceProvider::class);
+
+        $this->assertEquals(['bar'], Event::getRawListeners()['foo']);
+    }
+}
+
+class TestPubSubEventServiceProvider extends EventServiceProvider
+{
+    protected $listen = [
+        'foo' => ['bar'],
+    ];
 }
