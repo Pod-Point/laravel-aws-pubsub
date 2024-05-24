@@ -2,6 +2,7 @@
 
 namespace PodPoint\AwsPubSub\Tests;
 
+use Illuminate\Support\Facades\Event;
 use PodPoint\AwsPubSub\EventServiceProvider;
 
 class EventServiceProviderTest extends TestCase
@@ -132,11 +133,12 @@ class EventServiceProviderTest extends TestCase
     /**
      * @test
      */
-    public function it_can_register_listeners_when_array_is_populated()
+    public function it_can_register_listeners_when_listen_array_is_populated()
     {
         $this->app->register(TestPubSubEventServiceProvider::class);
 
-        $this->assertEquals(['bar'], Event::getRawListeners()['foo']);
+        $this->assertCount(1, Event::getListeners('foo'));
+        $this->assertCount(2, Event::getListeners('bar'));
     }
 }
 
@@ -144,5 +146,6 @@ class TestPubSubEventServiceProvider extends EventServiceProvider
 {
     protected $listen = [
         'foo' => ['bar'],
+        'bar' => ['baz', 'qux'],
     ];
 }

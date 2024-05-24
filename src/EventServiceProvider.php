@@ -20,6 +20,8 @@ class EventServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        parent::register();
+
         $this->registerSnsBroadcaster();
 
         $this->registerSqsSnsQueueConnector();
