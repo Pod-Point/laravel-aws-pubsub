@@ -37,8 +37,9 @@ class EventServiceProvider extends ServiceProvider
     protected function registerSnsBroadcaster()
     {
         $this->app->resolving(BroadcastManager::class, function (BroadcastManager $manager) {
-            $manager->extend('sns', function (Container $app, array $config) {
-                return $this->createSnsDriver($config);
+            $self = $this;
+            $manager->extend('sns', function (Container $app, array $config) use ($self) {
+                return $self->createSnsDriver($config);
             });
         });
     }
@@ -82,8 +83,9 @@ class EventServiceProvider extends ServiceProvider
     protected function registerEventBridgeBroadcaster()
     {
         $this->app->resolving(BroadcastManager::class, function (BroadcastManager $manager) {
-            $manager->extend('eventbridge', function (Container $app, array $config) {
-                return $this->createEventBridgeDriver($config);
+            $self = $this;
+            $manager->extend('eventbridge', function (Container $app, array $config) use ($self) {
+                return $self->createEventBridgeDriver($config);
             });
         });
     }
