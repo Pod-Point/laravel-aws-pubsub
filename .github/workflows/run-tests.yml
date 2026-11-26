@@ -41,6 +41,17 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip
           coverage: none
 
+      - name: Allow end-of-life Laravel versions
+        # Every Laravel 11-and-older release has security advisories that are only fixed in
+        # Laravel 12+, so Composer refuses to install them. Turn the block off for these CI
+        # jobs only, so we can still check compatibility. Apps installing this package keep
+        # Composer's advisory checks.
+        if: ${{ !contains(matrix.laravel, '12') }}
+        run: >-
+          php -r '$f = "composer.json"; $j = json_decode(file_get_contents($f), true);
+          $j["config"]["policy"]["advisories"]["block"] = false;
+          file_put_contents($f, json_encode($j, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));'
+
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
